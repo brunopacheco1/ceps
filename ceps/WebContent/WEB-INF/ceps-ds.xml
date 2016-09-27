@@ -5,7 +5,7 @@
 
 	<datasource jndi-name="java:jboss/datasources/cepsDS"
 		pool-name="${app.context}Pool" enabled="true" use-java-context="true">
-		<connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+		<connection-url>jdbc:h2:file:/home/casa/dev/db/${app.context}.db</connection-url>
 		<driver>h2</driver>
 		<security>
 			<user-name>sa</user-name>

@@ -14,16 +14,4 @@
 		<env-entry-type>java.lang.String</env-entry-type>
 		<env-entry-value>${app.context}</env-entry-value>
 	</env-entry>
-
-	<env-entry>
-		<env-entry-name>api.address</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>${api.address}</env-entry-value>
-	</env-entry>
-
-	<env-entry>
-		<env-entry-name>api.key</env-entry-name>
-		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>${api.key}</env-entry-value>
-	</env-entry>
 </web-app>

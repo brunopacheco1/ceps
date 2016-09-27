@@ -1,0 +1,7 @@
+action.package=org.domain.ceps.session
+action.sources=/ceps/src
+eclipse.preferences.version=1
+model.package=org.domain.ceps.entity
+model.sources=/ceps/src
+test.package=org.domain.ceps.test
+test.sources=/ceps/src

@@ -1,7 +1,7 @@
 package com.dev.bruno.ceps.service;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import com.dev.bruno.ceps.dao.AbstractDAO;
 import com.dev.bruno.ceps.dao.CepBairroDAO;
@@ -14,16 +14,16 @@ import com.dev.bruno.ceps.model.Cep;
 @Stateless
 public class CepService extends AbstractService<Cep, CepDTO> {
 
-	@EJB
+	@Inject
 	private CepDAO cepDAO;
 	
-	@EJB
+	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
 	
-	@EJB
+	@Inject
 	private CepBairroDAO cepBairroDAO;
 	
-	@EJB
+	@Inject
 	private CepLogradouroDAO cepLogradouroDAO;
 	
 	@Override

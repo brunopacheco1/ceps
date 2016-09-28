@@ -1,7 +1,7 @@
 package com.dev.bruno.ceps.resource;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.ws.rs.Path;
 
 import com.dev.bruno.ceps.dto.CepBairroDTO;
@@ -13,7 +13,7 @@ import com.dev.bruno.ceps.service.CepBairroService;
 @Path("bairro")
 public class CepBairroResource extends AbstractResource<CepBairro, CepBairroDTO> {
 
-	@EJB
+	@Inject
 	private CepBairroService service;
 	
 	@Override

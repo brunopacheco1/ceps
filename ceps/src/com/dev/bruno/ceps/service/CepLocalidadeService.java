@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
@@ -40,19 +40,19 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade, CepLoca
 
 	private Map<String, CepBairro> bairros = new HashMap<>();
 	
-	@EJB
+	@Inject
 	private CepLogradouroDAO cepLogradouroDAO;
 	
-	@EJB
+	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
 	
-	@EJB
+	@Inject
 	private CepUFDAO cepUFDAO;
 	
-	@EJB
+	@Inject
 	private CepDAO cepDAO;
 	
-	@EJB
+	@Inject
 	private CepBairroDAO cepBairroDAO;
 
 	@Override

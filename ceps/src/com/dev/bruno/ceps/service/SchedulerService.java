@@ -5,9 +5,9 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.Job;
@@ -33,7 +33,7 @@ public class SchedulerService {
 	
 	private Scheduler scheduler;
 	
-	@EJB
+	@Inject
 	private CepUFDAO cepUFDAO;
 	
 	@PostConstruct

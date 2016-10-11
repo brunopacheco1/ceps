@@ -3,6 +3,7 @@ package com.dev.bruno.ceps.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -13,7 +14,7 @@ public class CepTipoLogradouro extends AbstractModel {
 	private static final long serialVersionUID = 4542587527145303945L;
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="COD_CEP_TIPO_LOGRADOURO", nullable=false)
 	private Long id;
 

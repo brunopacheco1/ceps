@@ -17,4 +17,7 @@ public class CepTipoLogradouroService extends AbstractService<CepTipoLogradouro>
 	protected AbstractDAO<CepTipoLogradouro> getDAO() {
 		return cepTipoLogradouroDAO;
 	}
+
+	@Override
+	protected void build(CepTipoLogradouro entity) throws Exception {}
 }

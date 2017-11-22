@@ -80,6 +80,10 @@ public class CepLocalidade extends AbstractModel {
 	public void setCepUF(CepUF cepUF) {
 		this.cepUF = cepUF;
 	}
+	
+	public Long getCepUFId() {
+		return cepUF != null ? cepUF.getId() : null;
+	}
 
 	public String getNome() {
 		return nome;

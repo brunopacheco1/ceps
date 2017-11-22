@@ -70,13 +70,21 @@ public class CepLogradouro extends AbstractModel {
 	public CepLocalidade getCepLocalidade() {
 		return cepLocalidade;
 	}
-
+	
+	public Long getCepLocalidadeId() {
+		return cepLocalidade != null ? cepLocalidade.getId() : null;
+	}
+	
 	public void setCepLocalidade(CepLocalidade cepLocalidade) {
 		this.cepLocalidade = cepLocalidade;
 	}
 
 	public CepBairro getCepBairro() {
 		return cepBairro;
+	}
+	
+	public Long getCepBairroId() {
+		return cepBairro != null ? cepBairro.getId() : null;
 	}
 
 	public void setCepBairro(CepBairro cepBairro) {
@@ -85,6 +93,10 @@ public class CepLogradouro extends AbstractModel {
 
 	public CepTipoLogradouro getCepTipoLogradouro() {
 		return cepTipoLogradouro;
+	}
+	
+	public Long getCepTipoLogradouroId() {
+		return cepTipoLogradouro != null ? cepTipoLogradouro.getId() : null;
 	}
 
 	public void setCepTipoLogradouro(CepTipoLogradouro cepTipoLogradouro) {

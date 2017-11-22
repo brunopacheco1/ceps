@@ -3,6 +3,7 @@ package com.dev.bruno.ceps.service;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -29,6 +30,8 @@ import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
 import com.dev.bruno.ceps.model.CepUF;
+import com.dev.bruno.ceps.responses.ResultList;
+import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CepLocalidadeService extends AbstractService<CepLocalidade> {
@@ -57,6 +60,31 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 	@Override
 	protected AbstractDAO<CepLocalidade> getDAO() {
 		return cepLocalidadeDAO;
+	}
+
+	@Override
+	protected void build(CepLocalidade entity) throws Exception {
+		CepUF uf = null;
+
+		Long ufId = entity.getCepUFId();
+
+		if (ufId != null) {
+			uf = cepUFDAO.get(ufId);
+		}
+
+		entity.setCepUF(uf);
+
+		String distrito = entity.getDistrito();
+
+		String nome = entity.getNome();
+
+		if (nome != null) {
+			if (distrito == null) {
+				entity.setNomeNormalizado(StringUtils.normalizarNome(nome));
+			} else {
+				entity.setNomeNormalizado(StringUtils.normalizarNome(distrito + " (" + nome + ")"));
+			}
+		}
 	}
 
 	public void captarFaixasCep() throws Exception {
@@ -157,9 +185,9 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 				cepLocalidade.setNome(localidade);
 
 				if (distrito == null) {
-					cepLocalidade.setNomeNormalizado(normalizarNome(localidade));
+					cepLocalidade.setNomeNormalizado(StringUtils.normalizarNome(localidade));
 				} else {
-					cepLocalidade.setNomeNormalizado(normalizarNome(distrito + " (" + localidade + ")"));
+					cepLocalidade.setNomeNormalizado(StringUtils.normalizarNome(distrito + " (" + localidade + ")"));
 				}
 				cepLocalidade.setDistrito(distrito);
 				cepLocalidade.setCepUF(cepUF);
@@ -291,8 +319,8 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 				String bairro = localidadeTr.select("td").get(1).html().replaceAll("&nbsp;", "").replaceAll("<.*?>", "")
 						.trim();
 
-				String localidade = normalizarNome(localidadeTr.select("td").get(2).html().replaceAll("&nbsp;", "")
-						.replaceAll("<.*?>", "").trim());
+				String localidade = StringUtils.normalizarNome(localidadeTr.select("td").get(2).html()
+						.replaceAll("&nbsp;", "").replaceAll("<.*?>", "").trim());
 
 				if (localidade.contains("/")) {
 					localidade = localidade.substring(0, localidade.lastIndexOf("/")).trim();
@@ -309,7 +337,7 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 				CepBairro cepBairro = new CepBairro();
 				cepBairro.setCepLocalidade(cepLocalidade);
 				cepBairro.setNome(bairro);
-				cepBairro.setNomeNormalizado(normalizarNome(bairro));
+				cepBairro.setNomeNormalizado(StringUtils.normalizarNome(bairro));
 
 				cepBairroDAO.add(cepBairro);
 			}
@@ -317,17 +345,6 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 
 	}
 
-	private String normalizarNome(String text) {
-		if (text == null) {
-			return null;
-		}
-
-		return java.text.Normalizer.normalize(text.toUpperCase().trim(), java.text.Normalizer.Form.NFD)
-				.replaceAll("[^\\p{ASCII}]", "");
-	}
-
-	// private void buscarFaixaCep(String uf, String localidadeQuery, CepUF cepUF,
-	// CepLocalidade cepLocalidade) throws Exception {
 	private void buscarFaixaCep(CepLocalidade cepLocalidade) throws Exception {
 		Random random = new Random();
 		Integer secs = random.nextInt(9) + 1;
@@ -473,8 +490,8 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 
 			String validarCidade = tr.select("td").get(2).text();
 
-			if (!cep.matches("^\\d{8}$") || ceps.contains(cep) || !localidade.equals(normalizarNome(validarCidade))
-					|| cepDAO.existsByCEP(cep)) {
+			if (!cep.matches("^\\d{8}$") || ceps.contains(cep)
+					|| !localidade.equals(StringUtils.normalizarNome(validarCidade)) || cepDAO.existsByCEP(cep)) {
 				continue;
 			}
 
@@ -492,7 +509,7 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 					cepBairro = new CepBairro();
 					cepBairro.setCepLocalidade(cepLocalidade);
 					cepBairro.setNome(bairro);
-					cepBairro.setNomeNormalizado(normalizarNome(bairro));
+					cepBairro.setNomeNormalizado(StringUtils.normalizarNome(bairro));
 
 					cepBairroDAO.add(cepBairro);
 
@@ -503,10 +520,10 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 			if (logradouro.contains("javascript:detalhaCep")) {
 				if (logradouro.contains("<br>")) {
 					String[] slices = logradouro.split("<br>");
-					nomeEspecial = normalizarNome(slices[slices.length - 1].replaceAll("<.*?>", "").trim());
+					nomeEspecial = StringUtils.normalizarNome(slices[slices.length - 1].replaceAll("<.*?>", "").trim());
 					logradouro = slices[0].replaceAll("<.*?>", "").trim();
 				} else {
-					nomeEspecial = normalizarNome(logradouro.replaceAll("<.*?>", "").trim());
+					nomeEspecial = StringUtils.normalizarNome(logradouro.replaceAll("<.*?>", "").trim());
 					logradouro = null;
 				}
 			} else {
@@ -545,7 +562,7 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 					cepLogradouro.setCepBairro(cepBairro);
 					cepLogradouro.setNome(logradouro);
 					cepLogradouro.setComplemento(complemento);
-					cepLogradouro.setNomeNormalizado(normalizarNome(logradouro));
+					cepLogradouro.setNomeNormalizado(StringUtils.normalizarNome(logradouro));
 
 					cepLogradouroDAO.add(cepLogradouro);
 
@@ -573,5 +590,56 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 
 			buscarCEPSEspeciais(cookies, cepLocalidade, tipoCep, qtdrow, pagini, pagfim);
 		}
+	}
+
+	public ResultList<CepBairro> getBairros(Long cepLocalidadeId) throws Exception {
+		CepLocalidade localidade = getDAO().get(cepLocalidadeId);
+
+		List<CepBairro> entities = localidade.getBairros();
+
+		ResultList<CepBairro> result = new ResultList<>();
+
+		result.setResultSize((long) entities.size());
+		result.setTotalSize((long) entities.size());
+		result.setResult(entities);
+		result.setLimit(entities.size());
+		result.setOrder("id");
+		result.setStart(0);
+
+		return result;
+	}
+
+	public ResultList<CepLogradouro> getLogradouros(Long cepLocalidadeId) throws Exception {
+		CepLocalidade localidade = getDAO().get(cepLocalidadeId);
+
+		List<CepLogradouro> entities = localidade.getLogradouros();
+
+		ResultList<CepLogradouro> result = new ResultList<>();
+
+		result.setResultSize((long) entities.size());
+		result.setTotalSize((long) entities.size());
+		result.setResult(entities);
+		result.setLimit(entities.size());
+		result.setOrder("id");
+		result.setStart(0);
+
+		return result;
+	}
+
+	public ResultList<Cep> getCeps(Long cepLocalidadeId) throws Exception {
+		CepLocalidade localidade = getDAO().get(cepLocalidadeId);
+
+		List<Cep> entities = localidade.getCeps();
+
+		ResultList<Cep> result = new ResultList<>();
+
+		result.setResultSize((long) entities.size());
+		result.setTotalSize((long) entities.size());
+		result.setResult(entities);
+		result.setLimit(entities.size());
+		result.setOrder("id");
+		result.setStart(0);
+
+		return result;
 	}
 }

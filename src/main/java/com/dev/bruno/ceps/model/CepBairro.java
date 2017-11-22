@@ -67,6 +67,10 @@ public class CepBairro extends AbstractModel {
 	public CepLocalidade getCepLocalidade() {
 		return cepLocalidade;
 	}
+	
+	public Long getCepLocalidadeId() {
+		return cepLocalidade != null ? cepLocalidade.getId() : null;
+	}
 
 	public void setCepLocalidade(CepLocalidade cepLocalidade) {
 		this.cepLocalidade = cepLocalidade;

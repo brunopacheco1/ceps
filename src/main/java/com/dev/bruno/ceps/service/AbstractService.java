@@ -91,6 +91,8 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 	}
 
 	public ENTITY add(ENTITY entity) throws Exception {
+		build(entity);
+		
 		validate(null, entity);
 
 		getDAO().add(entity);
@@ -98,7 +100,11 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 		return entity;
 	}
 
+	protected abstract void build(ENTITY entity) throws Exception;
+
 	public ENTITY update(Long id, ENTITY entity) throws Exception {
+		build(entity);
+		
 		validate(id, entity);
 
 		getDAO().update(entity);

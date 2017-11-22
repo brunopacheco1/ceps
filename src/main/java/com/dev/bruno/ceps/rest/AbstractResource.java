@@ -14,8 +14,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.dev.bruno.ceps.model.AbstractModel;
-import com.dev.bruno.ceps.model.ResultList;
-import com.dev.bruno.ceps.response.GenericResponse;
+import com.dev.bruno.ceps.responses.GenericResponse;
+import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.service.AbstractService;
 
 @Produces(MediaType.APPLICATION_JSON)

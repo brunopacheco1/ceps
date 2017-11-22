@@ -2,6 +2,7 @@ package com.dev.bruno.ceps.service;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -9,13 +10,13 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
 import com.dev.bruno.ceps.dao.AbstractDAO;
-import com.dev.bruno.ceps.exception.EntityNotFoundException;
+import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
+import com.dev.bruno.ceps.exceptions.EntityNotFoundException;
 import com.dev.bruno.ceps.model.AbstractModel;
-import com.dev.bruno.ceps.model.ResultList;
+import com.dev.bruno.ceps.responses.ResultList;
 
 public abstract class AbstractService<ENTITY extends AbstractModel> {
 
@@ -122,7 +123,15 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 		Set<ConstraintViolation<ENTITY>> violations = validator.validate(entity);
 
 		if (!violations.isEmpty()) {
-			throw new ConstraintViolationException(violations);
+			List<String> msgs = new ArrayList<>();
+
+			for (ConstraintViolation<ENTITY> violation : violations) {
+				msgs.add(String.format("%s field %s", violation.getPropertyPath(), violation.getMessage()));
+			}
+
+			ConstraintViolationException exception = new ConstraintViolationException(String.join(", ", msgs));
+
+			throw exception;
 		}
 
 		entity.setId(id);

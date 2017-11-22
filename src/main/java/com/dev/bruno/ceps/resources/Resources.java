@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.resource;
+package com.dev.bruno.ceps.resources;
 
 import java.util.logging.Logger;
 

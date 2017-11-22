@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.exception;
+package com.dev.bruno.ceps.exceptions;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import com.dev.bruno.ceps.response.GenericResponse;
+import com.dev.bruno.ceps.responses.GenericResponse;
 
 @Provider
 public class ThrowableMapper implements ExceptionMapper<Throwable> {

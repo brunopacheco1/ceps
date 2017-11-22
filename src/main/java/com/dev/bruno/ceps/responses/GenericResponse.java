@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.response;
+package com.dev.bruno.ceps.responses;
 
 public class GenericResponse {
 

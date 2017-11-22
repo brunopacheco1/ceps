@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.exception;
+package com.dev.bruno.ceps.exceptions;
 
 public class MandatoryFieldsException extends GenericException {
 

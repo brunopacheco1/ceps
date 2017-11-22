@@ -1,9 +1,17 @@
-package com.dev.bruno.ceps.model;
+package com.dev.bruno.ceps.responses;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.dev.bruno.ceps.model.AbstractModel;
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ResultList<DTO extends AbstractModel> implements Serializable {
 
 	private static final long serialVersionUID = -4216175342452534456L;

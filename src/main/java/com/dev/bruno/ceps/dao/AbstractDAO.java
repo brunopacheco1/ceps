@@ -17,9 +17,9 @@ import javax.persistence.TypedQuery;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.dev.bruno.ceps.exception.EntityNotFoundException;
-import com.dev.bruno.ceps.exception.InvalidValueException;
-import com.dev.bruno.ceps.exception.MandatoryFieldsException;
+import com.dev.bruno.ceps.exceptions.EntityNotFoundException;
+import com.dev.bruno.ceps.exceptions.InvalidValueException;
+import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.AbstractModel;
 
 public abstract class AbstractDAO<ENTITY extends AbstractModel> {

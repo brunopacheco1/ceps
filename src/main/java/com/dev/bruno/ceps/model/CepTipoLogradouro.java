@@ -21,7 +21,7 @@ public class CepTipoLogradouro extends AbstractModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "COD_CEP_TIPO_LOGRADOURO", nullable = false)
+	@Column(name = "COD_CEP_TIPO_LOGRADOURO")
 	private Long id;
 
 	@Column(name = "DSC_NOME", nullable = false)

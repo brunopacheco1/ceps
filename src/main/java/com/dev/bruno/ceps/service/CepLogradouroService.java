@@ -40,8 +40,6 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 
 	@Override
 	protected void build(CepLogradouro entity) throws Exception {
-		CepLocalidade localidade = null;
-
 		CepBairro bairro = null;
 
 		CepTipoLogradouro tipoLogradouro = null;
@@ -52,9 +50,7 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 
 		Long cepTipoLogradouroId = entity.getCepTipoLogradouroId();
 
-		if (cepLocalidadeId != null) {
-			localidade = cepLocalidadeDAO.get(cepLocalidadeId);
-		}
+		CepLocalidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
 		if (cepBairroId != null) {
 			bairro = cepBairroDAO.get(cepBairroId);
@@ -76,7 +72,7 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 			entity.setNomeNormalizado(StringUtils.normalizarNome(nome));
 		}
 	}
-	
+
 	public ResultList<Cep> getCeps(Long cepLogradouroId) throws Exception {
 		CepLogradouro logradouro = getDAO().get(cepLogradouroId);
 

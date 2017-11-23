@@ -28,7 +28,7 @@ public class CepLogradouro extends AbstractModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "COD_CEP_LOGRADOURO", nullable = false)
+	@Column(name = "COD_CEP_LOGRADOURO")
 	private Long id;
 
 	@ManyToOne
@@ -70,11 +70,11 @@ public class CepLogradouro extends AbstractModel {
 	public CepLocalidade getCepLocalidade() {
 		return cepLocalidade;
 	}
-	
+
 	public Long getCepLocalidadeId() {
 		return cepLocalidade != null ? cepLocalidade.getId() : null;
 	}
-	
+
 	public void setCepLocalidade(CepLocalidade cepLocalidade) {
 		this.cepLocalidade = cepLocalidade;
 	}
@@ -82,7 +82,7 @@ public class CepLogradouro extends AbstractModel {
 	public CepBairro getCepBairro() {
 		return cepBairro;
 	}
-	
+
 	public Long getCepBairroId() {
 		return cepBairro != null ? cepBairro.getId() : null;
 	}
@@ -94,7 +94,7 @@ public class CepLogradouro extends AbstractModel {
 	public CepTipoLogradouro getCepTipoLogradouro() {
 		return cepTipoLogradouro;
 	}
-	
+
 	public Long getCepTipoLogradouroId() {
 		return cepTipoLogradouro != null ? cepTipoLogradouro.getId() : null;
 	}

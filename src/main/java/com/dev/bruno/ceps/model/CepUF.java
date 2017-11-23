@@ -26,7 +26,7 @@ public class CepUF extends AbstractModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "COD_CEP_UF", nullable = false)
+	@Column(name = "COD_CEP_UF")
 	private Long id;
 
 	@Column(name = "DSC_UF", nullable = false)

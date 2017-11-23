@@ -27,6 +27,7 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
+import com.dev.bruno.ceps.model.CepTipo;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.utils.StringUtils;
 
@@ -56,13 +57,9 @@ public class CepBairroService extends AbstractService<CepBairro> {
 
 	@Override
 	protected void build(CepBairro entity) throws Exception {
-		CepLocalidade localidade = null;
-
 		Long cepLocalidadeId = entity.getCepLocalidadeId();
 
-		if (cepLocalidadeId != null) {
-			localidade = cepLocalidadeDAO.get(cepLocalidadeId);
-		}
+		CepLocalidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
 		entity.setCepLocalidade(localidade);
 
@@ -229,17 +226,17 @@ public class CepBairroService extends AbstractService<CepBairro> {
 			Long cepSufixo = Long.parseLong(cep.substring(5));
 
 			if (cepSufixo <= 899) {
-				cepObj.setTipoCep("LOG");
+				cepObj.setTipoCep(CepTipo.LOG);
 			} else if (cepSufixo <= 959) {
-				cepObj.setTipoCep("GRU");
+				cepObj.setTipoCep(CepTipo.GRU);
 			} else if (cepSufixo <= 969) {
-				cepObj.setTipoCep("PRO");
+				cepObj.setTipoCep(CepTipo.PRO);
 			} else if (cepSufixo <= 989) {
-				cepObj.setTipoCep("UOP");
+				cepObj.setTipoCep(CepTipo.UOP);
 			} else if (cepSufixo <= 998) {
-				cepObj.setTipoCep("CPC");
+				cepObj.setTipoCep(CepTipo.CPC);
 			} else {
-				cepObj.setTipoCep("UOP");
+				cepObj.setTipoCep(CepTipo.UOP);
 			}
 
 			cepDAO.add(cepObj);

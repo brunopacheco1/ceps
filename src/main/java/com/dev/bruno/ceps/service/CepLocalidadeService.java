@@ -29,6 +29,7 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
+import com.dev.bruno.ceps.model.CepTipo;
 import com.dev.bruno.ceps.model.CepUF;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.utils.StringUtils;
@@ -64,13 +65,9 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 
 	@Override
 	protected void build(CepLocalidade entity) throws Exception {
-		CepUF uf = null;
-
 		Long ufId = entity.getCepUFId();
 
-		if (ufId != null) {
-			uf = cepUFDAO.get(ufId);
-		}
+		CepUF uf = cepUFDAO.get(ufId);
 
 		entity.setCepUF(uf);
 
@@ -197,7 +194,7 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 				Cep cepObj = null;
 				if (cep.matches("^\\d{8}$")) {
 					cepObj = new Cep();
-					cepObj.setTipoCep("UNI");
+					cepObj.setTipoCep(CepTipo.UNI);
 					cepObj.setCep(cep);
 					cepObj.setCepLocalidade(cepLocalidade);
 				}
@@ -576,7 +573,7 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 			cepObj.setCepBairro(cepBairro);
 			cepObj.setCepLocalidade(cepLocalidade);
 			cepObj.setNomeEspecial(nomeEspecial);
-			cepObj.setTipoCep(tipoCep);
+			cepObj.setTipoCep(CepTipo.valueOf(tipoCep));
 
 			cepDAO.add(cepObj);
 

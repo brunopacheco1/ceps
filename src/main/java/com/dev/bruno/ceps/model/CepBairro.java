@@ -29,7 +29,7 @@ public class CepBairro extends AbstractModel {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "COD_CEP_BAIRRO", nullable = false)
+	@Column(name = "COD_CEP_BAIRRO")
 	private Long id;
 
 	@ManyToOne
@@ -67,7 +67,7 @@ public class CepBairro extends AbstractModel {
 	public CepLocalidade getCepLocalidade() {
 		return cepLocalidade;
 	}
-	
+
 	public Long getCepLocalidadeId() {
 		return cepLocalidade != null ? cepLocalidade.getId() : null;
 	}

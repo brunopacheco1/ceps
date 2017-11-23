@@ -15,8 +15,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.dev.bruno.ceps.exceptions.EntityNotFoundException;
 import com.dev.bruno.ceps.exceptions.InvalidValueException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
@@ -100,7 +98,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
 		if (!orderOptions.contains(order) || !dirOptions().contains(dir)) {
 			throw new InvalidValueException(String.format("Possíveis valores para order[%s] e dir[%s]",
-					StringUtils.join(orderOptions, ", "), StringUtils.join(dirOptions(), ", ")));
+					String.join(", ", orderOptions), String.join(", ", dirOptions())));
 		}
 
 		StringBuilder hql = new StringBuilder("select e from " + type.getSimpleName() + " e where 1=1");

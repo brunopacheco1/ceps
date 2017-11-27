@@ -23,11 +23,12 @@ public class CepUFService extends AbstractService<CepUF> {
 	}
 
 	@Override
-	protected void build(CepUF entity) throws Exception {}
-	
-	public ResultList<CepLocalidade> getLocalidades(Long cepLocalidadeId) throws Exception {
-		CepUF uf = getDAO().get(cepLocalidadeId);
-		
+	protected void build(CepUF entity) throws Exception {
+	}
+
+	public ResultList<CepLocalidade> getLocalidades(Long cepUFId) throws Exception {
+		CepUF uf = getDAO().get(cepUFId);
+
 		List<CepLocalidade> entities = uf.getLocalidades();
 
 		ResultList<CepLocalidade> result = new ResultList<>();

@@ -22,7 +22,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.dev.bruno.ceps.dao.CepUFDAO;
 import com.dev.bruno.ceps.jobs.CaptacaoBairrosJob;
 import com.dev.bruno.ceps.jobs.CaptacaoCepsEspeciaisJob;
-import com.dev.bruno.ceps.jobs.CaptacaoCepsLogradourosJob;
+import com.dev.bruno.ceps.jobs.CaptacaoCepsJob;
 import com.dev.bruno.ceps.jobs.CaptacaoFaixasCepJob;
 import com.dev.bruno.ceps.jobs.CaptacaoLocalidadesJob;
 import com.dev.bruno.ceps.model.CepUF;
@@ -114,7 +114,7 @@ public class SchedulerService {
 		
 		String cron = CepsProperties.getInstance().getProperty("captacao.ceps-de-logradouros.cron");
 
-		scheduleJob(basicJobName, cron, CaptacaoCepsLogradourosJob.class, null);
+		scheduleJob(basicJobName, cron, CaptacaoCepsJob.class, null);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })

@@ -7,12 +7,12 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.dev.bruno.ceps.service.CepBairroService;
+import com.dev.bruno.ceps.service.CaptacaoCepsService;
 import com.dev.bruno.ceps.service.ServiceLocator;
 
-public class CaptacaoCepsLogradourosJob implements Job {
+public class CaptacaoCepsJob implements Job {
 
-	private CepBairroService service = (CepBairroService) ServiceLocator.getInstance().lookup(CepBairroService.class);
+	private CaptacaoCepsService service = (CaptacaoCepsService) ServiceLocator.getInstance().lookup(CaptacaoCepsService.class);
 	
 	protected Logger logger = Logger.getLogger(this.getClass().getName());
 	

@@ -1,13 +1,18 @@
 package com.dev.bruno.ceps.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.Destination;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
 
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
@@ -30,19 +35,19 @@ import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoCepsEspeciaisService {
-	
+
 	@Inject
 	private Logger logger;
-	
+
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
-	
+
 	@Inject
 	private CepBairroDAO cepBairroDAO;
-	
+
 	@Inject
 	private CepLogradouroDAO cepLogradouroDAO;
-	
+
 	@Inject
 	private CepDAO cepDAO;
 
@@ -51,16 +56,32 @@ public class CaptacaoCepsEspeciaisService {
 	private Map<String, CepLogradouro> logradouros = new HashMap<>();
 
 	private Map<String, CepBairro> bairros = new HashMap<>();
+	
+	@Inject
+	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
+	private JMSContext context;
+	
+	@Resource(mappedName="java:/jms/queue/CepsEspeciais")
+	private Destination queue;
 
 	public void captarCepsEspeciais(String uf) throws Exception {
-		for (CepLocalidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesPorUF(uf)) {
-			buscarCepsEspeciais(cepLocalidade);
-
-			cepLocalidadeDAO.update(cepLocalidade);
+		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
+			 context.createProducer().send(queue, cepLocalidadeId);
 		}
 	}
 
+	public void captarCepsEspeciais(Long cepLocalidadeId) throws Exception {
+		CepLocalidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
+
+		buscarCepsEspeciais(cepLocalidade);
+	}
+
 	private void buscarCepsEspeciais(CepLocalidade cepLocalidade) throws Exception {
+		if (cepLocalidade.getCaptacaoCepsEspeciais() != null
+				&& !LocalDate.now().isAfter(cepLocalidade.getCaptacaoCepsEspeciais())) {
+			return;
+		}
+
 		ceps = new HashSet<>();
 		logradouros = new HashMap<>();
 		bairros = new HashMap<>();
@@ -85,13 +106,21 @@ public class CaptacaoCepsEspeciaisService {
 
 		Map<String, String> cookies = ufResponse.cookies();
 
-		buscarCEPSEspeciais(cookies, cepLocalidade, "PRO", null, null, null);
-		buscarCEPSEspeciais(cookies, cepLocalidade, "CPC", null, null, null);
-		buscarCEPSEspeciais(cookies, cepLocalidade, "GRU", null, null, null);
-		buscarCEPSEspeciais(cookies, cepLocalidade, "UOP", null, null, null);
+		boolean result = false;
+
+		result |= buscarCEPSEspeciais(cookies, cepLocalidade, "PRO", null, null, null);
+		result |= buscarCEPSEspeciais(cookies, cepLocalidade, "CPC", null, null, null);
+		result |= buscarCEPSEspeciais(cookies, cepLocalidade, "GRU", null, null, null);
+		result |= buscarCEPSEspeciais(cookies, cepLocalidade, "UOP", null, null, null);
+
+		if (result) {
+			cepLocalidade.setCaptacaoCepsEspeciais(LocalDate.now());
+
+			cepLocalidadeDAO.update(cepLocalidade);
+		}
 	}
 
-	private void buscarCEPSEspeciais(Map<String, String> cookies, CepLocalidade cepLocalidade, String tipoCep,
+	private boolean buscarCEPSEspeciais(Map<String, String> cookies, CepLocalidade cepLocalidade, String tipoCep,
 			String qtdrow, String pagini, String pagfim) throws Exception {
 		logger.info(String.format("CAPTACAO DE CEP ESPECIAL[%s] --> %s / %s", tipoCep,
 				cepLocalidade.getNomeNormalizado(), cepLocalidade.getCepUF().getUf()));
@@ -130,7 +159,7 @@ public class CaptacaoCepsEspeciaisService {
 			} catch (HttpStatusException e1) {
 				logger.info(String.format("FALHA NA CAPTACAO DE CEP ESPECIAL[%s] --> %s / %s", tipoCep,
 						cepLocalidade.getNomeNormalizado(), cepLocalidade.getCepUF().getUf()));
-				return;
+				return false;
 			}
 		}
 
@@ -139,7 +168,7 @@ public class CaptacaoCepsEspeciaisService {
 		Document logradourosDocument = Jsoup.parse(new String(response.bodyAsBytes(), "ISO-8859-1"));
 
 		if (logradourosDocument.select("table.tmptabela").isEmpty()) {
-			return;
+			return true;
 		}
 
 		for (Element tr : logradourosDocument.select("table.tmptabela tbody tr")) {
@@ -252,7 +281,9 @@ public class CaptacaoCepsEspeciaisService {
 			pagini = logradourosDocument.select("form[name=Proxima] input[name=pagini]").attr("value");
 			pagfim = logradourosDocument.select("form[name=Proxima] input[name=pagfim]").attr("value");
 
-			buscarCEPSEspeciais(cookies, cepLocalidade, tipoCep, qtdrow, pagini, pagfim);
+			return buscarCEPSEspeciais(cookies, cepLocalidade, tipoCep, qtdrow, pagini, pagfim);
 		}
+
+		return true;
 	}
 }

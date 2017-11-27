@@ -1,17 +1,22 @@
 package com.dev.bruno.ceps.service;
 
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.Destination;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
 
 import org.jsoup.Connection;
-import org.jsoup.HttpStatusException;
-import org.jsoup.Jsoup;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
+import org.jsoup.HttpStatusException;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -23,25 +28,41 @@ import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoBairrosService {
-	
+
 	@Inject
 	protected Logger logger;
-	
+
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
 	private CepBairroDAO cepBairroDAO;
+	
+	@Inject
+	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
+	private JMSContext context;
+	
+	@Resource(mappedName="java:/jms/queue/Bairros")
+	private Destination queue;
 
 	public void captarBairros(String uf) throws Exception {
-		for (CepLocalidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesPorUF(uf)) {
-			buscarBairros(cepLocalidade);
-
-			cepLocalidadeDAO.update(cepLocalidade);
+		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
+			 context.createProducer().send(queue, cepLocalidadeId);
 		}
 	}
-	
+
+	public void captarBairros(Long cepLocalidadeId) throws Exception {
+		CepLocalidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
+
+		buscarBairros(cepLocalidade);
+	}
+
 	private void buscarBairros(CepLocalidade cepLocalidade) throws Exception {
+		if (cepLocalidade.getCaptacaoBairros() != null
+				&& !LocalDate.now().isAfter(cepLocalidade.getCaptacaoBairros())) {
+			return;
+		}
+
 		logger.info(String.format("CAPTACAO DE BAIRRO --> %s / %s", cepLocalidade.getNomeNormalizado(),
 				cepLocalidade.getCepUF().getUf()));
 
@@ -58,7 +79,7 @@ public class CaptacaoBairrosService {
 		Response localidadeResponse = null;
 		try {
 			localidadeResponse = localidadeConnection.method(Method.GET).execute();
-		} catch (HttpStatusException e) {
+		} catch (Exception e) {
 			Thread.sleep(5000l);
 			try {
 				localidadeResponse = localidadeConnection.method(Method.GET).execute();
@@ -73,6 +94,12 @@ public class CaptacaoBairrosService {
 		Map<String, String> localidadeCookies = localidadeResponse.cookies();
 
 		Document localidadeDocument = Jsoup.parse(new String(localidadeResponse.bodyAsBytes(), "ISO-8859-1"));
+
+		if (localidadeDocument.toString().contains("ACESSO NEGADO")) {
+			logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
+					cepLocalidade.getCepUF().getUf()));
+			return;
+		}
 
 		for (Element localidadeA : localidadeDocument.select("a[name=Letra]")) {
 			String localidadeLetra = localidadeA.html().replaceAll("&nbsp;", "");
@@ -103,6 +130,12 @@ public class CaptacaoBairrosService {
 				}
 			}
 
+			if (localidadeLetterDocument.toString().contains("ACESSO NEGADO")) {
+				logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
+						cepLocalidade.getCepUF().getUf()));
+				break;
+			}
+
 			for (Element localidadeTr : localidadeLetterDocument.select("tr")) {
 				String bairro = localidadeTr.select("td").get(1).html().replaceAll("&nbsp;", "").replaceAll("<.*?>", "")
 						.trim();
@@ -131,5 +164,8 @@ public class CaptacaoBairrosService {
 			}
 		}
 
+		cepLocalidade.setCaptacaoBairros(LocalDate.now());
+
+		cepLocalidadeDAO.update(cepLocalidade);
 	}
 }

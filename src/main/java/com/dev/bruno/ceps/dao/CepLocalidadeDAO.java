@@ -50,4 +50,8 @@ public class CepLocalidadeDAO extends AbstractDAO<CepLocalidade> {
 	public List<CepLocalidade> listarLocalidadesPorUF(String uf) {
 		return manager.createQuery("select l from CepLocalidade l where l.cepUF.uf = :uf order by l.nomeNormalizado", CepLocalidade.class).setParameter("uf", uf).getResultList();
 	}
+	
+	public List<Long> listarLocalidadesIdsPorUF(String uf) {
+		return manager.createQuery("select l.id from CepLocalidade l where l.cepUF.uf = :uf order by l.nomeNormalizado", Long.class).setParameter("uf", uf).getResultList();
+	}
 }

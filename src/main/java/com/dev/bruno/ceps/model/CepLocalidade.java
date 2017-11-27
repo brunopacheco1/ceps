@@ -1,5 +1,6 @@
 package com.dev.bruno.ceps.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,8 +63,13 @@ public class CepLocalidade extends AbstractModel {
 	@XmlTransient
 	private List<Cep> ceps = new ArrayList<>();
 
-	// @Column(name="DAT_ULTIMO_PROCESSAMENTO")
-	// private Date ultimoProcessamento;
+	@Column(name = "DAT_CAPTACAO_CEPS_ESPECIAIS")
+	@XmlTransient
+	private LocalDate captacaoCepsEspeciais;
+
+	@Column(name = "DAT_CAPTACAO_BAIRROS")
+	@XmlTransient
+	private LocalDate captacaoBairros;
 
 	public Long getId() {
 		return id;
@@ -141,11 +147,19 @@ public class CepLocalidade extends AbstractModel {
 		this.ceps = ceps;
 	}
 
-	// public Date getUltimoProcessamento() {
-	// return ultimoProcessamento;
-	// }
-	//
-	// public void setUltimoProcessamento(Date ultimoProcessamento) {
-	// this.ultimoProcessamento = ultimoProcessamento;
-	// }
+	public LocalDate getCaptacaoCepsEspeciais() {
+		return captacaoCepsEspeciais;
+	}
+
+	public void setCaptacaoCepsEspeciais(LocalDate captacaoCepsEspeciais) {
+		this.captacaoCepsEspeciais = captacaoCepsEspeciais;
+	}
+
+	public LocalDate getCaptacaoBairros() {
+		return captacaoBairros;
+	}
+
+	public void setCaptacaoBairros(LocalDate captacaoBairros) {
+		this.captacaoBairros = captacaoBairros;
+	}
 }

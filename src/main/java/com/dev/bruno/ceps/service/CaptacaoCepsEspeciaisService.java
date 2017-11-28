@@ -61,7 +61,7 @@ public class CaptacaoCepsEspeciaisService {
 	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
 	private JMSContext context;
 	
-	@Resource(mappedName="java:/jms/queue/CepsEspeciais")
+	@Resource(mappedName="java:/jms/queue/ceps/CepsEspeciais")
 	private Destination queue;
 
 	public void captarCepsEspeciais(String uf) throws Exception {

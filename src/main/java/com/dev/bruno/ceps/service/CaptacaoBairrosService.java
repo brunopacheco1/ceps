@@ -42,7 +42,7 @@ public class CaptacaoBairrosService {
 	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
 	private JMSContext context;
 	
-	@Resource(mappedName="java:/jms/queue/Bairros")
+	@Resource(mappedName="java:/jms/queue/ceps/Bairros")
 	private Destination queue;
 
 	public void captarBairros(String uf) throws Exception {

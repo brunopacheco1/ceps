@@ -8,8 +8,11 @@ import com.dev.bruno.ceps.model.CepTipoLogradouro;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepTipoLogradouroService;
 
+import io.swagger.annotations.Api;
+
 @RequestScoped
 @Path("tipo-logradouro")
+@Api(tags="tipo-logradouro", value="Servicos consulta e persistencia relacionados a Tipo de Logradouro")
 public class CepTipoLogradouroResource extends AbstractResource<CepTipoLogradouro> {
 
 	@Inject

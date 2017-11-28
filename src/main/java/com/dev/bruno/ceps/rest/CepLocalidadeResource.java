@@ -14,8 +14,11 @@ import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepLocalidadeService;
 
+import io.swagger.annotations.Api;
+
 @RequestScoped
 @Path("localidade")
+@Api(tags="localidade", value="Servicos consulta e persistencia relacionados a Localidade")
 public class CepLocalidadeResource extends AbstractResource<CepLocalidade> {
 
 	@Inject
@@ -28,19 +31,19 @@ public class CepLocalidadeResource extends AbstractResource<CepLocalidade> {
 	
 	@GET
 	@Path("/{id}/bairros")
-	public ResultList<CepBairro> getBairros(@PathParam("id") Long id) throws Exception {
+	public ResultList<CepBairro> getBairrosDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getBairros(id);
 	}
 
 	@GET
 	@Path("/{id}/logradouros")
-	public ResultList<CepLogradouro> getLogradouros(@PathParam("id") Long id) throws Exception {
+	public ResultList<CepLogradouro> getLogradourosDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getLogradouros(id);
 	}
 
 	@GET
 	@Path("/{id}/ceps")
-	public ResultList<Cep> getCeps(@PathParam("id") Long id) throws Exception {
+	public ResultList<Cep> getCepsDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getCeps(id);
 	}
 }

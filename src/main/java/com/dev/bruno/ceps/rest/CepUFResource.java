@@ -12,8 +12,11 @@ import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepUFService;
 
+import io.swagger.annotations.Api;
+
 @RequestScoped
 @Path("uf")
+@Api(tags="uf", value="Servicos consulta e persistencia relacionados a UF")
 public class CepUFResource extends AbstractResource<CepUF> {
 
 	@Inject
@@ -26,7 +29,7 @@ public class CepUFResource extends AbstractResource<CepUF> {
 
 	@GET
 	@Path("/{id}/localidades")
-	public ResultList<CepLocalidade> getLocalidades(@PathParam("id") Long id) throws Exception {
+	public ResultList<CepLocalidade> getLocalidadesDeUF(@PathParam("id") Long id) throws Exception {
 		return service.getLocalidades(id);
 	}
 }

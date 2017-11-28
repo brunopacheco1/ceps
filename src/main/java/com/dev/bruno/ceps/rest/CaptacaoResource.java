@@ -15,9 +15,12 @@ import com.dev.bruno.ceps.service.CaptacaoCepsService;
 import com.dev.bruno.ceps.service.CaptacaoFaixasCepService;
 import com.dev.bruno.ceps.service.CaptacaoLocalidadesService;
 
+import io.swagger.annotations.Api;
+
 @RequestScoped
 @Path("captacao")
 @Produces(MediaType.APPLICATION_JSON)
+@Api(tags="captacao", value="Servicos de Captacao")
 public class CaptacaoResource {
 
 	@Inject
@@ -53,7 +56,7 @@ public class CaptacaoResource {
 
 	@POST
 	@Path("/uf/{uf}/ceps-especiais")
-	public GenericResponse captarCepsEspeciais(@PathParam("uf") String uf) throws Exception {
+	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") String uf) throws Exception {
 		captacaoCepsEspeciaisService.captarCepsEspeciais(uf);
 
 		return new GenericResponse(true);

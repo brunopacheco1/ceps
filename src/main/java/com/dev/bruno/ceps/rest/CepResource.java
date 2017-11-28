@@ -8,8 +8,11 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepService;
 
+import io.swagger.annotations.Api;
+
 @RequestScoped
 @Path("cep")
+@Api(tags="cep", value="Servicos consulta e persistencia relacionados a CEP")
 public class CepResource extends AbstractResource<Cep> {
 
 	@Inject

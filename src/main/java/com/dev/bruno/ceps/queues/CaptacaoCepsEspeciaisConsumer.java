@@ -12,7 +12,7 @@ import com.dev.bruno.ceps.service.CaptacaoCepsEspeciaisService;
 
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
-		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/queue/CepsEspeciais"),
+		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/queue/ceps/CepsEspeciais"),
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue") })
 public class CaptacaoCepsEspeciaisConsumer implements MessageListener {
 

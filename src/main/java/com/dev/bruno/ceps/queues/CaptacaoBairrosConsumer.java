@@ -12,7 +12,7 @@ import com.dev.bruno.ceps.service.CaptacaoBairrosService;
 
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
-		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/queue/Bairros"),
+		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/queue/ceps/Bairros"),
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue") })
 public class CaptacaoBairrosConsumer implements MessageListener {
 

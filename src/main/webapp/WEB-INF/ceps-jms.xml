@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messaging-deployment xmlns="urn:jboss:messaging-activemq-deployment:1.0">
+	<server name="default">
+		<jms-destinations>
+			<jms-queue name="queue/ceps/bairros">
+				<entry name="java:/jms/queue/ceps/Bairros" />
+			</jms-queue>
+			<jms-queue name="queue/ceps/CepsEspeciais">
+				<entry name="java:/jms/queue/ceps/CepsEspeciais" />
+			</jms-queue>
+		</jms-destinations>
+	</server>
+</messaging-deployment>

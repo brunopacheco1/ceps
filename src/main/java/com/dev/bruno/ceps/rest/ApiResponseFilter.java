@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class UTF8ResponseFilter implements ContainerResponseFilter {
+public class ApiResponseFilter implements ContainerResponseFilter {
 		
 	@Override
 	public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
@@ -18,5 +18,9 @@ public class UTF8ResponseFilter implements ContainerResponseFilter {
 		if (contentType != null && !contentType.toString().contains("charset")) {
             responseContext.getHeaders().putSingle("Content-Type", contentType + ";charset=utf-8");
         }
+		
+		responseContext.getHeaders().putSingle("Access-Control-Allow-Origin", "*");
+		responseContext.getHeaders().putSingle("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
+		responseContext.getHeaders().putSingle("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization");
 	}
 }

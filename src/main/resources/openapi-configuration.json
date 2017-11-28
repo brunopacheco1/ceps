@@ -1,0 +1,21 @@
+{
+    "resourcePackages": [
+        "com.dev.bruno.ceps.rest"
+    ],
+    "prettyPrint" : true,
+    "openAPI": {
+        "info": {
+            "version": "1.0",
+            "title": "API de CEPs",
+            "description": "API de CEPs desenvolvida com o intuido de simplificar a consulta de CEPs do Brasil, tendo em vista que o proprio Correios nao possui API de integracao simplificada e sem custo.",
+            "termsOfService": "http://swagger.io/terms/",
+            "contact": {
+                "email": "brunopacheco1@yahoo.com"
+            },
+            "license": {
+                "name": "Apache 2.0",
+                "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            }
+        }
+    }
+}

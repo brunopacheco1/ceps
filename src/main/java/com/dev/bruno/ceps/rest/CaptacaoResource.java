@@ -19,75 +19,75 @@ import com.dev.bruno.ceps.service.CaptacaoLocalidadesService;
 @Path("captacao")
 @Produces(MediaType.APPLICATION_JSON)
 public class CaptacaoResource {
-	
+
 	@Inject
 	private CaptacaoCepsService captacaoCepsService;
-	
+
 	@Inject
 	private CaptacaoBairrosService captacaoBairrosService;
-	
+
 	@Inject
 	private CaptacaoLocalidadesService captacaoLocalidadesService;
-	
+
 	@Inject
 	private CaptacaoCepsEspeciaisService captacaoCepsEspeciaisService;
 
 	@Inject
 	private CaptacaoFaixasCepService captacaoFaixasCepsService;
-	
+
 	@POST
 	@Path("/uf/{uf}/localidades")
 	public GenericResponse captarLocalidades(@PathParam("uf") String uf) throws Exception {
 		captacaoLocalidadesService.captarLocalidades(uf);
-		
+
 		return new GenericResponse(true);
 	}
-	
+
 	@POST
 	@Path("/uf/{uf}/bairros")
 	public GenericResponse captarBairros(@PathParam("uf") String uf) throws Exception {
 		captacaoBairrosService.captarBairros(uf);
-		
+
 		return new GenericResponse(true);
 	}
-	
+
 	@POST
 	@Path("/uf/{uf}/ceps-especiais")
 	public GenericResponse captarCepsEspeciais(@PathParam("uf") String uf) throws Exception {
 		captacaoCepsEspeciaisService.captarCepsEspeciais(uf);
-		
+
 		return new GenericResponse(true);
 	}
-	
+
 	@POST
 	@Path("/localidade/{id}/faixas-cep")
 	public GenericResponse captarCepsEspeciaisById(@PathParam("id") Long cepLocalidadeId) throws Exception {
 		captacaoFaixasCepsService.captarFaixasCep(cepLocalidadeId);
-		
+
 		return new GenericResponse(true);
 	}
-	
+
 	@POST
 	@Path("/localidades/faixas-cep")
 	public GenericResponse captarCepsEspeciais() throws Exception {
 		captacaoFaixasCepsService.captarFaixasCep();
-		
+
 		return new GenericResponse(true);
 	}
-	
+
 	@POST
 	@Path("/bairro/{id}/ceps")
 	public GenericResponse captarCepsById(@PathParam("id") Long cepBairroId) throws Exception {
 		captacaoCepsService.captarCeps(cepBairroId);
-		
+
 		return new GenericResponse(true);
 	}
-	
+
 	@POST
 	@Path("/bairros/ceps")
 	public GenericResponse captarCeps() throws Exception {
 		captacaoCepsService.captarCeps();
-		
+
 		return new GenericResponse(true);
 	}
 }

@@ -12,12 +12,13 @@ public class CepTipoLogradouroService extends AbstractService<CepTipoLogradouro>
 
 	@Inject
 	private CepTipoLogradouroDAO cepTipoLogradouroDAO;
-	
+
 	@Override
 	protected AbstractDAO<CepTipoLogradouro> getDAO() {
 		return cepTipoLogradouroDAO;
 	}
 
 	@Override
-	protected void build(CepTipoLogradouro entity) throws Exception {}
+	protected void build(CepTipoLogradouro entity) throws Exception {
+	}
 }

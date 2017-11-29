@@ -58,7 +58,7 @@ public class CaptacaoCepsService {
 	
 	public void captarCeps(Long cepBairroId) throws Exception {
 		CepBairro cepBairro = cepBairroDAO.get(cepBairroId);
-		
+
 		captarCepsDeBairro(cepBairro);
 	}
 

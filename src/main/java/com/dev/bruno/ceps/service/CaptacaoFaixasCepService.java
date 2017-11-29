@@ -21,10 +21,10 @@ import com.dev.bruno.ceps.model.CepUF;
 
 @Stateless
 public class CaptacaoFaixasCepService {
-	
+
 	@Inject
 	private Logger logger;
-	
+
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
 
@@ -37,12 +37,12 @@ public class CaptacaoFaixasCepService {
 			cepLocalidadeDAO.update(cepLocalidade);
 		}
 	}
-	
+
 	public void captarFaixasCep(Long cepLocalidadeId) throws Exception {
 		CepLocalidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
 		buscarFaixaCep(cepLocalidade);
-		
+
 		cepLocalidadeDAO.update(cepLocalidade);
 	}
 

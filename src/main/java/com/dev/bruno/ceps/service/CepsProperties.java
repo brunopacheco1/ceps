@@ -9,9 +9,9 @@ public class CepsProperties {
 	private CepsProperties() {
 		try {
 			InputStream inputStream = this.getClass().getResourceAsStream("/scheduler.properties");
-			
+
 			load(inputStream);
-			
+
 			inputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -23,27 +23,27 @@ public class CepsProperties {
 	private Properties properties = new Properties();
 
 	private void load(InputStream stream) throws IOException {
-		if(loaded) {
+		if (loaded) {
 			return;
 		}
-		
+
 		properties.load(stream);
 		loaded = true;
 	}
-	
+
 	static {
 		instance = new CepsProperties();
 	}
-	
+
 	public static CepsProperties getInstance() {
 		return instance;
 	}
 
 	public String getProperty(String key) {
-		if(!loaded) {
+		if (!loaded) {
 			return null;
 		}
-		
+
 		return properties.getProperty(key);
 	}
 

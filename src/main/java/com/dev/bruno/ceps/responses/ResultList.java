@@ -12,11 +12,11 @@ import com.dev.bruno.ceps.model.AbstractModel;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ResultList<DTO extends AbstractModel> implements Serializable {
+public class ResultList<ENTITY extends AbstractModel> implements Serializable {
 
 	private static final long serialVersionUID = -4216175342452534456L;
 
-	private List<DTO> result = new ArrayList<>();
+	private List<ENTITY> result = new ArrayList<>();
 
 	private Long resultSize = 0l;
 
@@ -30,7 +30,7 @@ public class ResultList<DTO extends AbstractModel> implements Serializable {
 
 	private String dir;
 
-	public void remove(DTO dto) {
+	public void remove(ENTITY dto) {
 		result.remove(dto);
 
 		if (resultSize > 0) {
@@ -42,7 +42,7 @@ public class ResultList<DTO extends AbstractModel> implements Serializable {
 		}
 	}
 
-	public void add(DTO dto) {
+	public void add(ENTITY dto) {
 		result.add(dto);
 
 		resultSize++;
@@ -50,11 +50,11 @@ public class ResultList<DTO extends AbstractModel> implements Serializable {
 		totalSize++;
 	}
 
-	public List<DTO> getResult() {
+	public List<ENTITY> getResult() {
 		return result;
 	}
 
-	public void setResult(List<DTO> result) {
+	public void setResult(List<ENTITY> result) {
 		this.result = result;
 	}
 

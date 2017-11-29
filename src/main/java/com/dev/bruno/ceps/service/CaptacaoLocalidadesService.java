@@ -24,10 +24,10 @@ import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoLocalidadesService {
-	
+
 	@Inject
 	private CepUFDAO cepUFDAO;
-	
+
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
 

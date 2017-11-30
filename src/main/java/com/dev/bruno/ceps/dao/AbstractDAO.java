@@ -138,39 +138,6 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		return manager.createQuery("select e from " + type.getSimpleName() + " e order by e.id", type).getResultList();
 	}
 
-	public Long count(String queryStr) {
-
-		StringBuilder hql = new StringBuilder("select count(e) from " + type.getSimpleName() + " e where 1=1");
-
-		if (queryStr != null && !queryStr.isEmpty()) {
-			hql.append(" and (");
-
-			boolean first = true;
-
-			for (String queryOption : queryOptions()) {
-				if (!first) {
-					hql.append(" or ");
-				}
-
-				hql.append("upper(e.").append(queryOption).append(") like upper(:").append(queryOption).append(")");
-
-				first = false;
-			}
-
-			hql.append(")");
-		}
-
-		TypedQuery<Long> query = manager.createQuery(hql.toString(), Long.class);
-
-		if (queryStr != null && !queryStr.isEmpty()) {
-			for (String queryOption : queryOptions()) {
-				query.setParameter(queryOption, "%" + queryStr + "%");
-			}
-		}
-
-		return query.getSingleResult();
-	}
-
 	public Boolean exists(Long id) throws MandatoryFieldsException {
 		if (id == null) {
 			throw new MandatoryFieldsException("id é obrigatório");

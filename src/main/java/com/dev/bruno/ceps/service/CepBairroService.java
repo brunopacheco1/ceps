@@ -51,12 +51,8 @@ public class CepBairroService extends AbstractService<CepBairro> {
 
 		ResultList<CepLogradouro> result = new ResultList<>();
 
-		result.setResultSize((long) entities.size());
-		result.setTotalSize((long) entities.size());
 		result.setResult(entities);
 		result.setLimit(entities.size());
-		result.setOrder("id");
-		result.setStart(0);
 
 		return result;
 	}
@@ -68,12 +64,8 @@ public class CepBairroService extends AbstractService<CepBairro> {
 
 		ResultList<Cep> result = new ResultList<>();
 
-		result.setResultSize((long) entities.size());
-		result.setTotalSize((long) entities.size());
 		result.setResult(entities);
 		result.setLimit(entities.size());
-		result.setOrder("id");
-		result.setStart(0);
 
 		return result;
 	}

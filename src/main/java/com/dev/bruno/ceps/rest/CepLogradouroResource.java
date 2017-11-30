@@ -28,7 +28,7 @@ public class CepLogradouroResource extends AbstractResource<CepLogradouro> {
 	}
 	
 	@GET
-	@Path("/{id}/ceps")
+	@Path("/{id:\\d+}/ceps")
 	public ResultList<Cep> getCepsDeLogradouro(@PathParam("id") Long id) throws Exception {
 		return service.getCeps(id);
 	}

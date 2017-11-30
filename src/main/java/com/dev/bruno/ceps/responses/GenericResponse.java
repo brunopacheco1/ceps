@@ -7,21 +7,15 @@ public class GenericResponse {
 	protected String message;
 
 	public GenericResponse(Boolean success, String message) {
-		super();
-		
 		this.success = success;
 		this.message = message;
 	}
 	
 	public GenericResponse(Boolean success) {
-		super();
-		
 		this.success = success;
 	}
 	
 	public GenericResponse(String message) {
-		super();
-		
 		this.message = message;
 	}
 

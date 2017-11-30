@@ -1,5 +1,7 @@
 package com.dev.bruno.ceps.service;
 
+import java.util.List;
+
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
@@ -12,6 +14,8 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
+import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.responses.ResultList;
 
 @Stateless
 public class CepService extends AbstractService<Cep> {
@@ -64,5 +68,37 @@ public class CepService extends AbstractService<Cep> {
 		entity.setCepBairro(bairro);
 
 		entity.setCepLogradouro(logradouro);
+	}
+
+	public ResultList<Cep> getCeps(CepTipo cepTipo, Integer start, Integer limit, String order, String dir)
+			throws Exception {
+
+		if (start == null) {
+			start = 0;
+		}
+
+		if (limit == null) {
+			limit = 100;
+		}
+
+		if (order == null) {
+			order = "id";
+		}
+
+		if (dir == null) {
+			dir = "asc";
+		}
+
+		List<Cep> entities = cepDAO.list(cepTipo, start, limit, order, dir);
+
+		ResultList<Cep> result = new ResultList<>();
+
+		result.setResult(entities);
+		result.setLimit(limit);
+		result.setOrder(order);
+		result.setDir(dir);
+		result.setStart(start);
+
+		return result;
 	}
 }

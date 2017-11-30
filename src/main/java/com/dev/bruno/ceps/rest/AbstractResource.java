@@ -33,7 +33,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	}
 
 	@GET
-	@Path("/{id}")
+	@Path("/{id:\\d+}")
 	public ENTITY get(@PathParam("id") Long id) throws Exception {
 		return getService().get(id);
 	}
@@ -47,7 +47,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	}
 
 	@PUT
-	@Path("/{id}")
+	@Path("/{id:\\d+}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public GenericResponse update(@PathParam("id") Long id, ENTITY dto) throws Exception {
 		getService().update(id, dto);
@@ -56,14 +56,10 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	}
 
 	@DELETE
-	@Path("/{id}")
+	@Path("/{id:\\d+}")
 	public GenericResponse remove(@PathParam("id") Long id) throws Exception {
 		getService().remove(id);
 
 		return new GenericResponse(true);
-	}
-
-	public Long count(String queryStr) {
-		return getService().count(queryStr);
 	}
 }

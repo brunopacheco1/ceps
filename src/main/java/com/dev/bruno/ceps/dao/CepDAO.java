@@ -3,8 +3,12 @@ package com.dev.bruno.ceps.dao;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.persistence.TypedQuery;
 
+import com.dev.bruno.ceps.exceptions.InvalidValueException;
+import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.Cep;
+import com.dev.bruno.ceps.model.CepTipo;
 
 @Stateless
 public class CepDAO extends AbstractDAO<Cep> {
@@ -31,5 +35,33 @@ public class CepDAO extends AbstractDAO<Cep> {
 	public Cep buscarByCEP(String cep) {
 		return manager.createQuery("select c from Cep c where c.cep = :cep", Cep.class).setParameter("cep", cep)
 				.getSingleResult();
+	}
+
+	public List<Cep> list(CepTipo tipoCep, Integer start, Integer limit, String order, String dir)
+			throws MandatoryFieldsException, InvalidValueException {
+		if (tipoCep == null || start == null || limit == null || order == null || dir == null) {
+			throw new MandatoryFieldsException("tipo, start, limit, order e dir são obrigatórios");
+		}
+
+		if (!orderOptions.contains(order) || !dirOptions().contains(dir)) {
+			throw new InvalidValueException(String.format("Possíveis valores para order[%s] e dir[%s]",
+					String.join(", ", orderOptions), String.join(", ", dirOptions())));
+		}
+
+		StringBuilder hql = new StringBuilder("select c from Cep c where 1=1");
+
+		if (tipoCep != null) {
+			hql.append(" and c.tipoCep = :tipoCep");
+		}
+
+		hql.append(" order by c." + order + " " + dir);
+
+		TypedQuery<Cep> query = manager.createQuery(hql.toString(), Cep.class);
+
+		if (tipoCep != null) {
+			query.setParameter("tipoCep", tipoCep);
+		}
+
+		return query.setFirstResult(start).setMaxResults(limit).getResultList();
 	}
 }

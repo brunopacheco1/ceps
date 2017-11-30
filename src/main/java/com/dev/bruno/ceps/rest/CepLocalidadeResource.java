@@ -30,19 +30,19 @@ public class CepLocalidadeResource extends AbstractResource<CepLocalidade> {
 	}
 	
 	@GET
-	@Path("/{id}/bairros")
+	@Path("/{id:\\d+}/bairros")
 	public ResultList<CepBairro> getBairrosDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getBairros(id);
 	}
 
 	@GET
-	@Path("/{id}/logradouros")
+	@Path("/{id:\\d+}/logradouros")
 	public ResultList<CepLogradouro> getLogradourosDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getLogradouros(id);
 	}
 
 	@GET
-	@Path("/{id}/ceps")
+	@Path("/{id:\\d+}/ceps")
 	public ResultList<Cep> getCepsDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getCeps(id);
 	}

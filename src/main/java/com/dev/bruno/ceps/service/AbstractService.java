@@ -60,8 +60,6 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 
 		ResultList<ENTITY> result = new ResultList<>();
 
-		result.setResultSize((long) entities.size());
-		result.setTotalSize(count(queryStr));
 		result.setResult(entities);
 		result.setDir(dir);
 		result.setLimit(limit);
@@ -76,12 +74,8 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 
 		ResultList<ENTITY> result = new ResultList<>();
 
-		result.setResultSize((long) entities.size());
-		result.setTotalSize((long) entities.size());
 		result.setResult(entities);
 		result.setLimit(entities.size());
-		result.setOrder("id");
-		result.setStart(0);
 
 		return result;
 	}
@@ -115,10 +109,6 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 	public void remove(Long id) throws Exception {
 		ENTITY entity = getDAO().get(id);
 		getDAO().remove(entity);
-	}
-
-	public Long count(String queryStr) {
-		return getDAO().count(queryStr);
 	}
 
 	public void validate(Long id, ENTITY entity) throws Exception {

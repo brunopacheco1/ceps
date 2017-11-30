@@ -39,7 +39,7 @@ public class CaptacaoResource {
 	private CaptacaoFaixasCepService captacaoFaixasCepsService;
 
 	@POST
-	@Path("/uf/{uf}/localidades")
+	@Path("/uf/{uf:[A-Z]{2}}/localidades")
 	public GenericResponse captarLocalidades(@PathParam("uf") String uf) throws Exception {
 		captacaoLocalidadesService.captarLocalidades(uf);
 
@@ -47,7 +47,7 @@ public class CaptacaoResource {
 	}
 
 	@POST
-	@Path("/uf/{uf}/bairros")
+	@Path("/uf/{uf:[A-Z]{2}}/bairros")
 	public GenericResponse captarBairros(@PathParam("uf") String uf) throws Exception {
 		captacaoBairrosService.captarBairros(uf);
 
@@ -55,7 +55,7 @@ public class CaptacaoResource {
 	}
 
 	@POST
-	@Path("/uf/{uf}/ceps-especiais")
+	@Path("/uf/{uf:[A-Z]{2}}/ceps-especiais")
 	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") String uf) throws Exception {
 		captacaoCepsEspeciaisService.captarCepsEspeciais(uf);
 
@@ -63,7 +63,7 @@ public class CaptacaoResource {
 	}
 
 	@POST
-	@Path("/localidade/{id}/faixas-cep")
+	@Path("/localidade/{id:\\d+}/faixas-cep")
 	public GenericResponse captarCepsEspeciaisById(@PathParam("id") Long cepLocalidadeId) throws Exception {
 		captacaoFaixasCepsService.captarFaixasCep(cepLocalidadeId);
 
@@ -79,7 +79,7 @@ public class CaptacaoResource {
 	}
 
 	@POST
-	@Path("/bairro/{id}/ceps")
+	@Path("/bairro/{id:\\d+}/ceps")
 	public GenericResponse captarCepsById(@PathParam("id") Long cepBairroId) throws Exception {
 		captacaoCepsService.captarCeps(cepBairroId);
 

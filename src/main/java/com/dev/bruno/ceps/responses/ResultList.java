@@ -18,37 +18,15 @@ public class ResultList<ENTITY extends AbstractModel> implements Serializable {
 
 	private List<ENTITY> result = new ArrayList<>();
 
-	private Long resultSize = 0l;
+	private Integer size = 0;
 
-	private Long totalSize = 0l;
+	private Integer start = 0;
 
-	private Integer start;
+	private Integer limit = 100;
 
-	private Integer limit;
+	private String order = "id";
 
-	private String order;
-
-	private String dir;
-
-	public void remove(ENTITY dto) {
-		result.remove(dto);
-
-		if (resultSize > 0) {
-			resultSize--;
-		}
-
-		if (totalSize > 0) {
-			totalSize--;
-		}
-	}
-
-	public void add(ENTITY dto) {
-		result.add(dto);
-
-		resultSize++;
-
-		totalSize++;
-	}
+	private String dir = "asc";
 
 	public List<ENTITY> getResult() {
 		return result;
@@ -56,22 +34,15 @@ public class ResultList<ENTITY extends AbstractModel> implements Serializable {
 
 	public void setResult(List<ENTITY> result) {
 		this.result = result;
+		this.size = result.size();
 	}
 
-	public Long getResultSize() {
-		return resultSize;
+	public Integer getSize() {
+		return size;
 	}
 
-	public void setResultSize(Long resultSize) {
-		this.resultSize = resultSize;
-	}
-
-	public Long getTotalSize() {
-		return totalSize;
-	}
-
-	public void setTotalSize(Long totalSize) {
-		this.totalSize = totalSize;
+	public void setSize(Integer size) {
+		this.size = size;
 	}
 
 	public Integer getStart() {

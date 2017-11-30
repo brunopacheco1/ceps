@@ -80,12 +80,8 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 
 		ResultList<Cep> result = new ResultList<>();
 
-		result.setResultSize((long) entities.size());
-		result.setTotalSize((long) entities.size());
 		result.setResult(entities);
 		result.setLimit(entities.size());
-		result.setOrder("id");
-		result.setStart(0);
 
 		return result;
 	}

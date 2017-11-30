@@ -28,7 +28,7 @@ public class CepUFResource extends AbstractResource<CepUF> {
 	}
 
 	@GET
-	@Path("/{id}/localidades")
+	@Path("/{id:\\d+}/localidades")
 	public ResultList<CepLocalidade> getLocalidadesDeUF(@PathParam("id") Long id) throws Exception {
 		return service.getLocalidades(id);
 	}

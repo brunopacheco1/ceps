@@ -1,8 +1,5 @@
 package com.dev.bruno.ceps.timers;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.ScheduleExpression;
@@ -22,18 +19,20 @@ import com.dev.bruno.ceps.service.CepsProperties;
 @Startup
 public class CaptacaoCepsEspeciaisTimer {
 
+	public static final String INFO_PREFIX = "CaptacaoCepsEspeciaisTimer_";
+	
 	@Inject
 	private CaptacaoCepsEspeciaisService service;
 
 	@Inject
-	protected Logger logger;
+	private CepsProperties properties;
 
 	@Resource
 	private TimerService timerService;
 
 	@PostConstruct
 	private void init() {
-		Boolean ativa = Boolean.parseBoolean(CepsProperties.getInstance().getProperty("captacao.ativa"));
+		Boolean ativa = Boolean.parseBoolean(properties.getProperty("captacao.ativa"));
 
 		if (!ativa) {
 			return;
@@ -41,11 +40,10 @@ public class CaptacaoCepsEspeciaisTimer {
 
 		for (CepUFEnum uf : CepUFEnum.values()) {
 			TimerConfig timerConfig = new TimerConfig();
-			timerConfig.setInfo("CaptacaoCepsEspeciaisTimer_" + uf);
+			timerConfig.setInfo(INFO_PREFIX + uf);
 			timerConfig.setPersistent(false);
 
-			String[] expressions = CepsProperties.getInstance().getProperty("captacao.ceps-especiais." + uf)
-					.split("\\s");
+			String[] expressions = properties.getProperty("captacao.ceps-especiais." + uf).split("\\s");
 
 			ScheduleExpression schedule = new ScheduleExpression();
 
@@ -57,22 +55,6 @@ public class CaptacaoCepsEspeciaisTimer {
 
 	@Timeout
 	public void execute(Timer timer) {
-		Long time = System.currentTimeMillis();
-
-		String info = (String) timer.getInfo();
-
-		String uf = info.split("_")[1];
-
-		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> BEGIN", uf));
-
-		try {
-			service.captarCepsEspeciais(uf);
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-		}
-
-		time = System.currentTimeMillis() - time;
-
-		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> END - Tempo total: %sms", uf, time));
+		service.captarCepsEspeciais(timer);
 	}
 }

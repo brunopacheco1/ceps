@@ -2,11 +2,17 @@ package com.dev.bruno.ceps.service;
 
 import java.net.URLEncoder;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerConfig;
+import javax.ejb.TimerService;
 import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.JMSConnectionFactory;
@@ -24,30 +30,73 @@ import com.dev.bruno.ceps.dao.CepBairroDAO;
 import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
 import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
+import com.dev.bruno.ceps.timers.CaptacaoBairrosTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoBairrosService {
 
 	@Inject
-	protected Logger logger;
+	private Logger logger;
 
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
 	private CepBairroDAO cepBairroDAO;
-	
+
 	@Inject
 	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
 	private JMSContext context;
-	
-	@Resource(mappedName="java:/jms/queue/ceps/Bairros")
+
+	@Resource(mappedName = "java:/jms/queue/ceps/Bairros")
 	private Destination queue;
 
-	public void captarBairros(String uf) throws Exception {
+	@Resource
+	private TimerService timerService;
+
+	public void agendarCaptacaoBairros(String uf) {
+		String info = CaptacaoBairrosTimer.INFO_PREFIX + uf + "_manualtimer";
+
+		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
+
+		if (count > 0) {
+			return;
+		}
+
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(info);
+		timerConfig.setPersistent(false);
+
+		Date expiration = new Date();
+
+		timerService.createSingleActionTimer(expiration, timerConfig);
+	}
+
+	@Timeout
+	public void captarBairros(Timer timer) {
+		Long time = System.currentTimeMillis();
+
+		String info = (String) timer.getInfo();
+
+		String uf = info.split("_")[1];
+
+		logger.info(String.format("CAPTACAO DE BAIRROS PARA %s --> BEGIN", uf));
+
+		try {
+			captarBairros(uf);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		time = System.currentTimeMillis() - time;
+
+		logger.info(String.format("CAPTACAO DE BAIRROS PARA %s --> END - Tempo total: %sms", uf, time));
+	}
+
+	private void captarBairros(String uf) throws Exception {
 		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
-			 context.createProducer().send(queue, cepLocalidadeId);
+			context.createProducer().send(queue, cepLocalidadeId);
 		}
 	}
 

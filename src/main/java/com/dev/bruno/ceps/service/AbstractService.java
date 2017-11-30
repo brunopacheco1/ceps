@@ -5,7 +5,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -19,9 +18,6 @@ import com.dev.bruno.ceps.model.AbstractModel;
 import com.dev.bruno.ceps.responses.ResultList;
 
 public abstract class AbstractService<ENTITY extends AbstractModel> {
-
-	@Inject
-	protected Logger logger;
 
 	@Inject
 	protected Validator validator;

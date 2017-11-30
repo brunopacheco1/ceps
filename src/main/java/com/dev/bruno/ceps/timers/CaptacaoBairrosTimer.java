@@ -1,8 +1,5 @@
 package com.dev.bruno.ceps.timers;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.ScheduleExpression;
@@ -21,19 +18,21 @@ import com.dev.bruno.ceps.service.CepsProperties;
 @Singleton
 @Startup
 public class CaptacaoBairrosTimer {
+	
+	public static final String INFO_PREFIX = "CaptacaoBairrosTimer_";
 
 	@Inject
 	private CaptacaoBairrosService service;
 
 	@Inject
-	protected Logger logger;
+	private CepsProperties properties;
 
 	@Resource
 	private TimerService timerService;
 
 	@PostConstruct
 	private void init() {
-		Boolean ativa = Boolean.parseBoolean(CepsProperties.getInstance().getProperty("captacao.ativa"));
+		Boolean ativa = Boolean.parseBoolean(properties.getProperty("captacao.ativa"));
 
 		if (!ativa) {
 			return;
@@ -41,10 +40,10 @@ public class CaptacaoBairrosTimer {
 
 		for (CepUFEnum uf : CepUFEnum.values()) {
 			TimerConfig timerConfig = new TimerConfig();
-			timerConfig.setInfo("CaptacaoBairrosTimer_" + uf);
+			timerConfig.setInfo(INFO_PREFIX + uf);
 			timerConfig.setPersistent(false);
 
-			String[] expressions = CepsProperties.getInstance().getProperty("captacao.bairros." + uf).split("\\s");
+			String[] expressions = properties.getProperty("captacao.bairros." + uf).split("\\s");
 
 			ScheduleExpression schedule = new ScheduleExpression();
 			schedule.second(expressions[0]).minute(expressions[1]).hour(expressions[2]).dayOfWeek(expressions[5]);
@@ -55,22 +54,6 @@ public class CaptacaoBairrosTimer {
 
 	@Timeout
 	public void execute(Timer timer) {
-		Long time = System.currentTimeMillis();
-
-		String info = (String) timer.getInfo();
-
-		String uf = info.split("_")[1];
-
-		logger.info(String.format("CAPTACAO DE BAIRROS PARA %s --> BEGIN", uf));
-
-		try {
-			service.captarBairros(uf);
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-		}
-
-		time = System.currentTimeMillis() - time;
-
-		logger.info(String.format("CAPTACAO DE BAIRROS PARA %s --> END - Tempo total: %sms", uf, time));
+		service.captarBairros(timer);
 	}
 }

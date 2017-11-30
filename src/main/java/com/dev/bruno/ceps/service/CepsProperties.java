@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.Singleton;
+
+@Singleton
 public class CepsProperties {
 
-	private CepsProperties() {
+	@PostConstruct
+	private void init() {
 		try {
 			InputStream inputStream = this.getClass().getResourceAsStream("/scheduler.properties");
 
-			load(inputStream);
+			properties.load(inputStream);
 
 			inputStream.close();
 		} catch (IOException e) {
@@ -18,36 +23,9 @@ public class CepsProperties {
 		}
 	}
 
-	private static CepsProperties instance;
-	private boolean loaded = false;
 	private Properties properties = new Properties();
 
-	private void load(InputStream stream) throws IOException {
-		if (loaded) {
-			return;
-		}
-
-		properties.load(stream);
-		loaded = true;
-	}
-
-	static {
-		instance = new CepsProperties();
-	}
-
-	public static CepsProperties getInstance() {
-		return instance;
-	}
-
 	public String getProperty(String key) {
-		if (!loaded) {
-			return null;
-		}
-
 		return properties.getProperty(key);
-	}
-
-	public boolean isLoaded() {
-		return loaded;
 	}
 }

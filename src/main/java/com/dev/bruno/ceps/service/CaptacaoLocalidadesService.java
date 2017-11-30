@@ -1,8 +1,16 @@
 package com.dev.bruno.ceps.service;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerConfig;
+import javax.ejb.TimerService;
 import javax.inject.Inject;
 
 import org.jsoup.Connection;
@@ -20,6 +28,7 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepTipo;
 import com.dev.bruno.ceps.model.CepUF;
+import com.dev.bruno.ceps.timers.CaptacaoLocalidadesTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
@@ -33,6 +42,51 @@ public class CaptacaoLocalidadesService {
 
 	@Inject
 	private CepDAO cepDAO;
+	
+	@Inject
+	private Logger logger;
+
+	@Resource
+	private TimerService timerService;
+
+	public void agendarCaptacaoLocalidades(String uf) throws Exception {
+		String info = CaptacaoLocalidadesTimer.INFO_PREFIX + uf + "_manualtimer";
+
+		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
+
+		if (count > 0) {
+			return;
+		}
+
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(info);
+		timerConfig.setPersistent(false);
+
+		Date expiration = new Date();
+
+		timerService.createSingleActionTimer(expiration, timerConfig);
+	}
+	
+	@Timeout
+	public void captarLocalidades(Timer timer) {
+		Long time = System.currentTimeMillis();
+
+		String info = (String) timer.getInfo();
+
+		String uf = info.split("_")[1];
+
+		logger.info(String.format("CAPTACAO DE LOCALIDADES PARA %s --> BEGIN", uf));
+
+		try {
+			captarLocalidades(uf);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		time = System.currentTimeMillis() - time;
+
+		logger.info(String.format("CAPTACAO DE LOCALIDADES PARA %s --> END - Tempo total: %sms", uf, time));
+	}
 
 	public void captarLocalidades(String uf) throws Exception {
 		CepUF cepUF = cepUFDAO.buscarPorUF(uf);

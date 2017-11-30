@@ -20,7 +20,7 @@ import io.swagger.annotations.Api;
 @RequestScoped
 @Path("captacao")
 @Produces(MediaType.APPLICATION_JSON)
-@Api(tags="captacao", value="Servicos de Captacao")
+@Api(tags = "captacao", value = "Servicos de Captacao")
 public class CaptacaoResource {
 
 	@Inject
@@ -41,7 +41,7 @@ public class CaptacaoResource {
 	@POST
 	@Path("/uf/{uf:[A-Z]{2}}/localidades")
 	public GenericResponse captarLocalidades(@PathParam("uf") String uf) throws Exception {
-		captacaoLocalidadesService.captarLocalidades(uf);
+		captacaoLocalidadesService.agendarCaptacaoLocalidades(uf);
 
 		return new GenericResponse(true);
 	}
@@ -49,7 +49,7 @@ public class CaptacaoResource {
 	@POST
 	@Path("/uf/{uf:[A-Z]{2}}/bairros")
 	public GenericResponse captarBairros(@PathParam("uf") String uf) throws Exception {
-		captacaoBairrosService.captarBairros(uf);
+		captacaoBairrosService.agendarCaptacaoBairros(uf);
 
 		return new GenericResponse(true);
 	}
@@ -57,15 +57,7 @@ public class CaptacaoResource {
 	@POST
 	@Path("/uf/{uf:[A-Z]{2}}/ceps-especiais")
 	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") String uf) throws Exception {
-		captacaoCepsEspeciaisService.captarCepsEspeciais(uf);
-
-		return new GenericResponse(true);
-	}
-
-	@POST
-	@Path("/localidade/{id:\\d+}/faixas-cep")
-	public GenericResponse captarCepsEspeciaisById(@PathParam("id") Long cepLocalidadeId) throws Exception {
-		captacaoFaixasCepsService.captarFaixasCep(cepLocalidadeId);
+		captacaoCepsEspeciaisService.agendarCaptacaoCepsEspeciais(uf);
 
 		return new GenericResponse(true);
 	}
@@ -73,15 +65,7 @@ public class CaptacaoResource {
 	@POST
 	@Path("/localidades/faixas-cep")
 	public GenericResponse captarCepsEspeciais() throws Exception {
-		captacaoFaixasCepsService.captarFaixasCep();
-
-		return new GenericResponse(true);
-	}
-
-	@POST
-	@Path("/bairro/{id:\\d+}/ceps")
-	public GenericResponse captarCepsById(@PathParam("id") Long cepBairroId) throws Exception {
-		captacaoCepsService.captarCeps(cepBairroId);
+		captacaoFaixasCepsService.agendarCaptacaoFaixasCep();
 
 		return new GenericResponse(true);
 	}
@@ -89,7 +73,7 @@ public class CaptacaoResource {
 	@POST
 	@Path("/bairros/ceps")
 	public GenericResponse captarCeps() throws Exception {
-		captacaoCepsService.captarCeps();
+		captacaoCepsService.agendarCaptacaoCeps();
 
 		return new GenericResponse(true);
 	}

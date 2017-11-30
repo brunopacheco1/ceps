@@ -1,8 +1,10 @@
 package com.dev.bruno.ceps.dao;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.persistence.TypedQuery;
 
 import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
@@ -28,8 +30,14 @@ public class CepBairroDAO extends AbstractDAO<CepBairro> {
 	}
 
 	public List<CepBairro> listarBairrosNaoProcessados(Integer limit) {
-		return manager.createQuery(
-				"select b from CepBairro b where b.ultimoProcessamento is null or b.ultimoProcessamento + 7 < sysdate order by b.ultimoProcessamento",
-				CepBairro.class).setMaxResults(limit).getResultList();
+		LocalDateTime date = LocalDateTime.now().minusDays(7L);
+
+		TypedQuery<CepBairro> query = manager.createQuery(
+				"select b from CepBairro b where b.ultimoProcessamento is null or b.ultimoProcessamento < :date order by b.ultimoProcessamento",
+				CepBairro.class);
+
+		query.setParameter("date", date);
+
+		return query.setMaxResults(limit).getResultList();
 	}
 }

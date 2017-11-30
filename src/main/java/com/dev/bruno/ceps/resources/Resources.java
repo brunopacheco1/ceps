@@ -12,7 +12,7 @@ public class Resources {
 	@Produces
     @PersistenceContext
     private EntityManager em;
-
+	
 	@Produces
 	public Logger exposeLogger(InjectionPoint ip) {
 		String clazzName = ip.getMember().getDeclaringClass().getName();

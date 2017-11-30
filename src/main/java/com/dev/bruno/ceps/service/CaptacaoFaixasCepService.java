@@ -1,10 +1,17 @@
 package com.dev.bruno.ceps.service;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerConfig;
+import javax.ejb.TimerService;
 import javax.inject.Inject;
 
 import org.jsoup.Connection;
@@ -18,6 +25,7 @@ import org.jsoup.nodes.Element;
 import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepUF;
+import com.dev.bruno.ceps.timers.CaptacaoFaixasCepTimer;
 
 @Stateless
 public class CaptacaoFaixasCepService {
@@ -26,24 +34,57 @@ public class CaptacaoFaixasCepService {
 	private Logger logger;
 
 	@Inject
+	private CepsProperties properties;
+
+	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
 
-	public void captarFaixasCep() throws Exception {
-		Integer limit = Integer.parseInt(CepsProperties.getInstance().getProperty("captacao.faixas-de-cep.limit"));
+	@Resource
+	private TimerService timerService;
+
+	public void agendarCaptacaoFaixasCep() {
+		String info = CaptacaoFaixasCepTimer.INFO_PREFIX + "_manualtimer";
+
+		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
+
+		if (count > 0) {
+			return;
+		}
+
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(info);
+		timerConfig.setPersistent(false);
+
+		Date expiration = new Date();
+
+		timerService.createSingleActionTimer(expiration, timerConfig);
+	}
+
+	@Timeout
+	public void captarFaixasCep(Timer timer) {
+		Long time = System.currentTimeMillis();
+
+		logger.info(String.format("CAPTACAO DE FAIXAS DE CEP --> BEGIN"));
+
+		try {
+			captarFaixasCep();
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		time = System.currentTimeMillis() - time;
+
+		logger.info(String.format("CAPTACAO DE FAIXAS DE CEP --> END - Tempo total: %sms", time));
+	}
+
+	private void captarFaixasCep() throws Exception {
+		Integer limit = Integer.parseInt(properties.getProperty("captacao.faixas-de-cep.limit"));
 
 		for (CepLocalidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesSemFaixaCep(limit)) {
 			buscarFaixaCep(cepLocalidade);
 
 			cepLocalidadeDAO.update(cepLocalidade);
 		}
-	}
-
-	public void captarFaixasCep(Long cepLocalidadeId) throws Exception {
-		CepLocalidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
-
-		buscarFaixaCep(cepLocalidade);
-
-		cepLocalidadeDAO.update(cepLocalidade);
 	}
 
 	private void buscarFaixaCep(CepLocalidade cepLocalidade) throws Exception {

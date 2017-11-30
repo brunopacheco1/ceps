@@ -1,20 +1,27 @@
 package com.dev.bruno.ceps.service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerConfig;
+import javax.ejb.TimerService;
 import javax.inject.Inject;
 
 import org.jsoup.Connection;
-import org.jsoup.HttpStatusException;
-import org.jsoup.Jsoup;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
+import org.jsoup.HttpStatusException;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -26,36 +33,77 @@ import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
 import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.timers.CaptacaoCepsTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoCepsService {
-	
+
 	@Inject
-	protected Logger logger;
-	
+	private Logger logger;
+
+	@Inject
+	private CepsProperties properties;
+
 	@Inject
 	private CepBairroDAO cepBairroDAO;
-	
+
 	@Inject
 	private CepLogradouroDAO cepLogradouroDAO;
 
 	@Inject
 	private CepDAO cepDAO;
-	
+
+	@Resource
+	private TimerService timerService;
+
 	private Set<String> ceps = new HashSet<>();
 
 	private Map<String, CepLogradouro> logradouros = new HashMap<>();
 
-	public void captarCeps() throws Exception {
-		Integer limit = Integer
-				.parseInt(CepsProperties.getInstance().getProperty("captacao.ceps-de-logradouros.limit"));
+	public void agendarCaptacaoCeps() {
+		String info = CaptacaoCepsTimer.INFO_PREFIX + "_manualtimer";
+
+		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
+
+		if (count > 0) {
+			return;
+		}
+
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(info);
+		timerConfig.setPersistent(false);
+
+		Date expiration = new Date();
+
+		timerService.createSingleActionTimer(expiration, timerConfig);
+	}
+
+	@Timeout
+	public void captarCeps(Timer timer) {
+		Long time = System.currentTimeMillis();
+
+		logger.info(String.format("CAPTACAO DE CEPS DE LOGRADOUROS --> BEGIN"));
+
+		try {
+			captarCeps();
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		time = System.currentTimeMillis() - time;
+
+		logger.info(String.format("CAPTACAO DE CEPS DE LOGRADOUROS --> END - Tempo total: %sms", time));
+	}
+
+	private void captarCeps() throws Exception {
+		Integer limit = Integer.parseInt(properties.getProperty("captacao.ceps-de-logradouros.limit"));
 
 		for (CepBairro cepBairro : cepBairroDAO.listarBairrosNaoProcessados(limit)) {
 			captarCepsDeBairro(cepBairro);
 		}
 	}
-	
+
 	public void captarCeps(Long cepBairroId) throws Exception {
 		CepBairro cepBairro = cepBairroDAO.get(cepBairroId);
 
@@ -90,7 +138,7 @@ public class CaptacaoCepsService {
 		buscarCeps(cookies, cepBairro.getCepLocalidade(), cepBairro, cepBairro.getCepLocalidade().getCepUF().getUf(),
 				null, null, null);
 
-		cepBairro.setUltimoProcessamento(new Date());
+		cepBairro.setUltimoProcessamento(LocalDateTime.now());
 
 		cepBairroDAO.update(cepBairro);
 	}

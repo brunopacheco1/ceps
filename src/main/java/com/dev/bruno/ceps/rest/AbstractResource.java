@@ -1,7 +1,5 @@
 package com.dev.bruno.ceps.rest;
 
-import java.util.logging.Logger;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,8 +18,6 @@ import com.dev.bruno.ceps.service.AbstractService;
 
 @Produces(MediaType.APPLICATION_JSON)
 public abstract class AbstractResource<ENTITY extends AbstractModel> {
-
-	protected Logger logger = Logger.getLogger(this.getClass().getName());
 
 	protected abstract AbstractService<ENTITY> getService();
 

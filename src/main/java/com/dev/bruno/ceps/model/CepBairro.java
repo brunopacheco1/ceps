@@ -1,7 +1,7 @@
 package com.dev.bruno.ceps.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -54,7 +54,8 @@ public class CepBairro extends AbstractModel {
 	private List<Cep> ceps = new ArrayList<>();
 
 	@Column(name = "DAT_ULTIMO_PROCESSAMENTO")
-	private Date ultimoProcessamento;
+	@XmlTransient
+	private LocalDateTime ultimoProcessamento;
 
 	public Long getId() {
 		return id;
@@ -108,11 +109,11 @@ public class CepBairro extends AbstractModel {
 		this.ceps = ceps;
 	}
 
-	public Date getUltimoProcessamento() {
+	public LocalDateTime getUltimoProcessamento() {
 		return ultimoProcessamento;
 	}
 
-	public void setUltimoProcessamento(Date ultimoProcessamento) {
+	public void setUltimoProcessamento(LocalDateTime ultimoProcessamento) {
 		this.ultimoProcessamento = ultimoProcessamento;
 	}
 }

@@ -1,14 +1,20 @@
 package com.dev.bruno.ceps.service;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerConfig;
+import javax.ejb.TimerService;
 import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.JMSConnectionFactory;
@@ -31,6 +37,7 @@ import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
 import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.timers.CaptacaoCepsEspeciaisTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
@@ -56,17 +63,59 @@ public class CaptacaoCepsEspeciaisService {
 	private Map<String, CepLogradouro> logradouros = new HashMap<>();
 
 	private Map<String, CepBairro> bairros = new HashMap<>();
-	
+
 	@Inject
 	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
 	private JMSContext context;
-	
-	@Resource(mappedName="java:/jms/queue/ceps/CepsEspeciais")
+
+	@Resource(mappedName = "java:/jms/queue/ceps/CepsEspeciais")
 	private Destination queue;
 
-	public void captarCepsEspeciais(String uf) throws Exception {
+	@Resource
+	private TimerService timerService;
+
+	public void agendarCaptacaoCepsEspeciais(String uf) {
+		String info = CaptacaoCepsEspeciaisTimer.INFO_PREFIX + uf + "_manualtimer";
+
+		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
+
+		if (count > 0) {
+			return;
+		}
+
+		TimerConfig timerConfig = new TimerConfig();
+		timerConfig.setInfo(info);
+		timerConfig.setPersistent(false);
+
+		Date expiration = new Date();
+
+		timerService.createSingleActionTimer(expiration, timerConfig);
+	}
+
+	@Timeout
+	public void captarCepsEspeciais(Timer timer) {
+		Long time = System.currentTimeMillis();
+
+		String info = (String) timer.getInfo();
+
+		String uf = info.split("_")[1];
+
+		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> BEGIN", uf));
+
+		try {
+			captarCepsEspeciais(uf);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		time = System.currentTimeMillis() - time;
+
+		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> END - Tempo total: %sms", uf, time));
+	}
+
+	private void captarCepsEspeciais(String uf) throws Exception {
 		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
-			 context.createProducer().send(queue, cepLocalidadeId);
+			context.createProducer().send(queue, cepLocalidadeId);
 		}
 	}
 

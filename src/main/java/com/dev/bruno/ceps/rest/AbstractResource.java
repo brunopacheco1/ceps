@@ -16,12 +16,15 @@ import com.dev.bruno.ceps.responses.GenericResponse;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.service.AbstractService;
 
+import io.swagger.annotations.ApiOperation;
+
 @Produces(MediaType.APPLICATION_JSON)
 public abstract class AbstractResource<ENTITY extends AbstractModel> {
 
 	protected abstract AbstractService<ENTITY> getService();
 
 	@GET
+	@ApiOperation(value = "Listar Entidades")
 	public ResultList<ENTITY> list(@QueryParam("query") String queryStr, @QueryParam("start") Integer start,
 			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir)
 			throws Exception {
@@ -30,12 +33,14 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 
 	@GET
 	@Path("/{id:\\d+}")
+	@ApiOperation(value = "Buscar Entidade Por ID")
 	public ENTITY get(@PathParam("id") Long id) throws Exception {
 		return getService().get(id);
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Adicionar Entidade")
 	public GenericResponse add(ENTITY dto) throws Exception {
 		getService().add(dto);
 
@@ -45,6 +50,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	@PUT
 	@Path("/{id:\\d+}")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Atualizar Entidade")
 	public GenericResponse update(@PathParam("id") Long id, ENTITY dto) throws Exception {
 		getService().update(id, dto);
 
@@ -53,6 +59,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 
 	@DELETE
 	@Path("/{id:\\d+}")
+	@ApiOperation(value = "Remover Entidade")
 	public GenericResponse remove(@PathParam("id") Long id) throws Exception {
 		getService().remove(id);
 

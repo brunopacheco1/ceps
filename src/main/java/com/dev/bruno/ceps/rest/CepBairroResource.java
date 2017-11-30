@@ -14,28 +14,32 @@ import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepBairroService;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 
 @RequestScoped
 @Path("bairro")
-@Api(tags="bairro", value="Servicos consulta e persistencia relacionados a Bairro")
+@Api(tags = "bairro", value = "Servicos consulta e persistencia relacionados a Bairro", authorizations = @Authorization(value = "api_key", scopes = {}))
 public class CepBairroResource extends AbstractResource<CepBairro> {
 
 	@Inject
 	private CepBairroService service;
-	
+
 	@Override
 	protected AbstractService<CepBairro> getService() {
 		return service;
 	}
-	
+
 	@GET
 	@Path("/{id:\\d+}/logradouros")
+	@ApiOperation(value = "Busca de Logradouros por Bairro")
 	public ResultList<CepLogradouro> getLogradourosDeBairro(@PathParam("id") Long id) throws Exception {
 		return service.getLogradouros(id);
 	}
 
 	@GET
 	@Path("/{id:\\d+}/ceps")
+	@ApiOperation(value = "Busca de CEPs por Bairro")
 	public ResultList<Cep> getCepsDeBairro(@PathParam("id") Long id) throws Exception {
 		return service.getCeps(id);
 	}

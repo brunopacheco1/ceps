@@ -20,9 +20,9 @@ public class JaxRsActivator extends Application {
 				+ "    simplificada e sem custo.");
 		beanConfig.setTitle("API de CEPs");
 		beanConfig.setScan(true);
-
+		beanConfig.setPrettyPrint(true);
 		// x-google-endpoints:
 		// - name: echo-api.endpoints.sentimentalizer-169016.cloud.goog
-		// target: 198.162.0.1
+		// tarread: 198.162.0.1
 	}
 }

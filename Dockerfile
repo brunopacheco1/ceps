@@ -4,6 +4,8 @@ USER root
 
 RUN yum -y install maven && yum clean all
 
+RUN ls
+
 USER jboss
 
 WORKDIR ./ 

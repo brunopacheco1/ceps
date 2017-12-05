@@ -1,8 +1,8 @@
 FROM jboss/wildfly
 
-RUN apt-get update
+RUN sudo apt-get update
 
-RUN apt-get install -y maven
+RUN sudo apt-get install -y maven
 
 RUN mvn clean package
 

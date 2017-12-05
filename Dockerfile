@@ -4,7 +4,7 @@ USER root
 
 RUN yum -y install maven && yum clean all
 
-RUN ls
+RUN ls -ltR /
 
 USER jboss
 

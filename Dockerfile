@@ -1,5 +1,9 @@
 FROM jboss/wildfly
 
+RUN apt-get update
+
+RUN apt-get install -y maven
+
 RUN mvn clean package
 
 ADD ./src/main/docker/postgresql-9.1-903.jdbc4.jar /opt/jboss/wildfly/standalone/deployments/

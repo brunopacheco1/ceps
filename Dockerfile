@@ -1,6 +1,10 @@
 FROM jboss/wildfly
 
+USER root
+
 RUN yum -y install maven && yum clean all
+
+USER jboss
 
 RUN mvn clean package
 

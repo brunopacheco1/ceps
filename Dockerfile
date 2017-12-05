@@ -6,7 +6,7 @@ RUN yum -y install maven && yum clean all
 
 USER jboss
 
-RUN mvn clean package
+RUN mvn clean package ./
 
 ADD ./src/main/docker/postgresql-9.1-903.jdbc4.jar /opt/jboss/wildfly/standalone/deployments/
 

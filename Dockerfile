@@ -3,6 +3,7 @@ FROM jboss/wildfly
 RUN mvn clean package
 
 ADD ./src/main/docker/postgresql-9.1-903.jdbc4.jar /opt/jboss/wildfly/standalone/deployments/
+
 ADD ./target/ceps.war /opt/jboss/wildfly/standalone/deployments/
 
 EXPOSE 8080

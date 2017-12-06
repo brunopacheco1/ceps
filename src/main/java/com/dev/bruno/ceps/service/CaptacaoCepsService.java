@@ -39,8 +39,7 @@ import com.dev.bruno.ceps.utils.StringUtils;
 @Stateless
 public class CaptacaoCepsService {
 
-	@Inject
-	private Logger logger;
+	private Logger logger = Logger.getLogger(getClass().getName());
 
 	@Inject
 	private CepsProperties properties;

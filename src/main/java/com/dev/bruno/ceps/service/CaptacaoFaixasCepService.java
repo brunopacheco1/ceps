@@ -30,8 +30,7 @@ import com.dev.bruno.ceps.timers.CaptacaoFaixasCepTimer;
 @Stateless
 public class CaptacaoFaixasCepService {
 
-	@Inject
-	private Logger logger;
+	private Logger logger = Logger.getLogger(getClass().getName());
 
 	@Inject
 	private CepsProperties properties;

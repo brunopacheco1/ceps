@@ -43,8 +43,7 @@ public class CaptacaoLocalidadesService {
 	@Inject
 	private CepDAO cepDAO;
 	
-	@Inject
-	private Logger logger;
+	private Logger logger = Logger.getLogger(getClass().getName());
 
 	@Resource
 	private TimerService timerService;

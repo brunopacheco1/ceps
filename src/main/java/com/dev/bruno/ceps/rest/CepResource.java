@@ -13,13 +13,17 @@ import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestScoped
 @Path("cep")
-@Api(tags = "cep", value = "Servicos consulta e persistencia relacionados a CEP", authorizations = @Authorization(value = "api_key", scopes = {}))
+@Tag(name = "cep", description = "Servicos consulta e persistencia relacionados a CEP")
+@SecurityScheme(name = "api_key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
 public class CepResource extends AbstractResource<Cep> {
 
 	@Inject
@@ -32,7 +36,8 @@ public class CepResource extends AbstractResource<Cep> {
 
 	@GET
 	@Path("/{tipo:[A-Z]{3}}")
-	@ApiOperation(value = "Busca de CEPs por Tipo de CEP")
+	@Operation(description = "Busca de CEPs por Tipo de CEP")
+	@SecurityRequirement(name = "api_key")
 	public ResultList<Cep> getCepsPorTipo(@PathParam("tipo") CepTipo cepTipo, @QueryParam("start") Integer start,
 			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir)
 			throws Exception {

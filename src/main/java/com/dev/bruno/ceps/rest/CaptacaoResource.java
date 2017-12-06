@@ -15,14 +15,18 @@ import com.dev.bruno.ceps.service.CaptacaoCepsService;
 import com.dev.bruno.ceps.service.CaptacaoFaixasCepService;
 import com.dev.bruno.ceps.service.CaptacaoLocalidadesService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestScoped
 @Path("captacao")
 @Produces(MediaType.APPLICATION_JSON)
-@Api(tags = "captacao", value = "Servicos de Captacao", authorizations = @Authorization(value = "api_key", scopes = {}))
+@Tag(name = "captacao", description = "Servicos de Captacao")
+@SecurityScheme(name = "api_key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
 public class CaptacaoResource {
 
 	@Inject
@@ -42,7 +46,7 @@ public class CaptacaoResource {
 
 	@POST
 	@Path("/uf/{uf:[A-Z]{2}}/localidades")
-	@ApiOperation(value = "Captacao de Localidade")
+	@Operation(description = "Captacao de Localidade")
 	public GenericResponse captarLocalidades(@PathParam("uf") String uf) throws Exception {
 		captacaoLocalidadesService.agendarCaptacaoLocalidades(uf);
 
@@ -51,7 +55,8 @@ public class CaptacaoResource {
 
 	@POST
 	@Path("/uf/{uf:[A-Z]{2}}/bairros")
-	@ApiOperation(value = "Captacao de Bairros")
+	@Operation(description = "Captacao de Bairros")
+	@SecurityRequirement(name = "api_key")
 	public GenericResponse captarBairros(@PathParam("uf") String uf) throws Exception {
 		captacaoBairrosService.agendarCaptacaoBairros(uf);
 
@@ -60,7 +65,8 @@ public class CaptacaoResource {
 
 	@POST
 	@Path("/uf/{uf:[A-Z]{2}}/ceps-especiais")
-	@ApiOperation(value = "Captacao de CEPs Especiais")
+	@Operation(description = "Captacao de CEPs Especiais")
+	@SecurityRequirement(name = "api_key")
 	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") String uf) throws Exception {
 		captacaoCepsEspeciaisService.agendarCaptacaoCepsEspeciais(uf);
 
@@ -69,7 +75,8 @@ public class CaptacaoResource {
 
 	@POST
 	@Path("/localidades/faixas-cep")
-	@ApiOperation(value = "Captacao de Faixas de CEPs")
+	@Operation(description = "Captacao de Faixas de CEPs")
+	@SecurityRequirement(name = "api_key")
 	public GenericResponse captarCepsEspeciais() throws Exception {
 		captacaoFaixasCepsService.agendarCaptacaoFaixasCep();
 
@@ -78,7 +85,8 @@ public class CaptacaoResource {
 
 	@POST
 	@Path("/bairros/ceps")
-	@ApiOperation(value = "Captacao de CEPs")
+	@Operation(description = "Captacao de CEPs")
+	@SecurityRequirement(name = "api_key")
 	public GenericResponse captarCeps() throws Exception {
 		captacaoCepsService.agendarCaptacaoCeps();
 

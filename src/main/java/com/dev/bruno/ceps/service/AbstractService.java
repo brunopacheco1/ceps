@@ -14,6 +14,7 @@ import javax.validation.Validator;
 import com.dev.bruno.ceps.dao.AbstractDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.EntityNotFoundException;
+import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.AbstractModel;
 import com.dev.bruno.ceps.responses.ResultList;
 
@@ -81,8 +82,6 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 	}
 
 	public ENTITY add(ENTITY entity) throws Exception {
-		build(entity);
-		
 		validate(null, entity);
 
 		getDAO().add(entity);
@@ -93,8 +92,6 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 	protected abstract void build(ENTITY entity) throws Exception;
 
 	public ENTITY update(Long id, ENTITY entity) throws Exception {
-		build(entity);
-		
 		validate(id, entity);
 
 		getDAO().update(entity);
@@ -108,9 +105,15 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 	}
 
 	public void validate(Long id, ENTITY entity) throws Exception {
+		if (entity == null) {
+			throw new MandatoryFieldsException(entityType.getSimpleName() + " nao encontrada na requisicao.");
+		}
+
 		if (id != null && !getDAO().exists(id)) {
 			throw new EntityNotFoundException(entityType.getSimpleName() + "[" + id + "] não encontrado.");
 		}
+		
+		build(entity);
 
 		Set<ConstraintViolation<ENTITY>> violations = validator.validate(entity);
 

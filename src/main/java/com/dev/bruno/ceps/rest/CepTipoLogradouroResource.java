@@ -8,12 +8,15 @@ import com.dev.bruno.ceps.model.CepTipoLogradouro;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepTipoLogradouroService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestScoped
 @Path("tipo-logradouro")
-@Api(tags = "tipo-logradouro", value = "Servicos consulta e persistencia relacionados a Tipo de Logradouro", authorizations = @Authorization(value = "api_key", scopes = {}))
+@Tag(name = "tipo-logradouro", description = "Servicos consulta e persistencia relacionados a Tipo de Logradouro")
+@SecurityScheme(name = "api_key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
 public class CepTipoLogradouroResource extends AbstractResource<CepTipoLogradouro> {
 
 	@Inject

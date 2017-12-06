@@ -13,13 +13,17 @@ import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepBairroService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestScoped
 @Path("bairro")
-@Api(tags = "bairro", value = "Servicos consulta e persistencia relacionados a Bairro", authorizations = @Authorization(value = "api_key", scopes = {}))
+@Tag(name = "bairro", description = "Servicos consulta e persistencia relacionados a Bairro")
+@SecurityScheme(name = "api_key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
 public class CepBairroResource extends AbstractResource<CepBairro> {
 
 	@Inject
@@ -32,14 +36,16 @@ public class CepBairroResource extends AbstractResource<CepBairro> {
 
 	@GET
 	@Path("/{id:\\d+}/logradouros")
-	@ApiOperation(value = "Busca de Logradouros por Bairro")
+	@Operation(description = "Busca de Logradouros por Bairro")
+	@SecurityRequirement(name = "api_key")
 	public ResultList<CepLogradouro> getLogradourosDeBairro(@PathParam("id") Long id) throws Exception {
 		return service.getLogradouros(id);
 	}
 
 	@GET
 	@Path("/{id:\\d+}/ceps")
-	@ApiOperation(value = "Busca de CEPs por Bairro")
+	@Operation(description = "Busca de CEPs por Bairro")
+	@SecurityRequirement(name = "api_key")
 	public ResultList<Cep> getCepsDeBairro(@PathParam("id") Long id) throws Exception {
 		return service.getCeps(id);
 	}

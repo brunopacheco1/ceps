@@ -14,13 +14,17 @@ import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.service.AbstractService;
 import com.dev.bruno.ceps.service.CepLocalidadeService;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestScoped
 @Path("localidade")
-@Api(tags = "localidade", value = "Servicos consulta e persistencia relacionados a Localidade", authorizations = @Authorization(value = "api_key", scopes = {}))
+@Tag(name = "localidade", description = "Servicos consulta e persistencia relacionados a Localidade")
+@SecurityScheme(name = "api_key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
 public class CepLocalidadeResource extends AbstractResource<CepLocalidade> {
 
 	@Inject
@@ -33,21 +37,24 @@ public class CepLocalidadeResource extends AbstractResource<CepLocalidade> {
 
 	@GET
 	@Path("/{id:\\d+}/bairros")
-	@ApiOperation(value = "Busca de Bairros por Localidade")
+	@Operation(description = "Busca de Bairros por Localidade")
+	@SecurityRequirement(name = "api_key")
 	public ResultList<CepBairro> getBairrosDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getBairros(id);
 	}
 
 	@GET
 	@Path("/{id:\\d+}/logradouros")
-	@ApiOperation(value = "Busca de Logradouros por Localidade")
+	@Operation(description = "Busca de Logradouros por Localidade")
+	@SecurityRequirement(name = "api_key")
 	public ResultList<CepLogradouro> getLogradourosDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getLogradouros(id);
 	}
 
 	@GET
 	@Path("/{id:\\d+}/ceps")
-	@ApiOperation(value = "Busca de CEPs por Localidade")
+	@Operation(description = "Busca de CEPs por Localidade")
+	@SecurityRequirement(name = "api_key")
 	public ResultList<Cep> getCepsDeLocalidade(@PathParam("id") Long id) throws Exception {
 		return service.getCeps(id);
 	}

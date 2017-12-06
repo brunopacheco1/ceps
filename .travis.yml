@@ -14,5 +14,5 @@ after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker push brunopacheco1/ceps:latest;
     else
-    docker push brunopacheco1/ceps:$TRAVIS_BRANCH;
+    docker push "brunopacheco1/ceps:$TRAVIS_BRANCH";
     fi

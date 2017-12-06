@@ -7,7 +7,6 @@ services:
 before_install:
   - docker pull jboss/wildfly
 script: 
-  - mvn clean test
   - mvn clean package
   - docker build -t brunopacheco1/ceps .
 after_success:

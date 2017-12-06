@@ -10,7 +10,9 @@ script:
   - mvn clean package
   - docker build -t brunopacheco1/ceps .
 after_success:
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-    docker push brunopacheco1/ceps;
+    docker push brunopacheco1/ceps:latest;
+    else
+    docker push brunopacheco1/ceps:$TRAVIS_BRANCH;
     fi

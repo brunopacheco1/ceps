@@ -8,7 +8,11 @@ before_install:
   - docker pull jboss/wildfly
 script: 
   - mvn clean package
-  - docker build -t brunopacheco1/ceps .
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker build -t brunopacheco1/ceps .;
+    else
+    docker build -t "brunopacheco1/ceps:$TRAVIS_BRANCH" .;
+    fi
 after_success:
   - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
   - if [ "$TRAVIS_BRANCH" == "master" ]; then

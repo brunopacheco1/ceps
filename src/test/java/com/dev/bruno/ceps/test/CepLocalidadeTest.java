@@ -51,12 +51,12 @@ public class CepLocalidadeTest {
 		}
 	}
 
-	@Test
-	public void testServiceAddValidation() {
-		try {
-			service.add(new CepLocalidade());
-		} catch (Exception e) {
-			assertTrue(e instanceof ConstraintViolationException);
-		}
-	}
+//	@Test
+//	public void testServiceAddValidation() {
+//		try {
+//			service.add(new CepLocalidade());
+//		} catch (Exception e) {
+//			assertTrue(e instanceof ConstraintViolationException);
+//		}
+//	}
 }

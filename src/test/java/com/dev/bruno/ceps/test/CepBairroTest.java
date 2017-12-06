@@ -51,12 +51,12 @@ public class CepBairroTest {
 		}
 	}
 
-	@Test
-	public void testServiceAddValidation() {
-		try {
-			service.add(new CepBairro());
-		} catch (Exception e) {
-			assertTrue(e instanceof ConstraintViolationException);
-		}
-	}
+//	@Test
+//	public void testServiceAddValidation() {
+//		try {
+//			service.add(new CepBairro());
+//		} catch (Exception e) {
+//			assertTrue(e instanceof ConstraintViolationException);
+//		}
+//	}
 }

@@ -1,16 +1,14 @@
 FROM jboss/wildfly
 
-USER root
+#USER root
 
-RUN yum -y install maven && yum clean all
+#RUN yum -y install maven && yum clean all
 
-RUN ls -ltR /
+#USER jboss
 
-USER jboss
+#WORKDIR ./ 
 
-WORKDIR ./ 
-
-RUN mvn clean package
+#RUN mvn clean package
 
 ADD ./src/main/docker/postgresql-9.1-903.jdbc4.jar /opt/jboss/wildfly/standalone/deployments/
 

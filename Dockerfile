@@ -1,15 +1,5 @@
 FROM jboss/wildfly
 
-#USER root
-
-#RUN yum -y install maven && yum clean all
-
-#USER jboss
-
-#WORKDIR ./ 
-
-#RUN mvn clean package
-
 ADD ./src/main/docker/postgresql-9.1-903.jdbc4.jar /opt/jboss/wildfly/standalone/deployments/
 
 ADD ./target/ceps.war /opt/jboss/wildfly/standalone/deployments/

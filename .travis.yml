@@ -6,9 +6,9 @@ services:
   - docker
 before_install:
   - docker pull jboss/wildfly
-  - docker build -t brunopacheco1/ceps .
 script: 
   - mvn clean package
+  - docker build -t brunopacheco1/ceps .
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";

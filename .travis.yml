@@ -13,11 +13,7 @@ addons:
 before_install:
   - docker pull jboss/wildfly
 script:
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar;
-    else
-    mvn clean package;
-    fi
+    mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.branch.name=$TRAVIS_BRANCH
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker build -t "$DOCKER_USERNAME/ceps" .;
     else

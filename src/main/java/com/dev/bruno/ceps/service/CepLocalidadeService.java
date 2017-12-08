@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.validation.Validator;
 
 import com.dev.bruno.ceps.dao.AbstractDAO;
 import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
@@ -24,6 +25,15 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 
 	@Inject
 	private CepUFDAO cepUFDAO;
+	
+	public CepLocalidadeService(){}
+
+	public CepLocalidadeService(CepLocalidadeDAO cepLocalidadeDAO, CepUFDAO cepUFDAO, Validator validator) {
+		super();
+		this.cepLocalidadeDAO = cepLocalidadeDAO;
+		this.cepUFDAO = cepUFDAO;
+		this.validator = validator;
+	}
 
 	@Override
 	protected AbstractDAO<CepLocalidade> getDAO() {
@@ -31,7 +41,7 @@ public class CepLocalidadeService extends AbstractService<CepLocalidade> {
 	}
 
 	@Override
-	protected void build(CepLocalidade entity) throws Exception {
+	protected void build(CepLocalidade entity) {
 		Long ufId = entity.getCepUFId();
 
 		CepUF uf = cepUFDAO.get(ufId);

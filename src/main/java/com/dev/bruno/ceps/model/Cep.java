@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -42,6 +43,7 @@ public class Cep extends AbstractModel {
 
 	@Column(name = "DSC_CEP", nullable = false)
 	@NotNull
+	@Pattern(regexp = "\\d{5}-\\d{3}")
 	private String cep;
 
 	@Column(name = "TIP_CEP", nullable = false)

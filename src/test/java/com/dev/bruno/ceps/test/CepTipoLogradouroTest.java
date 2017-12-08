@@ -1,15 +1,17 @@
 package com.dev.bruno.ceps.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
-import javax.ejb.embeddable.EJBContainer;
-import javax.inject.Inject;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.dev.bruno.ceps.dao.CepTipoLogradouroDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.CepTipoLogradouro;
@@ -17,33 +19,18 @@ import com.dev.bruno.ceps.service.CepTipoLogradouroService;
 
 public class CepTipoLogradouroTest {
 
-	@Inject
-	private CepTipoLogradouroService service;
-
-	private static EJBContainer container;
+	private static CepTipoLogradouroService service;
 
 	@BeforeClass
 	public static void setUp() {
-		container = EJBContainer.createEJBContainer();
-	}
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
 
-	@Before
-	public void SetUpTest() throws Exception {
-		container.getContext().bind("inject", this);
-	}
-
-	@AfterClass
-	public static void tearDown() {
-		container.close();
+		service = new CepTipoLogradouroService(mock(CepTipoLogradouroDAO.class), validator);
 	}
 
 	@Test
-	public void testNullService() {
-		assertTrue(service instanceof CepTipoLogradouroService);
-	}
-
-	@Test
-	public void testServiceAddNull() {
+	public void testAddNull() {
 		try {
 			service.add(null);
 		} catch (Exception e) {
@@ -52,11 +39,23 @@ public class CepTipoLogradouroTest {
 	}
 
 	@Test
-	public void testServiceAddValidation() {
+	public void testAddEmptyObject() {
 		try {
 			service.add(new CepTipoLogradouro());
 		} catch (Exception e) {
 			assertTrue(e instanceof ConstraintViolationException);
 		}
+	}
+
+	@Test
+	public void testAdd() {
+		CepTipoLogradouro cepTipoLogradouro = new CepTipoLogradouro();
+		cepTipoLogradouro.setNome("Rua");
+
+		Object result = service.add(cepTipoLogradouro);
+
+		assertNotNull(result);
+
+		assertTrue(result instanceof CepTipoLogradouro);
 	}
 }

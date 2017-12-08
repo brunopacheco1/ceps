@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.validation.Validator;
 
 import com.dev.bruno.ceps.dao.AbstractDAO;
 import com.dev.bruno.ceps.dao.CepBairroDAO;
@@ -38,8 +39,20 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 		return cepLogradouroDAO;
 	}
 
+	public CepLogradouroService() {
+	}
+
+	public CepLogradouroService(CepLocalidadeDAO cepLocalidadeDAO, CepBairroDAO cepBairroDAO,
+			CepTipoLogradouroDAO cepTipoLogradouroDAO, CepLogradouroDAO cepLogradouroDAO, Validator validator) {
+		this.cepLocalidadeDAO = cepLocalidadeDAO;
+		this.cepBairroDAO = cepBairroDAO;
+		this.cepTipoLogradouroDAO = cepTipoLogradouroDAO;
+		this.cepLogradouroDAO = cepLogradouroDAO;
+		this.validator = validator;
+	}
+
 	@Override
-	protected void build(CepLogradouro entity) throws Exception {
+	protected void build(CepLogradouro entity) {
 		CepBairro bairro = null;
 
 		CepTipoLogradouro tipoLogradouro = null;

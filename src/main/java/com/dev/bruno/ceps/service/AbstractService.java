@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -23,14 +22,11 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 	@Inject
 	protected Validator validator;
 
-	protected Class<ENTITY> entityType;
-
 	@SuppressWarnings("unchecked")
-	@PostConstruct
-	private void init() {
+	protected Class<ENTITY> getEntityType() {
 		Type t = getClass().getGenericSuperclass();
 		ParameterizedType pt = (ParameterizedType) t;
-		entityType = (Class<ENTITY>) pt.getActualTypeArguments()[0];
+		return (Class<ENTITY>) pt.getActualTypeArguments()[0];
 	}
 
 	protected abstract AbstractDAO<ENTITY> getDAO();
@@ -81,7 +77,7 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 		return getDAO().get(id);
 	}
 
-	public ENTITY add(ENTITY entity) throws Exception {
+	public ENTITY add(ENTITY entity) {
 		validate(null, entity);
 
 		getDAO().add(entity);
@@ -89,9 +85,9 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 		return entity;
 	}
 
-	protected abstract void build(ENTITY entity) throws Exception;
+	protected abstract void build(ENTITY entity);
 
-	public ENTITY update(Long id, ENTITY entity) throws Exception {
+	public ENTITY update(Long id, ENTITY entity) {
 		validate(id, entity);
 
 		getDAO().update(entity);
@@ -99,20 +95,20 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 		return entity;
 	}
 
-	public void remove(Long id) throws Exception {
+	public void remove(Long id) {
 		ENTITY entity = getDAO().get(id);
 		getDAO().remove(entity);
 	}
 
-	public void validate(Long id, ENTITY entity) throws Exception {
+	public void validate(Long id, ENTITY entity) {
 		if (entity == null) {
-			throw new MandatoryFieldsException(entityType.getSimpleName() + " nao encontrada na requisicao.");
+			throw new MandatoryFieldsException(getEntityType().getSimpleName() + " nao encontrada na requisicao.");
 		}
 
 		if (id != null && !getDAO().exists(id)) {
-			throw new EntityNotFoundException(entityType.getSimpleName() + "[" + id + "] não encontrado.");
+			throw new EntityNotFoundException(getEntityType().getSimpleName() + "[" + id + "] não encontrado.");
 		}
-		
+
 		build(entity);
 
 		Set<ConstraintViolation<ENTITY>> violations = validator.validate(entity);

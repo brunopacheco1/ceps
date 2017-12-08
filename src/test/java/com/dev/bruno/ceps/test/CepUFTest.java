@@ -1,15 +1,17 @@
 package com.dev.bruno.ceps.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
-import javax.ejb.embeddable.EJBContainer;
-import javax.inject.Inject;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.dev.bruno.ceps.dao.CepUFDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.CepUF;
@@ -17,33 +19,18 @@ import com.dev.bruno.ceps.service.CepUFService;
 
 public class CepUFTest {
 
-	@Inject
-	private CepUFService service;
-
-	private static EJBContainer container;
+	private static CepUFService service;
 
 	@BeforeClass
 	public static void setUp() {
-		container = EJBContainer.createEJBContainer();
-	}
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
 
-	@Before
-	public void SetUpTest() throws Exception {
-		container.getContext().bind("inject", this);
-	}
-
-	@AfterClass
-	public static void tearDown() {
-		container.close();
+		service = new CepUFService(mock(CepUFDAO.class), validator);
 	}
 
 	@Test
-	public void testNullService() {
-		assertTrue(service instanceof CepUFService);
-	}
-
-	@Test
-	public void testServiceAddNull() {
+	public void testAddNull() {
 		try {
 			service.add(null);
 		} catch (Exception e) {
@@ -52,11 +39,23 @@ public class CepUFTest {
 	}
 
 	@Test
-	public void testServiceAddValidation() {
+	public void testAddEmptyObject() {
 		try {
 			service.add(new CepUF());
 		} catch (Exception e) {
 			assertTrue(e instanceof ConstraintViolationException);
 		}
+	}
+
+	@Test
+	public void testAdd() {
+		CepUF cepUF = new CepUF();
+		cepUF.setUf("RJ");
+
+		Object result = service.add(cepUF);
+
+		assertNotNull(result);
+
+		assertTrue(result instanceof CepUF);
 	}
 }

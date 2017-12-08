@@ -1,62 +1,95 @@
 package com.dev.bruno.ceps.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import javax.ejb.embeddable.EJBContainer;
-import javax.inject.Inject;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
+import com.dev.bruno.ceps.dao.CepUFDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.CepLocalidade;
+import com.dev.bruno.ceps.model.CepUF;
 import com.dev.bruno.ceps.service.CepLocalidadeService;
 
 public class CepLocalidadeTest {
 
-	@Inject
-	private CepLocalidadeService service;
+	private static CepUFDAO cepUFDAO;
 
-	private static EJBContainer container;
+	private static CepLocalidadeService service;
 
 	@BeforeClass
 	public static void setUp() {
-		container = EJBContainer.createEJBContainer();
-	}
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
 
-	@Before
-	public void SetUpTest() throws Exception {
-		container.getContext().bind("inject", this);
-	}
+		cepUFDAO = mock(CepUFDAO.class);
 
-	@AfterClass
-	public static void tearDown() {
-		container.close();
+		service = new CepLocalidadeService(mock(CepLocalidadeDAO.class), cepUFDAO, validator);
 	}
-
+	
 	@Test
-	public void testNullService() {
-		assertTrue(service instanceof CepLocalidadeService);
-	}
-
-	@Test
-	public void testServiceAddNull() {
+	public void testAddNull() {
 		try {
 			service.add(null);
 		} catch (Exception e) {
 			assertTrue(e instanceof MandatoryFieldsException);
 		}
 	}
+	
+	@Test
+	public void testAddEmptyObject() {
+		when(cepUFDAO.get(null)).thenThrow(MandatoryFieldsException.class);
+		
+		try {
+			service.add(new CepLocalidade());
+		} catch (Exception e) {
+			assertTrue(e instanceof MandatoryFieldsException);
+		}
+	}
 
-//	@Test
-//	public void testServiceAddValidation() {
-//		try {
-//			service.add(new CepLocalidade());
-//		} catch (Exception e) {
-//			assertTrue(e instanceof ConstraintViolationException);
-//		}
-//	}
+	@Test
+	public void testAddUf() {
+		CepUF cepUF = new CepUF();
+		cepUF.setUf("RJ");
+		cepUF.setId(1L);
+
+		CepLocalidade cepLocalidade = new CepLocalidade();
+		cepLocalidade.setCepUF(cepUF);
+
+		when(cepUFDAO.get(1L)).thenReturn(cepUF);
+
+		try {
+			service.add(cepLocalidade);
+		} catch (Exception e) {
+			assertTrue(e instanceof ConstraintViolationException);
+		}
+	}
+	
+	@Test
+	public void testAdd() {
+		CepUF cepUF = new CepUF();
+		cepUF.setUf("RJ");
+		cepUF.setId(1L);
+
+		CepLocalidade cepLocalidade = new CepLocalidade();
+		cepLocalidade.setCepUF(cepUF);
+		cepLocalidade.setNome("Rio de Janeiro");
+		
+		when(cepUFDAO.get(1L)).thenReturn(cepUF);
+
+		Object result = service.add(cepLocalidade);
+		
+		assertNotNull(result);
+		
+		assertTrue(result instanceof CepLocalidade);
+	}
 }

@@ -56,7 +56,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		}
 	}
 
-	public ENTITY get(Long id) throws EntityNotFoundException, MandatoryFieldsException {
+	public ENTITY get(Long id) {
 		if (!exists(id)) {
 			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
 		}
@@ -66,7 +66,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		return result;
 	}
 
-	public void remove(ENTITY entity) throws EntityNotFoundException {
+	public void remove(ENTITY entity) {
 		if (entity == null) {
 			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
 		}
@@ -74,7 +74,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		manager.remove(entity);
 	}
 
-	public void add(ENTITY entity) throws EntityNotFoundException {
+	public void add(ENTITY entity) {
 		if (entity == null) {
 			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
 		}
@@ -82,7 +82,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		manager.persist(entity);
 	}
 
-	public void update(ENTITY entity) throws EntityNotFoundException {
+	public void update(ENTITY entity) {
 		if (entity == null) {
 			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
 		}
@@ -90,8 +90,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		manager.merge(entity);
 	}
 
-	public List<ENTITY> list(String queryStr, Integer start, Integer limit, String order, String dir)
-			throws MandatoryFieldsException, InvalidValueException {
+	public List<ENTITY> list(String queryStr, Integer start, Integer limit, String order, String dir) {
 		if (start == null || limit == null || order == null || dir == null) {
 			throw new MandatoryFieldsException("start, limit, order e dir são obrigatórios");
 		}
@@ -138,7 +137,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		return manager.createQuery("select e from " + type.getSimpleName() + " e order by e.id", type).getResultList();
 	}
 
-	public Boolean exists(Long id) throws MandatoryFieldsException {
+	public Boolean exists(Long id) {
 		if (id == null) {
 			throw new MandatoryFieldsException("id é obrigatório");
 		}

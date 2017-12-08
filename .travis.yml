@@ -13,8 +13,8 @@ addons:
 before_install:
   - docker pull jboss/wildfly
 script:
-  - sonar-scanner
   - mvn clean package
+  - sonar-scanner
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker build -t "$DOCKER_USERNAME/ceps" .;
     else

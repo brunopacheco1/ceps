@@ -20,7 +20,7 @@ import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
-import com.dev.bruno.ceps.service.CepLogradouroService;
+import com.dev.bruno.ceps.services.CepLogradouroService;
 
 public class CepLogradouroTest {
 

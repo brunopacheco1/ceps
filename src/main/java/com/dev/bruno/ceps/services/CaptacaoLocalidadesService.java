@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.service;
+package com.dev.bruno.ceps.services;
 
 import java.util.Date;
 import java.util.Map;
@@ -42,8 +42,9 @@ public class CaptacaoLocalidadesService {
 
 	@Inject
 	private CepDAO cepDAO;
-	
-	private Logger logger = Logger.getLogger(getClass().getName());
+
+	@Inject
+	private Logger logger;
 
 	@Resource
 	private TimerService timerService;
@@ -65,7 +66,7 @@ public class CaptacaoLocalidadesService {
 
 		timerService.createSingleActionTimer(expiration, timerConfig);
 	}
-	
+
 	@Timeout
 	public void captarLocalidades(Timer timer) {
 		Long time = System.currentTimeMillis();

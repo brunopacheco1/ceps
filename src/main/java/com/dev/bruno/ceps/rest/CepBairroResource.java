@@ -10,8 +10,8 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLogradouro;
 import com.dev.bruno.ceps.responses.ResultList;
-import com.dev.bruno.ceps.service.AbstractService;
-import com.dev.bruno.ceps.service.CepBairroService;
+import com.dev.bruno.ceps.services.AbstractService;
+import com.dev.bruno.ceps.services.CepBairroService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

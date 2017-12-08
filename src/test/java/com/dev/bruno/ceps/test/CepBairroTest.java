@@ -18,7 +18,7 @@ import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.service.CepBairroService;
+import com.dev.bruno.ceps.services.CepBairroService;
 
 public class CepBairroTest {
 

@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import com.dev.bruno.ceps.model.AbstractModel;
 import com.dev.bruno.ceps.responses.GenericResponse;
 import com.dev.bruno.ceps.responses.ResultList;
-import com.dev.bruno.ceps.service.AbstractService;
+import com.dev.bruno.ceps.services.AbstractService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

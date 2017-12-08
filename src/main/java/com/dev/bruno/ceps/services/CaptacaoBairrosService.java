@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.service;
+package com.dev.bruno.ceps.services;
 
 import java.net.URLEncoder;
 import java.time.LocalDate;
@@ -36,7 +36,8 @@ import com.dev.bruno.ceps.utils.StringUtils;
 @Stateless
 public class CaptacaoBairrosService {
 
-	private Logger logger = Logger.getLogger(getClass().getName());
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;

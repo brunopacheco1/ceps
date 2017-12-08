@@ -11,8 +11,8 @@ import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
 import com.dev.bruno.ceps.responses.ResultList;
-import com.dev.bruno.ceps.service.AbstractService;
-import com.dev.bruno.ceps.service.CepLocalidadeService;
+import com.dev.bruno.ceps.services.AbstractService;
+import com.dev.bruno.ceps.services.CepLocalidadeService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

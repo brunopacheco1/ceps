@@ -15,7 +15,7 @@ import com.dev.bruno.ceps.dao.CepTipoLogradouroDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.CepTipoLogradouro;
-import com.dev.bruno.ceps.service.CepTipoLogradouroService;
+import com.dev.bruno.ceps.services.CepTipoLogradouroService;
 
 public class CepTipoLogradouroTest {
 

@@ -1,5 +1,7 @@
 package com.dev.bruno.ceps.timers;
 
+import java.util.Properties;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.ScheduleExpression;
@@ -12,29 +14,31 @@ import javax.ejb.TimerService;
 import javax.inject.Inject;
 
 import com.dev.bruno.ceps.model.CepUFEnum;
-import com.dev.bruno.ceps.service.CaptacaoBairrosService;
-import com.dev.bruno.ceps.service.CepsProperties;
+import com.dev.bruno.ceps.resources.Configurable;
+import com.dev.bruno.ceps.services.CaptacaoBairrosService;
 
 @Singleton
 @Startup
 public class CaptacaoBairrosTimer {
-	
+
 	public static final String INFO_PREFIX = "CaptacaoBairrosTimer_";
 
 	@Inject
 	private CaptacaoBairrosService service;
 
 	@Inject
-	private CepsProperties properties;
+	@Configurable("captacao.ativa")
+	private Boolean captacaoAtiva;
+
+	@Inject
+	private Properties properties;
 
 	@Resource
 	private TimerService timerService;
 
 	@PostConstruct
 	private void init() {
-		Boolean ativa = Boolean.parseBoolean(properties.getProperty("captacao.ativa"));
-
-		if (!ativa) {
+		if (!captacaoAtiva) {
 			return;
 		}
 

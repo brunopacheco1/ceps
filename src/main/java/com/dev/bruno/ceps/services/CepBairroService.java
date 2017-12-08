@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.service;
+package com.dev.bruno.ceps.services;
 
 import java.util.List;
 

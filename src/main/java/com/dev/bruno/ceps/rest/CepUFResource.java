@@ -9,8 +9,8 @@ import javax.ws.rs.PathParam;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepUF;
 import com.dev.bruno.ceps.responses.ResultList;
-import com.dev.bruno.ceps.service.AbstractService;
-import com.dev.bruno.ceps.service.CepUFService;
+import com.dev.bruno.ceps.services.AbstractService;
+import com.dev.bruno.ceps.services.CepUFService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

@@ -19,7 +19,7 @@ import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.CepTipo;
-import com.dev.bruno.ceps.service.CepService;
+import com.dev.bruno.ceps.services.CepService;
 
 public class CepTest {
 

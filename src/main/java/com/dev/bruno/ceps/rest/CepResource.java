@@ -10,8 +10,8 @@ import javax.ws.rs.QueryParam;
 import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.CepTipo;
 import com.dev.bruno.ceps.responses.ResultList;
-import com.dev.bruno.ceps.service.AbstractService;
-import com.dev.bruno.ceps.service.CepService;
+import com.dev.bruno.ceps.services.AbstractService;
+import com.dev.bruno.ceps.services.CepService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

@@ -9,11 +9,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.dev.bruno.ceps.responses.GenericResponse;
-import com.dev.bruno.ceps.service.CaptacaoBairrosService;
-import com.dev.bruno.ceps.service.CaptacaoCepsEspeciaisService;
-import com.dev.bruno.ceps.service.CaptacaoCepsService;
-import com.dev.bruno.ceps.service.CaptacaoFaixasCepService;
-import com.dev.bruno.ceps.service.CaptacaoLocalidadesService;
+import com.dev.bruno.ceps.services.CaptacaoBairrosService;
+import com.dev.bruno.ceps.services.CaptacaoCepsEspeciaisService;
+import com.dev.bruno.ceps.services.CaptacaoCepsService;
+import com.dev.bruno.ceps.services.CaptacaoFaixasCepService;
+import com.dev.bruno.ceps.services.CaptacaoLocalidadesService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

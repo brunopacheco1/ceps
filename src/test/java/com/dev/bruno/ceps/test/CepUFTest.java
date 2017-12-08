@@ -15,7 +15,7 @@ import com.dev.bruno.ceps.dao.CepUFDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.CepUF;
-import com.dev.bruno.ceps.service.CepUFService;
+import com.dev.bruno.ceps.services.CepUFService;
 
 public class CepUFTest {
 

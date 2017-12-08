@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.service;
+package com.dev.bruno.ceps.services;
 
 import java.util.Date;
 import java.util.Map;
@@ -25,15 +25,17 @@ import org.jsoup.nodes.Element;
 import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepUF;
+import com.dev.bruno.ceps.resources.Configurable;
 import com.dev.bruno.ceps.timers.CaptacaoFaixasCepTimer;
 
 @Stateless
 public class CaptacaoFaixasCepService {
 
-	private Logger logger = Logger.getLogger(getClass().getName());
-
 	@Inject
-	private CepsProperties properties;
+	private Logger logger;
+
+	@Configurable("captacao.faixas-de-cep.limit")
+	private Integer limiteCaptacaoFaixas;
 
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;
@@ -77,9 +79,7 @@ public class CaptacaoFaixasCepService {
 	}
 
 	private void captarFaixasCep() throws Exception {
-		Integer limit = Integer.parseInt(properties.getProperty("captacao.faixas-de-cep.limit"));
-
-		for (CepLocalidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesSemFaixaCep(limit)) {
+		for (CepLocalidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesSemFaixaCep(limiteCaptacaoFaixas)) {
 			buscarFaixaCep(cepLocalidade);
 
 			cepLocalidadeDAO.update(cepLocalidade);

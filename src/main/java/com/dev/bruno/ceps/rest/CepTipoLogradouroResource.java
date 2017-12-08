@@ -5,8 +5,8 @@ import javax.inject.Inject;
 import javax.ws.rs.Path;
 
 import com.dev.bruno.ceps.model.CepTipoLogradouro;
-import com.dev.bruno.ceps.service.AbstractService;
-import com.dev.bruno.ceps.service.CepTipoLogradouroService;
+import com.dev.bruno.ceps.services.AbstractService;
+import com.dev.bruno.ceps.services.CepTipoLogradouroService;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;

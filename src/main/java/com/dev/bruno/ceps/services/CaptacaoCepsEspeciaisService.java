@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.service;
+package com.dev.bruno.ceps.services;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -43,7 +43,8 @@ import com.dev.bruno.ceps.utils.StringUtils;
 @Stateless
 public class CaptacaoCepsEspeciaisService {
 
-	private Logger logger = Logger.getLogger(getClass().getName());
+	@Inject
+	private Logger logger;
 
 	@Inject
 	private CepLocalidadeDAO cepLocalidadeDAO;

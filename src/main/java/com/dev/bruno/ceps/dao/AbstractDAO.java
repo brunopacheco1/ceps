@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import com.dev.bruno.ceps.exceptions.EntityNotFoundException;
@@ -22,7 +22,7 @@ import com.dev.bruno.ceps.model.AbstractModel;
 
 public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
-	@PersistenceContext
+	@Inject
 	protected EntityManager manager;
 
 	protected Class<ENTITY> type;

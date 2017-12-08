@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.service;
+package com.dev.bruno.ceps.services;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -33,16 +33,19 @@ import com.dev.bruno.ceps.model.CepBairro;
 import com.dev.bruno.ceps.model.CepLocalidade;
 import com.dev.bruno.ceps.model.CepLogradouro;
 import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.resources.Configurable;
 import com.dev.bruno.ceps.timers.CaptacaoCepsTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoCepsService {
 
-	private Logger logger = Logger.getLogger(getClass().getName());
+	@Inject
+	private Logger logger;
 
 	@Inject
-	private CepsProperties properties;
+	@Configurable("captacao.ceps-de-logradouros.limit")
+	private Integer limiteCaptacaoLogradouro;
 
 	@Inject
 	private CepBairroDAO cepBairroDAO;
@@ -96,9 +99,7 @@ public class CaptacaoCepsService {
 	}
 
 	private void captarCeps() throws Exception {
-		Integer limit = Integer.parseInt(properties.getProperty("captacao.ceps-de-logradouros.limit"));
-
-		for (CepBairro cepBairro : cepBairroDAO.listarBairrosNaoProcessados(limit)) {
+		for (CepBairro cepBairro : cepBairroDAO.listarBairrosNaoProcessados(limiteCaptacaoLogradouro)) {
 			captarCepsDeBairro(cepBairro);
 		}
 	}

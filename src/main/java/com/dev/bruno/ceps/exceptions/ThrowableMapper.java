@@ -3,6 +3,7 @@ package com.dev.bruno.ceps.exceptions;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -14,7 +15,8 @@ import com.dev.bruno.ceps.responses.GenericResponse;
 @Provider
 public class ThrowableMapper implements ExceptionMapper<Throwable> {
 
-	private Logger logger = Logger.getLogger(getClass().getName());
+	@Inject
+	private Logger logger;
 
 	@Override
 	public Response toResponse(Throwable t) {

@@ -7,7 +7,7 @@ services:
   - docker
 addons:
   sonarcloud:
-    organization: "brunopacheco1-github"
+    organization: $SONAR_ORGANIZATION
     token:
       secure: $SONAR_TOKEN
 before_install:

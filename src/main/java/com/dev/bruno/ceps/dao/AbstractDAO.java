@@ -22,6 +22,8 @@ import com.dev.bruno.ceps.model.AbstractModel;
 
 public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
+	private static final String ENTIDADE_NAO_ENCONTRADA = "Entidade não encontrada"; 
+	
 	@Inject
 	protected EntityManager manager;
 
@@ -58,7 +60,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
 	public ENTITY get(Long id) {
 		if (!exists(id)) {
-			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
+			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
 
 		ENTITY result = manager.find(type, id);
@@ -68,7 +70,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
 	public void remove(ENTITY entity) {
 		if (entity == null) {
-			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
+			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
 
 		manager.remove(entity);
@@ -76,7 +78,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
 	public void add(ENTITY entity) {
 		if (entity == null) {
-			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
+			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
 
 		manager.persist(entity);
@@ -84,7 +86,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
 	public void update(ENTITY entity) {
 		if (entity == null) {
-			throw new EntityNotFoundException(type.getSimpleName() + " não encontrado");
+			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
 
 		manager.merge(entity);
@@ -107,7 +109,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 
 			boolean first = true;
 
-			for (String queryOption : queryOptions()) {
+			for (String queryOption : queryOptions) {
 				if (!first) {
 					hql.append(" or ");
 				}
@@ -125,7 +127,7 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		TypedQuery<ENTITY> query = manager.createQuery(hql.toString(), type);
 
 		if (queryStr != null && !queryStr.isEmpty()) {
-			for (String queryOption : queryOptions()) {
+			for (String queryOption : queryOptions) {
 				query.setParameter(queryOption, "%" + queryStr + "%");
 			}
 		}
@@ -156,22 +158,6 @@ public abstract class AbstractDAO<ENTITY extends AbstractModel> {
 		dirOptions.add("desc");
 
 		return dirOptions;
-	}
-
-	protected Set<String> queryOptions() {
-		List<Field> fields = new ArrayList<Field>();
-
-		fields.addAll(Arrays.asList(type.getDeclaredFields()));
-
-		Set<String> result = new HashSet<>();
-
-		for (Field field : fields) {
-			if (field.getType().equals(String.class)) {
-				result.add(field.getName());
-			}
-		}
-
-		return result;
 	}
 
 	public Class<ENTITY> getType() {

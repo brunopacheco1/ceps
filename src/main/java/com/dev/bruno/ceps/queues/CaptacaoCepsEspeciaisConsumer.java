@@ -22,7 +22,7 @@ public class CaptacaoCepsEspeciaisConsumer implements MessageListener {
 		try {
 			Long cepLocalidadeId = message.getBody(Long.class);
 
-			service.captarCepsEspeciais(cepLocalidadeId);
+			service.captarCepsEspeciaisByCepLocalidadeId(cepLocalidadeId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

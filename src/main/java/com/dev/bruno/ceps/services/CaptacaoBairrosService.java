@@ -21,7 +21,6 @@ import javax.jms.JMSContext;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -35,6 +34,8 @@ import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoBairrosService {
+
+	private static final String CORREIOS_CHARSET = "ISO-8859-1";
 
 	@Inject
 	private Logger logger;
@@ -107,8 +108,14 @@ public class CaptacaoBairrosService {
 	}
 
 	private void buscarBairros(CepLocalidade cepLocalidade) throws Exception {
-		if (cepLocalidade.getCaptacaoBairros() != null
-				&& !LocalDate.now().isAfter(cepLocalidade.getCaptacaoBairros())) {
+		LocalDate now = LocalDate.now();
+		LocalDate toCheck = now;
+
+		if (cepLocalidade.getCaptacaoBairros() != null) {
+			toCheck = cepLocalidade.getCaptacaoBairros();
+		}
+
+		if (!now.isAfter(toCheck)) {
 			return;
 		}
 
@@ -117,32 +124,29 @@ public class CaptacaoBairrosService {
 
 		String uf = cepLocalidade.getCepUF().getUf();
 
-		String localidadeQuery = cepLocalidade.getDistrito() != null ? cepLocalidade.getDistrito()
-				: cepLocalidade.getNome();
+		String localidadeQuery = cepLocalidade.getNome();
+		if (cepLocalidade.getDistrito() != null) {
+			localidadeQuery = cepLocalidade.getDistrito();
+		}
 
 		Connection localidadeConnection = Jsoup
 				.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/consultaBairro.cfm?mostrar=1&UF=" + uf
-						+ "&Localidade=" + URLEncoder.encode(localidadeQuery, "ISO-8859-1"))
+						+ "&Localidade=" + URLEncoder.encode(localidadeQuery, CORREIOS_CHARSET))
 				.timeout(360000);
 
 		Response localidadeResponse = null;
 		try {
 			localidadeResponse = localidadeConnection.method(Method.GET).execute();
 		} catch (Exception e) {
-			Thread.sleep(5000l);
-			try {
-				localidadeResponse = localidadeConnection.method(Method.GET).execute();
-			} catch (HttpStatusException e1) {
-				logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-						cepLocalidade.getCepUF().getUf()));
+			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
+					cepLocalidade.getCepUF().getUf()));
 
-				return;
-			}
+			return;
 		}
 
 		Map<String, String> localidadeCookies = localidadeResponse.cookies();
 
-		Document localidadeDocument = Jsoup.parse(new String(localidadeResponse.bodyAsBytes(), "ISO-8859-1"));
+		Document localidadeDocument = Jsoup.parse(new String(localidadeResponse.bodyAsBytes(), CORREIOS_CHARSET));
 
 		if (localidadeDocument.toString().contains("ACESSO NEGADO")) {
 			logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
@@ -164,25 +168,21 @@ public class CaptacaoBairrosService {
 
 			Document localidadeLetterDocument = null;
 			try {
-				localidadeLetterDocument = Jsoup.parse(new String(
-						localidadeLetterConnection.method(Method.POST).execute().bodyAsBytes(), "ISO-8859-1"));
-			} catch (HttpStatusException e) {
-				Thread.sleep(5000l);
-				try {
-					localidadeLetterDocument = Jsoup.parse(new String(
-							localidadeLetterConnection.method(Method.POST).execute().bodyAsBytes(), "ISO-8859-1"));
-				} catch (HttpStatusException e1) {
-					logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
+				Response response = localidadeLetterConnection.method(Method.POST).execute();
+				String stringBody = new String(response.bodyAsBytes(), CORREIOS_CHARSET);
+
+				if (stringBody.contains("ACESSO NEGADO")) {
+					logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
 							cepLocalidade.getCepUF().getUf()));
-
-					continue;
+					break;
 				}
-			}
 
-			if (localidadeLetterDocument.toString().contains("ACESSO NEGADO")) {
-				logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
+				localidadeLetterDocument = Jsoup.parse(stringBody);
+			} catch (Exception e) {
+				logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
 						cepLocalidade.getCepUF().getUf()));
-				break;
+
+				continue;
 			}
 
 			for (Element localidadeTr : localidadeLetterDocument.select("tr")) {

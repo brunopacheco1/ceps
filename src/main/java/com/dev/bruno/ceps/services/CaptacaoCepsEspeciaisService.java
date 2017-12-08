@@ -103,7 +103,7 @@ public class CaptacaoCepsEspeciaisService {
 		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> BEGIN", uf));
 
 		try {
-			captarCepsEspeciais(uf);
+			captarCepsEspeciaisByUF(uf);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
@@ -113,19 +113,19 @@ public class CaptacaoCepsEspeciaisService {
 		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	private void captarCepsEspeciais(String uf) throws Exception {
+	private void captarCepsEspeciaisByUF(String uf) throws Exception {
 		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
 			context.createProducer().send(queue, cepLocalidadeId);
 		}
 	}
 
-	public void captarCepsEspeciais(Long cepLocalidadeId) throws Exception {
+	public void captarCepsEspeciaisByCepLocalidadeId(Long cepLocalidadeId) throws Exception {
 		CepLocalidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
-		buscarCepsEspeciais(cepLocalidade);
+		captarCepsEspeciaisByCepLocalidade(cepLocalidade);
 	}
 
-	private void buscarCepsEspeciais(CepLocalidade cepLocalidade) throws Exception {
+	private void captarCepsEspeciaisByCepLocalidade(CepLocalidade cepLocalidade) throws Exception {
 		if (cepLocalidade.getCaptacaoCepsEspeciais() != null
 				&& !LocalDate.now().isAfter(cepLocalidade.getCaptacaoCepsEspeciais())) {
 			return;

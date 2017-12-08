@@ -1,12 +1,19 @@
 language: java
+dist: trusty
 sudo: required
 jdk:
   - oraclejdk8
 services:
   - docker
+addons:
+  sonarcloud:
+    organization: "brunopacheco1-github"
+    token:
+      secure: $SONAR_TOKEN
 before_install:
   - docker pull jboss/wildfly
-script: 
+script:
+  - sonar-scanner
   - mvn clean package
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker build -t "$DOCKER_USERNAME/ceps" .;

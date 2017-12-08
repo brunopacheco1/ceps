@@ -9,14 +9,14 @@ before_install:
 script: 
   - mvn clean package
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker build -t brunopacheco1/ceps .;
+    docker build -t "$DOCKER_USERNAME/ceps" .;
     else
-    docker build -t "brunopacheco1/ceps:$TRAVIS_BRANCH" .;
+    docker build -t "$DOCKER_USERNAME/ceps:$TRAVIS_BRANCH" .;
     fi
 after_success:
   - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker push brunopacheco1/ceps:latest;
+    docker push "$DOCKER_USERNAME/ceps:latest";
     else
-    docker push "brunopacheco1/ceps:$TRAVIS_BRANCH";
+    docker push "$DOCKER_USERNAME/ceps:$TRAVIS_BRANCH";
     fi

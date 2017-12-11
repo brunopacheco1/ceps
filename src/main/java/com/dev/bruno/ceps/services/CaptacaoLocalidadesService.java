@@ -34,10 +34,10 @@ import com.dev.bruno.ceps.utils.StringUtils;
 public class CaptacaoLocalidadesService {
 
 	@Inject
-	private UFDAO cepUFDAO;
+	private UFDAO ufDAO;
 
 	@Inject
-	private LocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO localidadeDAO;
 
 	@Inject
 	private CepDAO cepDAO;
@@ -77,7 +77,7 @@ public class CaptacaoLocalidadesService {
 		logger.info(String.format("CAPTACAO DE LOCALIDADES PARA %s --> BEGIN", uf));
 
 		try {
-			captarLocalidades(uf);
+			captarLocalidadesPorUF(uf);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
@@ -87,11 +87,11 @@ public class CaptacaoLocalidadesService {
 		logger.info(String.format("CAPTACAO DE LOCALIDADES PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	public void captarLocalidades(String uf) {
-		UF cepUF = cepUFDAO.buscarPorUF(uf);
+	public void captarLocalidadesPorUF(String nomeUf) {
+		UF uf = ufDAO.buscarPorUF(nomeUf);
 
 		Connection ufConnection = Jsoup.connect(
-				"http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=1&UF=" + uf)
+				"http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=1&UF=" + nomeUf)
 				.timeout(360000);
 
 		Response ufResponse = null;
@@ -114,7 +114,7 @@ public class CaptacaoLocalidadesService {
 					.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=2")
 					.timeout(360000);
 			letterConnection.cookies(cookies);
-			letterConnection.data("UF", uf);
+			letterConnection.data("UF", nomeUf);
 			letterConnection.data("Letra", ufLetra);
 
 			Document letterDocument = null;
@@ -128,60 +128,60 @@ public class CaptacaoLocalidadesService {
 
 			for (Element ufTr : letterDocument.select("tr")) {
 				String localidadeQuery = ufTr.select("td").get(0).select("input").attr("onclick");
-				String localidade = ufTr.select("td").get(1).html().replaceAll("&nbsp;", "").replaceAll("<.*?>", "")
+				String nomeLocalidade = ufTr.select("td").get(1).html().replaceAll("&nbsp;", "").replaceAll("<.*?>", "")
 						.trim();
-				String distrito = null;
+				String nomeDistrito = null;
 
-				String cep = ufTr.select("td").get(2).text();
+				String numeroCep = ufTr.select("td").get(2).text();
 
-				if (localidade.equals("Localidade:")) {
+				if (nomeLocalidade.equals("Localidade:")) {
 					continue;
 				}
 
-				if (localidade.matches("^.+\\s\\(.+\\)\\/\\D{2}$")) {
-					distrito = localidade.substring(0, localidade.indexOf("(")).trim();
-					localidade = localidade.substring(localidade.indexOf("(") + 1, localidade.indexOf(")")).trim();
+				if (nomeLocalidade.matches("^.+\\s\\(.+\\)\\/\\D{2}$")) {
+					nomeDistrito = nomeLocalidade.substring(0, nomeLocalidade.indexOf("(")).trim();
+					nomeLocalidade = nomeLocalidade.substring(nomeLocalidade.indexOf("(") + 1, nomeLocalidade.indexOf(")")).trim();
 				}
 
-				localidade = localidade.split("\\/")[0].trim();
+				nomeLocalidade = nomeLocalidade.split("\\/")[0].trim();
 
-				if (cep.contains("Localidade subordinada")) {
+				if (numeroCep.contains("Localidade subordinada")) {
 					continue;
 				}
 
-				if (cepLocalidadeDAO.existsByNomeDistrito(uf, localidade, distrito)) {
+				if (localidadeDAO.existePorNomeDistrito(nomeUf, nomeLocalidade, nomeDistrito)) {
 					continue;
 				}
 
-				Localidade cepLocalidade = new Localidade();
+				Localidade localidade = new Localidade();
 
-				cepLocalidade.setNome(localidade);
+				localidade.setNome(nomeLocalidade);
 
-				if (distrito == null) {
-					cepLocalidade.setNomeNormalizado(StringUtils.normalizarNome(localidade));
+				if (nomeDistrito == null) {
+					localidade.setNomeNormalizado(StringUtils.normalizarNome(nomeLocalidade));
 				} else {
-					cepLocalidade.setNomeNormalizado(StringUtils.normalizarNome(distrito + " (" + localidade + ")"));
+					localidade.setNomeNormalizado(StringUtils.normalizarNome(nomeDistrito + " (" + nomeLocalidade + ")"));
 				}
-				cepLocalidade.setDistrito(distrito);
-				cepLocalidade.setCepUF(cepUF);
+				localidade.setDistrito(nomeDistrito);
+				localidade.setUf(uf);
 
-				cep = cep.replaceAll("\\D", "");
+				numeroCep = numeroCep.replaceAll("\\D", "");
 
-				Cep cepObj = null;
-				if (cep.matches("^\\d{8}$")) {
-					cepObj = new Cep();
-					cepObj.setTipoCep(TipoCepEnum.UNI);
-					cepObj.setNumeroCep(cep);
-					cepObj.setCepLocalidade(cepLocalidade);
+				Cep cep = null;
+				if (numeroCep.matches("^\\d{8}$")) {
+					cep = new Cep();
+					cep.setTipoCep(TipoCepEnum.UNI);
+					cep.setNumeroCep(numeroCep);
+					cep.setLocalidade(localidade);
 				}
 
 				localidadeQuery = localidadeQuery.substring(localidadeQuery.indexOf(",\"") + 2,
 						localidadeQuery.lastIndexOf("\""));
 
-				cepLocalidadeDAO.add(cepLocalidade);
+				localidadeDAO.add(localidade);
 
-				if (cepObj != null) {
-					cepDAO.add(cepObj);
+				if (cep != null) {
+					cepDAO.add(cep);
 				}
 			}
 		}

@@ -18,7 +18,6 @@ import com.dev.bruno.ceps.dao.LogradouroDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.services.CepService;
 
 public class CepServiceTest {
@@ -60,14 +59,7 @@ public class CepServiceTest {
 		try {
 			service.add(cep);
 		} catch (Exception e) {
-			assertTrue(e instanceof ConstraintViolationException);
-		}
-
-		cep.setNumeroCep("20101111");
-
-		try {
-			service.add(cep);
-		} catch (Exception e) {
+			e.printStackTrace();
 			assertTrue(e instanceof ConstraintViolationException);
 		}
 
@@ -83,8 +75,7 @@ public class CepServiceTest {
 	@Test
 	public void testAdd() {
 		Cep cep = new Cep();
-		cep.setNumeroCep("20101-111");
-		cep.setTipoCep(TipoCepEnum.UOP);
+		cep.setNumeroCep("20101111");
 
 		Object result = service.add(cep);
 

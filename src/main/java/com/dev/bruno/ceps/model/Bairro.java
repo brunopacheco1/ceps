@@ -35,7 +35,7 @@ public class Bairro extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_LOCALIDADE", nullable = false)
 	@NotNull
-	private Localidade cepLocalidade;
+	private Localidade localidade;
 
 	@Column(name = "DSC_NOME", nullable = false)
 	@NotNull
@@ -45,17 +45,17 @@ public class Bairro extends AbstractModel {
 	@NotNull
 	private String nomeNormalizado;
 
-	@OneToMany(mappedBy = "cepBairro")
+	@OneToMany(mappedBy = "bairro")
 	@XmlTransient
 	private List<Logradouro> logradouros = new ArrayList<>();
 
-	@OneToMany(mappedBy = "cepBairro")
+	@OneToMany(mappedBy = "bairro")
 	@XmlTransient
 	private List<Cep> ceps = new ArrayList<>();
 
 	@Column(name = "DAT_ULTIMO_PROCESSAMENTO")
 	@XmlTransient
-	private LocalDateTime ultimoProcessamento;
+	private LocalDateTime dataUltimoProcessamento;
 
 	public Long getId() {
 		return id;
@@ -65,16 +65,16 @@ public class Bairro extends AbstractModel {
 		this.id = id;
 	}
 
-	public Localidade getCepLocalidade() {
-		return cepLocalidade;
+	public Localidade getLocalidade() {
+		return localidade;
 	}
 
-	public Long getCepLocalidadeId() {
-		return cepLocalidade != null ? cepLocalidade.getId() : null;
+	public Long getLocalidadeId() {
+		return localidade != null ? localidade.getId() : null;
 	}
 
-	public void setCepLocalidade(Localidade cepLocalidade) {
-		this.cepLocalidade = cepLocalidade;
+	public void setLocalidade(Localidade cepLocalidade) {
+		this.localidade = cepLocalidade;
 	}
 
 	public String getNome() {
@@ -109,11 +109,11 @@ public class Bairro extends AbstractModel {
 		this.ceps = ceps;
 	}
 
-	public LocalDateTime getUltimoProcessamento() {
-		return ultimoProcessamento;
+	public LocalDateTime getDataUltimoProcessamento() {
+		return dataUltimoProcessamento;
 	}
 
-	public void setUltimoProcessamento(LocalDateTime ultimoProcessamento) {
-		this.ultimoProcessamento = ultimoProcessamento;
+	public void setDataUltimoProcessamento(LocalDateTime dataUltimoProcessamento) {
+		this.dataUltimoProcessamento = dataUltimoProcessamento;
 	}
 }

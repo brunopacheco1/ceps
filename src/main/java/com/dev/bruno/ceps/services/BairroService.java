@@ -20,62 +20,62 @@ import com.dev.bruno.ceps.utils.StringUtils;
 public class BairroService extends AbstractService<Bairro> {
 
 	@Inject
-	private LocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO localidadeDAO;
 
 	@Inject
-	private BairroDAO cepBairroDAO;
+	private BairroDAO bairroDAO;
 
 	@Override
 	protected AbstractDAO<Bairro> getDAO() {
-		return cepBairroDAO;
+		return bairroDAO;
 	}
 
 	public BairroService() {
 	}
 
-	public BairroService(LocalidadeDAO cepLocalidadeDAO, BairroDAO cepBairroDAO, Validator validator) {
-		this.cepBairroDAO = cepBairroDAO;
-		this.cepLocalidadeDAO = cepLocalidadeDAO;
+	public BairroService(LocalidadeDAO localidadeDAO, BairroDAO bairroDAO, Validator validator) {
+		this.bairroDAO = bairroDAO;
+		this.localidadeDAO = localidadeDAO;
 		this.validator = validator;
 	}
 
 	@Override
-	protected void build(Bairro entity) {
-		Long cepLocalidadeId = entity.getCepLocalidadeId();
+	protected void build(Bairro bairro) {
+		Long localidadeId = bairro.getLocalidadeId();
 
-		Localidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
+		Localidade localidade = localidadeDAO.get(localidadeId);
 
-		entity.setCepLocalidade(localidade);
+		bairro.setLocalidade(localidade);
 
-		String nome = entity.getNome();
+		String nome = bairro.getNome();
 
 		if (nome != null) {
-			entity.setNomeNormalizado(StringUtils.normalizarNome(nome));
+			bairro.setNomeNormalizado(StringUtils.normalizarNome(nome));
 		}
 	}
 
-	public ResultList<Logradouro> getLogradouros(Long cepBairroId) {
-		Bairro bairro = getDAO().get(cepBairroId);
+	public ResultList<Logradouro> getLogradouros(Long bairroId) {
+		Bairro bairro = getDAO().get(bairroId);
 
-		List<Logradouro> entities = bairro.getLogradouros();
+		List<Logradouro> logradouros = bairro.getLogradouros();
 
 		ResultList<Logradouro> result = new ResultList<>();
 
-		result.setResult(entities);
-		result.setLimit(entities.size());
+		result.setResult(logradouros);
+		result.setLimit(logradouros.size());
 
 		return result;
 	}
 
-	public ResultList<Cep> getCeps(Long cepBairroId) {
-		Bairro bairro = getDAO().get(cepBairroId);
+	public ResultList<Cep> getCeps(Long bairroId) {
+		Bairro bairro = getDAO().get(bairroId);
 
-		List<Cep> entities = bairro.getCeps();
+		List<Cep> ceps = bairro.getCeps();
 
 		ResultList<Cep> result = new ResultList<>();
 
-		result.setResult(entities);
-		result.setLimit(entities.size());
+		result.setResult(ceps);
+		result.setLimit(ceps.size());
 
 		return result;
 	}

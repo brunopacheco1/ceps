@@ -25,24 +25,24 @@ public class CepService extends AbstractService<Cep> {
 	private CepDAO cepDAO;
 
 	@Inject
-	private LocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO localidadeDAO;
 
 	@Inject
-	private BairroDAO cepBairroDAO;
+	private BairroDAO bairroDAO;
 
 	@Inject
-	private LogradouroDAO cepLogradouroDAO;
+	private LogradouroDAO logradouroDAO;
 
 	public CepService() {
 	}
 
-	public CepService(CepDAO cepDAO, LocalidadeDAO cepLocalidadeDAO, BairroDAO cepBairroDAO,
-			LogradouroDAO cepLogradouroDAO, Validator validator) {
+	public CepService(CepDAO cepDAO, LocalidadeDAO localidadeDAO, BairroDAO bairroDAO, LogradouroDAO logradouroDAO,
+			Validator validator) {
 		super();
 		this.cepDAO = cepDAO;
-		this.cepLocalidadeDAO = cepLocalidadeDAO;
-		this.cepBairroDAO = cepBairroDAO;
-		this.cepLogradouroDAO = cepLogradouroDAO;
+		this.localidadeDAO = localidadeDAO;
+		this.bairroDAO = bairroDAO;
+		this.logradouroDAO = logradouroDAO;
 		this.validator = validator;
 	}
 
@@ -52,39 +52,43 @@ public class CepService extends AbstractService<Cep> {
 	}
 
 	@Override
-	protected void build(Cep entity) {
+	protected void build(Cep cep) {
 		Localidade localidade = null;
 
 		Bairro bairro = null;
 
 		Logradouro logradouro = null;
 
-		Long cepLocalidadeId = entity.getCepLocalidadeId();
+		Long localidadeId = cep.getLocalidadeId();
 
-		Long cepBairroId = entity.getCepBairroId();
+		Long bairroId = cep.getBairroId();
 
-		Long cepLogradouroId = entity.getCepLogradouroId();
+		Long logradouroId = cep.getLogradouroId();
 
-		if (cepLocalidadeId != null) {
-			localidade = cepLocalidadeDAO.get(cepLocalidadeId);
+		if (localidadeId != null) {
+			localidade = localidadeDAO.get(localidadeId);
 		}
 
-		if (cepBairroId != null) {
-			bairro = cepBairroDAO.get(cepBairroId);
+		if (bairroId != null) {
+			bairro = bairroDAO.get(bairroId);
 		}
 
-		if (cepLogradouroId != null) {
-			logradouro = cepLogradouroDAO.get(cepLogradouroId);
+		if (logradouroId != null) {
+			logradouro = logradouroDAO.get(logradouroId);
 		}
+		
+		String numeroCep = cep.getNumeroCep();
+		
+		cep.setTipoCep(TipoCepEnum.getTipoPorCEP(numeroCep));
 
-		entity.setCepLocalidade(localidade);
+		cep.setLocalidade(localidade);
 
-		entity.setCepBairro(bairro);
+		cep.setBairro(bairro);
 
-		entity.setCepLogradouro(logradouro);
+		cep.setLogradouro(logradouro);
 	}
 
-	public ResultList<Cep> getCeps(TipoCepEnum cepTipo, Integer start, Integer limit, String order, String dir) {
+	public ResultList<Cep> getCeps(TipoCepEnum tipo, Integer start, Integer limit, String order, String dir) {
 
 		if (start == null) {
 			start = 0;
@@ -102,11 +106,11 @@ public class CepService extends AbstractService<Cep> {
 			dir = "asc";
 		}
 
-		List<Cep> entities = cepDAO.list(cepTipo, start, limit, order, dir);
+		List<Cep> ceps = cepDAO.list(tipo, start, limit, order, dir);
 
 		ResultList<Cep> result = new ResultList<>();
 
-		result.setResult(entities);
+		result.setResult(ceps);
 		result.setLimit(limit);
 		result.setOrder(order);
 		result.setDir(dir);

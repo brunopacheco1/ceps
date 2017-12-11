@@ -63,7 +63,7 @@ public class BairroServiceTest {
 		cepLocalidade.setId(1L);
 
 		Bairro cepBairro = new Bairro();
-		cepBairro.setCepLocalidade(cepLocalidade);
+		cepBairro.setLocalidade(cepLocalidade);
 
 		when(cepLocalidadeDAO.get(1L)).thenReturn(cepLocalidade);
 
@@ -81,7 +81,7 @@ public class BairroServiceTest {
 		cepLocalidade.setId(1L);
 
 		Bairro cepBairro = new Bairro();
-		cepBairro.setCepLocalidade(cepLocalidade);
+		cepBairro.setLocalidade(cepLocalidade);
 		cepBairro.setNome("Santo Cristo");
 
 		when(cepLocalidadeDAO.get(1L)).thenReturn(cepLocalidade);

@@ -59,11 +59,11 @@ public class LocalidadeServiceTest {
 	@Test
 	public void testAddUf() {
 		UF cepUF = new UF();
-		cepUF.setUf("RJ");
+		cepUF.setNome("RJ");
 		cepUF.setId(1L);
 
 		Localidade cepLocalidade = new Localidade();
-		cepLocalidade.setCepUF(cepUF);
+		cepLocalidade.setUf(cepUF);
 
 		when(cepUFDAO.get(1L)).thenReturn(cepUF);
 
@@ -77,11 +77,11 @@ public class LocalidadeServiceTest {
 	@Test
 	public void testAdd() {
 		UF cepUF = new UF();
-		cepUF.setUf("RJ");
+		cepUF.setNome("RJ");
 		cepUF.setId(1L);
 
 		Localidade cepLocalidade = new Localidade();
-		cepLocalidade.setCepUF(cepUF);
+		cepLocalidade.setUf(cepUF);
 		cepLocalidade.setNome("Rio de Janeiro");
 		
 		when(cepUFDAO.get(1L)).thenReturn(cepUF);

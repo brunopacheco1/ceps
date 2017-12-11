@@ -12,23 +12,23 @@ import com.dev.bruno.ceps.model.TipoLogradouro;
 public class TipoLogradouroService extends AbstractService<TipoLogradouro> {
 
 	@Inject
-	private TipoLogradouroDAO cepTipoLogradouroDAO;
+	private TipoLogradouroDAO tipoLogradouroDAO;
 
 	public TipoLogradouroService() {
 	}
 
-	public TipoLogradouroService(TipoLogradouroDAO cepTipoLogradouroDAO, Validator validator) {
-		this.cepTipoLogradouroDAO = cepTipoLogradouroDAO;
+	public TipoLogradouroService(TipoLogradouroDAO tipoLogradouroDAO, Validator validator) {
+		this.tipoLogradouroDAO = tipoLogradouroDAO;
 		this.validator = validator;
 	}
 
 	@Override
 	protected AbstractDAO<TipoLogradouro> getDAO() {
-		return cepTipoLogradouroDAO;
+		return tipoLogradouroDAO;
 	}
 
 	@Override
-	protected void build(TipoLogradouro entity) {
-		//tipo de logradouro nao possui dependencias a serem contruidas
+	protected void build(TipoLogradouro tipoLogradouro) {
+		// tipo de logradouro nao possui dependencias a serem contruidas
 	}
 }

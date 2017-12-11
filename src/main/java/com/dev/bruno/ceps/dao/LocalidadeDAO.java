@@ -30,7 +30,7 @@ public class LocalidadeDAO extends AbstractDAO<Localidade> {
 				.getSingleResult();
 	}
 
-	public Boolean existsByNomeDistrito(String uf, String nome, String distrito) {
+	public Boolean existePorNomeDistrito(String uf, String nome, String distrito) {
 		String hql = "select count(l) from CepLocalidade l where l.cepUF.uf = :uf and l.nome = :nome";
 
 		if (distrito != null) {

@@ -34,15 +34,15 @@ public class Logradouro extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_LOCALIDADE", nullable = false)
 	@NotNull
-	private Localidade cepLocalidade;
+	private Localidade localidade;
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_BAIRRO")
-	private Bairro cepBairro;
+	private Bairro bairro;
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_TIPO_LOGRADOURO")
-	private TipoLogradouro cepTipoLogradouro;
+	private TipoLogradouro tipoLogradouro;
 
 	@Column(name = "DSC_NOME", nullable = false)
 	@NotNull
@@ -55,7 +55,7 @@ public class Logradouro extends AbstractModel {
 	@Column(name = "DSC_COMPLEMENTO")
 	private String complemento;
 
-	@OneToMany(mappedBy = "cepLogradouro")
+	@OneToMany(mappedBy = "logradouro")
 	@XmlTransient
 	private List<Cep> ceps = new ArrayList<>();
 
@@ -67,40 +67,40 @@ public class Logradouro extends AbstractModel {
 		this.id = id;
 	}
 
-	public Localidade getCepLocalidade() {
-		return cepLocalidade;
+	public Localidade getLocalidade() {
+		return localidade;
 	}
 
-	public Long getCepLocalidadeId() {
-		return cepLocalidade != null ? cepLocalidade.getId() : null;
+	public Long getLocalidadeId() {
+		return localidade != null ? localidade.getId() : null;
 	}
 
-	public void setCepLocalidade(Localidade cepLocalidade) {
-		this.cepLocalidade = cepLocalidade;
+	public void setLocalidade(Localidade localidade) {
+		this.localidade = localidade;
 	}
 
-	public Bairro getCepBairro() {
-		return cepBairro;
+	public Bairro getBairro() {
+		return bairro;
 	}
 
-	public Long getCepBairroId() {
-		return cepBairro != null ? cepBairro.getId() : null;
+	public Long getBairroId() {
+		return bairro != null ? bairro.getId() : null;
 	}
 
-	public void setCepBairro(Bairro cepBairro) {
-		this.cepBairro = cepBairro;
+	public void setBairro(Bairro cepBairro) {
+		this.bairro = cepBairro;
 	}
 
-	public TipoLogradouro getCepTipoLogradouro() {
-		return cepTipoLogradouro;
+	public TipoLogradouro getTipoLogradouro() {
+		return tipoLogradouro;
 	}
 
-	public Long getCepTipoLogradouroId() {
-		return cepTipoLogradouro != null ? cepTipoLogradouro.getId() : null;
+	public Long getTipoLogradouroId() {
+		return tipoLogradouro != null ? tipoLogradouro.getId() : null;
 	}
 
-	public void setCepTipoLogradouro(TipoLogradouro cepTipoLogradouro) {
-		this.cepTipoLogradouro = cepTipoLogradouro;
+	public void setTipoLogradouro(TipoLogradouro cepTipoLogradouro) {
+		this.tipoLogradouro = cepTipoLogradouro;
 	}
 
 	public String getNome() {

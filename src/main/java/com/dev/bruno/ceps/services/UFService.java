@@ -16,35 +16,35 @@ import com.dev.bruno.ceps.responses.ResultList;
 public class UFService extends AbstractService<UF> {
 
 	@Inject
-	private UFDAO cepUFDAO;
+	private UFDAO ufDAO;
 
 	@Override
 	protected AbstractDAO<UF> getDAO() {
-		return cepUFDAO;
+		return ufDAO;
 	}
 
 	public UFService() {
 	}
 
-	public UFService(UFDAO cepUFDAO, Validator validator) {
-		this.cepUFDAO = cepUFDAO;
+	public UFService(UFDAO ufDAO, Validator validator) {
+		this.ufDAO = ufDAO;
 		this.validator = validator;
 	}
 
 	@Override
-	protected void build(UF entity) {
-		//UF nao possui dependencias a serem contruidas
+	protected void build(UF uf) {
+		// UF nao possui dependencias a serem contruidas
 	}
 
-	public ResultList<Localidade> getLocalidades(Long cepUFId) {
-		UF uf = getDAO().get(cepUFId);
+	public ResultList<Localidade> getLocalidades(Long ufId) {
+		UF uf = getDAO().get(ufId);
 
-		List<Localidade> entities = uf.getLocalidades();
+		List<Localidade> localidades = uf.getLocalidades();
 
 		ResultList<Localidade> result = new ResultList<>();
 
-		result.setResult(entities);
-		result.setLimit(entities.size());
+		result.setResult(localidades);
+		result.setLimit(localidades.size());
 
 		return result;
 	}

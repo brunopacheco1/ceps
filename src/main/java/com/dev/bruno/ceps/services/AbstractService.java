@@ -103,7 +103,7 @@ public abstract class AbstractService<MODEL1 extends AbstractModel> {
 			throw new MandatoryFieldsException(getEntityType().getSimpleName() + " nao encontrada na requisicao.");
 		}
 
-		if (!getDAO().exists(id)) {
+		if (id != null && !getDAO().exists(id)) {
 			throw new EntityNotFoundException(getEntityType().getSimpleName() + "[" + id + "] não encontrado.");
 		}
 

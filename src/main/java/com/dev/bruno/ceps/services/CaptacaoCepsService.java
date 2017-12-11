@@ -49,10 +49,10 @@ public class CaptacaoCepsService {
 	private Integer limiteCaptacaoLogradouro;
 
 	@Inject
-	private BairroDAO cepBairroDAO;
+	private BairroDAO bairroDAO;
 
 	@Inject
-	private LogradouroDAO cepLogradouroDAO;
+	private LogradouroDAO logradouroDAO;
 
 	@Inject
 	private CepDAO cepDAO;
@@ -100,18 +100,18 @@ public class CaptacaoCepsService {
 	}
 
 	private void captarCeps() {
-		for (Bairro cepBairro : cepBairroDAO.listarBairrosNaoProcessados(limiteCaptacaoLogradouro)) {
-			captarCepsDeBairro(cepBairro);
+		for (Bairro bairro : bairroDAO.listarBairrosNaoProcessados(limiteCaptacaoLogradouro)) {
+			captarCepsPorBairro(bairro);
 		}
 	}
 
-	public void captarCeps(Long cepBairroId) {
-		Bairro cepBairro = cepBairroDAO.get(cepBairroId);
+	public void captarCeps(Long bairroId) {
+		Bairro bairro = bairroDAO.get(bairroId);
 
-		captarCepsDeBairro(cepBairro);
+		captarCepsPorBairro(bairro);
 	}
 
-	private void captarCepsDeBairro(Bairro cepBairro) {
+	private void captarCepsPorBairro(Bairro bairro) {
 		ceps = new HashSet<>();
 		logradouros = new HashMap<>();
 
@@ -123,27 +123,27 @@ public class CaptacaoCepsService {
 			ufResponse = beginConnection.method(Method.GET).execute();
 		} catch (Exception e) {
 			logger.info(String.format("FALHA NA CAPTACAO DE CEPS DE LOGRADOUROS --> %s - %s / %s",
-					cepBairro.getNomeNormalizado(), cepBairro.getCepLocalidade().getNomeNormalizado(),
-					cepBairro.getCepLocalidade().getCepUF().getUf()));
+					bairro.getNomeNormalizado(), bairro.getLocalidade().getNomeNormalizado(),
+					bairro.getLocalidade().getUf().getNome()));
 
 			return;
 		}
 
 		Map<String, String> cookies = ufResponse.cookies();
 
-		buscarCeps(cookies, cepBairro.getCepLocalidade(), cepBairro, cepBairro.getCepLocalidade().getCepUF().getUf(),
+		buscarCeps(cookies, bairro.getLocalidade(), bairro, bairro.getLocalidade().getUf().getNome(),
 				null, null, null);
 
-		cepBairro.setUltimoProcessamento(LocalDateTime.now());
+		bairro.setDataUltimoProcessamento(LocalDateTime.now());
 
-		cepBairroDAO.update(cepBairro);
+		bairroDAO.update(bairro);
 	}
 
-	private void buscarCeps(Map<String, String> cookies, Localidade cepLocalidade, Bairro cepBairro, String uf,
+	private void buscarCeps(Map<String, String> cookies, Localidade localidade, Bairro bairro, String uf,
 			String qtdrow, String pagini, String pagfim) {
 		logger.info(String.format("CAPTACAO DE CEPS DE LOGRADOUROS[%s,%s/%s] --> %s - %s / %s", qtdrow, pagini, pagfim,
-				cepBairro.getNomeNormalizado(), cepBairro.getCepLocalidade().getNomeNormalizado(),
-				cepBairro.getCepLocalidade().getCepUF().getUf()));
+				bairro.getNomeNormalizado(), bairro.getLocalidade().getNomeNormalizado(),
+				bairro.getLocalidade().getUf().getNome()));
 
 		Connection logradourosConnection = Jsoup
 				.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/resultadoBuscaLogBairro.cfm")
@@ -152,8 +152,8 @@ public class CaptacaoCepsService {
 		logradourosConnection.cookies(cookies);
 		logradourosConnection.data("UF", uf);
 		logradourosConnection.data("Localidade",
-				cepLocalidade.getDistrito() != null ? cepLocalidade.getDistrito() : cepLocalidade.getNome());
-		logradourosConnection.data("Bairro", cepBairro.getNome());
+				localidade.getDistrito() != null ? localidade.getDistrito() : localidade.getNome());
+		logradourosConnection.data("Bairro", bairro.getNome());
 
 		if (qtdrow != null) {
 			logradourosConnection.data("qtdrow", qtdrow);
@@ -177,8 +177,8 @@ public class CaptacaoCepsService {
 			logradourosDocument = Jsoup.parse(new String(response.bodyAsBytes(), CORREIOS_CHARSET));
 		} catch (Exception e) {
 			logger.info(String.format("FALHA NA CAPTACAO DE CEPS DE LOGRADOUROS --> %s - %s / %s",
-					cepBairro.getNomeNormalizado(), cepBairro.getCepLocalidade().getNomeNormalizado(),
-					cepBairro.getCepLocalidade().getCepUF().getUf()));
+					bairro.getNomeNormalizado(), bairro.getLocalidade().getNomeNormalizado(),
+					bairro.getLocalidade().getUf().getNome()));
 
 			return;
 		}
@@ -192,79 +192,65 @@ public class CaptacaoCepsService {
 				continue;
 			}
 
-			String logradouro = tr.select("td").get(0).html().replaceAll("&nbsp;", "");
+			String nomeLogradouro = tr.select("td").get(0).html().replaceAll("&nbsp;", "");
 			String nomeEspecial = null;
 
-			String cep = tr.select("td").get(3).text().replaceAll("\\D", "");
+			String numeroCep = tr.select("td").get(3).text().replaceAll("\\D", "");
 
 			String validarBairro = tr.select("td").get(1).text();
 
-			if (!cep.matches("^\\d{8}$") || ceps.contains(cep)
-					|| !cepBairro.getNomeNormalizado().equals(StringUtils.normalizarNome(validarBairro))
-					|| cepDAO.existsByCEP(cep)) {
+			if (!numeroCep.matches("^\\d{8}$") || ceps.contains(numeroCep)
+					|| !bairro.getNomeNormalizado().equals(StringUtils.normalizarNome(validarBairro))
+					|| cepDAO.existsByCEP(numeroCep)) {
 				continue;
 			}
 
-			if (logradouro.contains("javascript:detalhaCep")) {
+			if (nomeLogradouro.contains("javascript:detalhaCep")) {
 				nomeEspecial = StringUtils
-						.normalizarNome(logradouro.split("<br><br>")[1].replaceAll("<.*?>", "").trim());
-				logradouro = logradouro.split("<br><br>")[0].replaceAll("<.*?>", "").trim();
+						.normalizarNome(nomeLogradouro.split("<br><br>")[1].replaceAll("<.*?>", "").trim());
+				nomeLogradouro = nomeLogradouro.split("<br><br>")[0].replaceAll("<.*?>", "").trim();
 			} else {
-				logradouro = logradouro.replaceAll("<.*?>", "").trim();
+				nomeLogradouro = nomeLogradouro.replaceAll("<.*?>", "").trim();
 			}
 
 			String complemento = null;
 
-			if (logradouro.contains(" - ")) {
-				complemento = logradouro.substring(logradouro.indexOf(" - ") + 3).trim();
-				logradouro = logradouro.substring(0, logradouro.indexOf(" - ")).trim();
+			if (nomeLogradouro.contains(" - ")) {
+				complemento = nomeLogradouro.substring(nomeLogradouro.indexOf(" - ") + 3).trim();
+				nomeLogradouro = nomeLogradouro.substring(0, nomeLogradouro.indexOf(" - ")).trim();
 			}
 
-			Logradouro cepLogradouro = null;
+			Logradouro logradouro = null;
 
-			String chave = cepLocalidade.getId() + "-" + cepBairro.getId() + "-" + logradouro + "-" + complemento;
+			String chave = localidade.getId() + "-" + bairro.getId() + "-" + nomeLogradouro + "-" + complemento;
 
 			if (logradouros.containsKey(chave)) {
-				cepLogradouro = logradouros.get(chave);
+				logradouro = logradouros.get(chave);
 			} else {
-				cepLogradouro = new Logradouro();
-				cepLogradouro.setCepLocalidade(cepLocalidade);
-				cepLogradouro.setCepBairro(cepBairro);
-				cepLogradouro.setNome(logradouro);
-				cepLogradouro.setComplemento(complemento);
-				cepLogradouro.setNomeNormalizado(StringUtils.normalizarNome(logradouro));
+				logradouro = new Logradouro();
+				logradouro.setLocalidade(localidade);
+				logradouro.setBairro(bairro);
+				logradouro.setNome(nomeLogradouro);
+				logradouro.setComplemento(complemento);
+				logradouro.setNomeNormalizado(StringUtils.normalizarNome(nomeLogradouro));
 
-				cepLogradouroDAO.add(cepLogradouro);
+				logradouroDAO.add(logradouro);
 
-				logradouros.put(chave, cepLogradouro);
+				logradouros.put(chave, logradouro);
 			}
 
-			Cep cepObj = new Cep();
-			cepObj.setNumeroCep(cep);
-			cepObj.setCepLogradouro(cepLogradouro);
-			cepObj.setCepBairro(cepBairro);
-			cepObj.setCepLocalidade(cepLocalidade);
-			cepObj.setNomeEspecial(nomeEspecial);
+			Cep cep = new Cep();
+			cep.setNumeroCep(numeroCep);
+			cep.setLogradouro(logradouro);
+			cep.setBairro(bairro);
+			cep.setLocalidade(localidade);
+			cep.setNomeEspecial(nomeEspecial);
+			cep.setTipoCep(TipoCepEnum.getTipoPorCEP(numeroCep));
+			
 
-			Long cepSufixo = Long.parseLong(cep.substring(5));
+			cepDAO.add(cep);
 
-			if (cepSufixo <= 899) {
-				cepObj.setTipoCep(TipoCepEnum.LOG);
-			} else if (cepSufixo <= 959) {
-				cepObj.setTipoCep(TipoCepEnum.GRU);
-			} else if (cepSufixo <= 969) {
-				cepObj.setTipoCep(TipoCepEnum.PRO);
-			} else if (cepSufixo <= 989) {
-				cepObj.setTipoCep(TipoCepEnum.UOP);
-			} else if (cepSufixo <= 998) {
-				cepObj.setTipoCep(TipoCepEnum.CPC);
-			} else {
-				cepObj.setTipoCep(TipoCepEnum.UOP);
-			}
-
-			cepDAO.add(cepObj);
-
-			ceps.add(cep);
+			ceps.add(numeroCep);
 		}
 
 		if (!logradourosDocument.select("form[name=Proxima]").isEmpty()) {
@@ -272,7 +258,7 @@ public class CaptacaoCepsService {
 			pagini = logradourosDocument.select("form[name=Proxima] input[name=pagini]").attr("value");
 			pagfim = logradourosDocument.select("form[name=Proxima] input[name=pagfim]").attr("value");
 
-			buscarCeps(cookies, cepLocalidade, cepBairro, uf, qtdrow, pagini, pagfim);
+			buscarCeps(cookies, localidade, bairro, uf, qtdrow, pagini, pagfim);
 		}
 	}
 }

@@ -39,10 +39,10 @@ public class CaptacaoBairrosService {
 	private Logger logger;
 
 	@Inject
-	private LocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO localidadeDAO;
 
 	@Inject
-	private BairroDAO cepBairroDAO;
+	private BairroDAO bairroDAO;
 
 	@Inject
 	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
@@ -94,37 +94,37 @@ public class CaptacaoBairrosService {
 	}
 
 	private void captarBairros(String uf) {
-		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
-			context.createProducer().send(queue, cepLocalidadeId);
+		for (Long localidadeId : localidadeDAO.listarLocalidadesIdsPorUF(uf)) {
+			context.createProducer().send(queue, localidadeId);
 		}
 	}
 
-	public void captarBairros(Long cepLocalidadeId) {
-		Localidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
+	public void captarBairros(Long localidadeId) {
+		Localidade localidade = localidadeDAO.get(localidadeId);
 
-		buscarBairros(cepLocalidade);
+		buscarBairros(localidade);
 	}
 
-	private void buscarBairros(Localidade cepLocalidade) {
+	private void buscarBairros(Localidade localidade) {
 		LocalDate now = LocalDate.now();
 		LocalDate toCheck = now;
 
-		if (cepLocalidade.getCaptacaoBairros() != null) {
-			toCheck = cepLocalidade.getCaptacaoBairros();
+		if (localidade.getCaptacaoBairros() != null) {
+			toCheck = localidade.getCaptacaoBairros();
 		}
 
 		if (!now.isAfter(toCheck)) {
 			return;
 		}
 
-		logger.info(String.format("CAPTACAO DE BAIRRO --> %s / %s", cepLocalidade.getNomeNormalizado(),
-				cepLocalidade.getCepUF().getUf()));
+		logger.info(String.format("CAPTACAO DE BAIRRO --> %s / %s", localidade.getNomeNormalizado(),
+				localidade.getUf().getNome()));
 
-		String uf = cepLocalidade.getCepUF().getUf();
+		String uf = localidade.getUf().getNome();
 
-		String localidadeQuery = cepLocalidade.getNome();
-		if (cepLocalidade.getDistrito() != null) {
-			localidadeQuery = cepLocalidade.getDistrito();
+		String localidadeQuery = localidade.getNome();
+		if (localidade.getDistrito() != null) {
+			localidadeQuery = localidade.getDistrito();
 		}
 
 		Map<String, String> localidadeCookies = null;
@@ -142,15 +142,15 @@ public class CaptacaoBairrosService {
 
 			localidadeDocument = Jsoup.parse(new String(localidadeResponse.bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET));
 		} catch (Exception e) {
-			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-					cepLocalidade.getCepUF().getUf()));
+			logger.info(String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(),
+					localidade.getUf().getNome()));
 
 			return;
 		}
 
 		if (localidadeDocument.toString().contains("ACESSO NEGADO")) {
-			logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
-					cepLocalidade.getCepUF().getUf()));
+			logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", localidade.getNomeNormalizado(),
+					localidade.getUf().getNome()));
 			return;
 		}
 
@@ -172,49 +172,49 @@ public class CaptacaoBairrosService {
 				String stringBody = new String(response.bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET);
 
 				if (stringBody.contains("ACESSO NEGADO")) {
-					logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
-							cepLocalidade.getCepUF().getUf()));
+					logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", localidade.getNomeNormalizado(),
+							localidade.getUf().getNome()));
 					break;
 				}
 
 				localidadeLetterDocument = Jsoup.parse(stringBody);
 			} catch (Exception e) {
-				logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-						cepLocalidade.getCepUF().getUf()));
+				logger.info(String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(),
+						localidade.getUf().getNome()));
 
 				continue;
 			}
 
 			for (Element localidadeTr : localidadeLetterDocument.select("tr")) {
-				String bairro = localidadeTr.select("td").get(1).html().replaceAll("&nbsp;", "").replaceAll("<.*?>", "")
+				String nomeBairro = localidadeTr.select("td").get(1).html().replaceAll("&nbsp;", "").replaceAll("<.*?>", "")
 						.trim();
 
-				String localidade = StringUtils.normalizarNome(localidadeTr.select("td").get(2).html()
+				String nomeLocalidade = StringUtils.normalizarNome(localidadeTr.select("td").get(2).html()
 						.replaceAll("&nbsp;", "").replaceAll("<.*?>", "").trim());
 
-				if (localidade.contains("/")) {
-					localidade = localidade.substring(0, localidade.lastIndexOf("/")).trim();
+				if (nomeLocalidade.contains("/")) {
+					nomeLocalidade = nomeLocalidade.substring(0, nomeLocalidade.lastIndexOf("/")).trim();
 				}
 
-				if (bairro.equals("Bairro/Distrito:") || !cepLocalidade.getNomeNormalizado().equals(localidade)) {
+				if (nomeBairro.equals("Bairro/Distrito:") || !localidade.getNomeNormalizado().equals(nomeLocalidade)) {
 					continue;
 				}
 
-				if (cepBairroDAO.existsByNomeLocalidade(cepLocalidade, bairro)) {
+				if (bairroDAO.existsByNomeLocalidade(localidade, nomeBairro)) {
 					continue;
 				}
 
-				Bairro cepBairro = new Bairro();
-				cepBairro.setCepLocalidade(cepLocalidade);
-				cepBairro.setNome(bairro);
-				cepBairro.setNomeNormalizado(StringUtils.normalizarNome(bairro));
+				Bairro bairro = new Bairro();
+				bairro.setLocalidade(localidade);
+				bairro.setNome(nomeBairro);
+				bairro.setNomeNormalizado(StringUtils.normalizarNome(nomeBairro));
 
-				cepBairroDAO.add(cepBairro);
+				bairroDAO.add(bairro);
 			}
 		}
 
-		cepLocalidade.setCaptacaoBairros(LocalDate.now());
+		localidade.setCaptacaoBairros(LocalDate.now());
 
-		cepLocalidadeDAO.update(cepLocalidade);
+		localidadeDAO.update(localidade);
 	}
 }

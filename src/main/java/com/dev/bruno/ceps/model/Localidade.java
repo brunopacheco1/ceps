@@ -35,7 +35,7 @@ public class Localidade extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_UF")
 	@NotNull
-	private UF cepUF;
+	private UF uf;
 
 	@Column(name = "DSC_NOME", nullable = false)
 	@NotNull
@@ -51,15 +51,15 @@ public class Localidade extends AbstractModel {
 	@Column(name = "FAIXA_CEP")
 	private String faixaCEP;
 
-	@OneToMany(mappedBy = "cepLocalidade")
+	@OneToMany(mappedBy = "localidade")
 	@XmlTransient
 	private List<Bairro> bairros = new ArrayList<>();
 
-	@OneToMany(mappedBy = "cepLocalidade")
+	@OneToMany(mappedBy = "localidade")
 	@XmlTransient
 	private List<Logradouro> logradouros = new ArrayList<>();
 
-	@OneToMany(mappedBy = "cepLocalidade")
+	@OneToMany(mappedBy = "localidade")
 	@XmlTransient
 	private List<Cep> ceps = new ArrayList<>();
 
@@ -79,16 +79,16 @@ public class Localidade extends AbstractModel {
 		this.id = id;
 	}
 
-	public UF getCepUF() {
-		return cepUF;
+	public UF getUf() {
+		return uf;
 	}
 
-	public void setCepUF(UF cepUF) {
-		this.cepUF = cepUF;
+	public void setUf(UF uf) {
+		this.uf = uf;
 	}
 
-	public Long getCepUFId() {
-		return cepUF != null ? cepUF.getId() : null;
+	public Long getUfId() {
+		return uf != null ? uf.getId() : null;
 	}
 
 	public String getNome() {

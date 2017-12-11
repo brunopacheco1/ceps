@@ -50,7 +50,7 @@ public class UFServiceTest {
 	@Test
 	public void testAdd() {
 		UF cepUF = new UF();
-		cepUF.setUf("RJ");
+		cepUF.setNome("RJ");
 
 		Object result = service.add(cepUF);
 

@@ -66,7 +66,7 @@ public class LogradouroServiceTest {
 		cepLocalidade.setId(1L);
 
 		Logradouro cepLogradouro = new Logradouro();
-		cepLogradouro.setCepLocalidade(cepLocalidade);
+		cepLogradouro.setLocalidade(cepLocalidade);
 
 		when(cepLocalidadeDAO.get(1L)).thenReturn(cepLocalidade);
 
@@ -84,7 +84,7 @@ public class LogradouroServiceTest {
 		cepLocalidade.setId(1L);
 
 		Logradouro cepLogradouro = new Logradouro();
-		cepLogradouro.setCepLocalidade(cepLocalidade);
+		cepLogradouro.setLocalidade(cepLocalidade);
 		cepLogradouro.setNome("Rua Cidade de Lima");
 
 		when(cepLocalidadeDAO.get(1L)).thenReturn(cepLocalidade);

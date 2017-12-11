@@ -31,12 +31,12 @@ public class UF extends AbstractModel {
 
 	@Column(name = "DSC_UF", nullable = false)
 	@NotNull
-	private String uf;
+	private String nome;
 
 	@Column(name = "FAIXA_CEP")
 	private String faixaCEP;
 
-	@OneToMany(mappedBy = "cepUF")
+	@OneToMany(mappedBy = "uf")
 	@XmlTransient
 	private List<Localidade> localidades = new ArrayList<>();
 
@@ -48,12 +48,12 @@ public class UF extends AbstractModel {
 		this.id = id;
 	}
 
-	public String getUf() {
-		return uf;
+	public String getNome() {
+		return nome;
 	}
 
-	public void setUf(String uf) {
-		this.uf = uf;
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
 	public String getFaixaCEP() {

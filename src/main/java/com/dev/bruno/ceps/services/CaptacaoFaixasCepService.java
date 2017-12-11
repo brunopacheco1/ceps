@@ -36,7 +36,7 @@ public class CaptacaoFaixasCepService {
 	private Integer limiteCaptacaoFaixas;
 
 	@Inject
-	private LocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO localidadeDAO;
 
 	@Resource
 	private TimerService timerService;
@@ -77,22 +77,22 @@ public class CaptacaoFaixasCepService {
 	}
 
 	private void captarFaixasCep() {
-		for (Localidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesSemFaixaCep(limiteCaptacaoFaixas)) {
-			buscarFaixaCep(cepLocalidade);
+		for (Localidade localidade : localidadeDAO.listarLocalidadesSemFaixaCep(limiteCaptacaoFaixas)) {
+			buscarFaixaCep(localidade);
 
-			cepLocalidadeDAO.update(cepLocalidade);
+			localidadeDAO.update(localidade);
 		}
 	}
 
-	private void buscarFaixaCep(Localidade cepLocalidade) {
+	private void buscarFaixaCep(Localidade localidade) {
 		logger.info(String.format("CAPTACAO DE FAIXAS DE CEP --> %s / %s",
-				cepLocalidade.getNomeNormalizado(), cepLocalidade.getCepUF().getUf()));
+				localidade.getNomeNormalizado(), localidade.getUf().getNome()));
 
-		String localidadeQuery = cepLocalidade.getDistrito() != null ? cepLocalidade.getDistrito()
-				: cepLocalidade.getNome();
-		UF cepUF = cepLocalidade.getCepUF();
-		String uf = cepUF.getUf();
-		if (cepLocalidade.getDistrito() != null) {
+		String localidadeQuery = localidade.getDistrito() != null ? localidade.getDistrito()
+				: localidade.getNome();
+		UF cepUF = localidade.getUf();
+		String uf = cepUF.getNome();
+		if (localidade.getDistrito() != null) {
 			return;
 		}
 
@@ -103,8 +103,8 @@ public class CaptacaoFaixasCepService {
 		try {
 			cookieResponse = cookieConnection.method(Method.GET).execute();
 		} catch (Exception e) {
-			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-					cepLocalidade.getCepUF().getUf()));
+			logger.info(String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(),
+					localidade.getUf().getNome()));
 			return;
 		}
 
@@ -122,8 +122,8 @@ public class CaptacaoFaixasCepService {
 			faixaDocument = Jsoup
 					.parse(new String(faixaConnection.method(Method.POST).execute().bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET));
 		} catch (Exception e) {
-			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-					cepLocalidade.getCepUF().getUf()));
+			logger.info(String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(),
+					localidade.getUf().getNome()));
 			return;
 		}
 
@@ -147,7 +147,7 @@ public class CaptacaoFaixasCepService {
 		}
 
 		if (faixaUf != null && faixaLocalidade != null) {
-			cepLocalidade.setFaixaCEP(faixaLocalidade);
+			localidade.setFaixaCEP(faixaLocalidade);
 		}
 	}
 }

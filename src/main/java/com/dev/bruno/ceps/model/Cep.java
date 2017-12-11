@@ -31,19 +31,19 @@ public class Cep extends AbstractModel {
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_LOCALIDADE")
-	private Localidade cepLocalidade;
+	private Localidade localidade;
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_BAIRRO")
-	private Bairro cepBairro;
+	private Bairro bairro;
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_LOGRADOURO")
-	private Logradouro cepLogradouro;
+	private Logradouro logradouro;
 
 	@Column(name = "DSC_CEP", nullable = false)
 	@NotNull
-	@Pattern(regexp = "\\d{5}-\\d{3}")
+	@Pattern(regexp = "\\d{8}")
 	private String numeroCep;
 
 	@Column(name = "TIP_CEP", nullable = false)
@@ -57,43 +57,43 @@ public class Cep extends AbstractModel {
 	@Column(name = "DSC_NOME_ESPECIAL")
 	private String nomeEspecial;
 
-	public Localidade getCepLocalidade() {
-		return cepLocalidade;
+	public Localidade getLocalidade() {
+		return localidade;
 	}
 
-	public Long getCepLocalidadeId() {
-		return cepLocalidade != null ? cepLocalidade.getId() : null;
+	public Long getLocalidadeId() {
+		return localidade != null ? localidade.getId() : null;
 	}
 
-	public void setCepLocalidade(Localidade cepLocalidade) {
-		this.cepLocalidade = cepLocalidade;
+	public void setLocalidade(Localidade localidade) {
+		this.localidade = localidade;
 	}
 
-	public Bairro getCepBairro() {
-		return cepBairro;
+	public Bairro getBairro() {
+		return bairro;
 	}
 
-	public Long getCepBairroId() {
-		return cepBairro != null ? cepBairro.getId() : null;
+	public Long getBairroId() {
+		return bairro != null ? bairro.getId() : null;
 	}
 
-	public void setCepBairro(Bairro cepBairro) {
-		this.cepBairro = cepBairro;
+	public void setBairro(Bairro bairro) {
+		this.bairro = bairro;
 	}
 
-	public Logradouro getCepLogradouro() {
-		return cepLogradouro;
+	public Logradouro getLogradouro() {
+		return logradouro;
 	}
 
-	public Long getCepLogradouroId() {
-		return cepLogradouro != null ? cepLogradouro.getId() : null;
+	public Long getLogradouroId() {
+		return logradouro != null ? logradouro.getId() : null;
 	}
 
-	public void setCepLogradouro(Logradouro cepLogradouro) {
-		this.cepLogradouro = cepLogradouro;
+	public void setLogradouro(Logradouro logradouro) {
+		this.logradouro = logradouro;
 	}
 
-	public String getNumeroCodigo() {
+	public String getNumeroCep() {
 		return numeroCep;
 	}
 

@@ -11,8 +11,8 @@ import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.LocalidadeDAO;
 import com.dev.bruno.ceps.dao.LogradouroDAO;
 import com.dev.bruno.ceps.dao.TipoLogradouroDAO;
-import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.Bairro;
+import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.Logradouro;
 import com.dev.bruno.ceps.model.TipoLogradouro;
@@ -23,78 +23,78 @@ import com.dev.bruno.ceps.utils.StringUtils;
 public class LogradouroService extends AbstractService<Logradouro> {
 
 	@Inject
-	private LocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO localidadeDAO;
 
 	@Inject
-	private BairroDAO cepBairroDAO;
+	private BairroDAO bairroDAO;
 
 	@Inject
-	private TipoLogradouroDAO cepTipoLogradouroDAO;
+	private TipoLogradouroDAO tipoLogradouroDAO;
 
 	@Inject
-	private LogradouroDAO cepLogradouroDAO;
+	private LogradouroDAO logradouroDAO;
 
 	@Override
 	protected AbstractDAO<Logradouro> getDAO() {
-		return cepLogradouroDAO;
+		return logradouroDAO;
 	}
 
 	public LogradouroService() {
 	}
 
-	public LogradouroService(LocalidadeDAO cepLocalidadeDAO, BairroDAO cepBairroDAO,
-			TipoLogradouroDAO cepTipoLogradouroDAO, LogradouroDAO cepLogradouroDAO, Validator validator) {
-		this.cepLocalidadeDAO = cepLocalidadeDAO;
-		this.cepBairroDAO = cepBairroDAO;
-		this.cepTipoLogradouroDAO = cepTipoLogradouroDAO;
-		this.cepLogradouroDAO = cepLogradouroDAO;
+	public LogradouroService(LocalidadeDAO localidadeDAO, BairroDAO bairroDAO, TipoLogradouroDAO tipoLogradouroDAO,
+			LogradouroDAO logradouroDAO, Validator validator) {
+		this.localidadeDAO = localidadeDAO;
+		this.bairroDAO = bairroDAO;
+		this.tipoLogradouroDAO = tipoLogradouroDAO;
+		this.logradouroDAO = logradouroDAO;
 		this.validator = validator;
 	}
 
 	@Override
-	protected void build(Logradouro entity) {
+	protected void build(Logradouro logradouro) {
 		Bairro bairro = null;
 
 		TipoLogradouro tipoLogradouro = null;
 
-		Long cepLocalidadeId = entity.getCepLocalidadeId();
+		Long localidadeId = logradouro.getLocalidadeId();
 
-		Long cepBairroId = entity.getCepBairroId();
+		Long bairroId = logradouro.getBairroId();
 
-		Long cepTipoLogradouroId = entity.getCepTipoLogradouroId();
+		Long tipoLogradouroId = logradouro.getTipoLogradouroId();
 
-		Localidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
+		Localidade localidade = localidadeDAO.get(localidadeId);
 
-		if (cepBairroId != null) {
-			bairro = cepBairroDAO.get(cepBairroId);
+		if (bairroId != null) {
+			bairro = bairroDAO.get(bairroId);
 		}
 
-		if (cepTipoLogradouroId != null) {
-			tipoLogradouro = cepTipoLogradouroDAO.get(cepTipoLogradouroId);
+		if (tipoLogradouroId != null) {
+			tipoLogradouro = tipoLogradouroDAO.get(tipoLogradouroId);
 		}
 
-		entity.setCepLocalidade(localidade);
+		logradouro.setLocalidade(localidade);
 
-		entity.setCepBairro(bairro);
+		logradouro.setBairro(bairro);
 
-		entity.setCepTipoLogradouro(tipoLogradouro);
+		logradouro.setTipoLogradouro(tipoLogradouro);
 
-		String nome = entity.getNome();
+		String nome = logradouro.getNome();
 
 		if (nome != null) {
-			entity.setNomeNormalizado(StringUtils.normalizarNome(nome));
+			logradouro.setNomeNormalizado(StringUtils.normalizarNome(nome));
 		}
 	}
 
-	public ResultList<Cep> getCeps(Long cepLogradouroId) {
-		Logradouro logradouro = getDAO().get(cepLogradouroId);
+	public ResultList<Cep> getCeps(Long logradouroId) {
+		Logradouro logradouro = getDAO().get(logradouroId);
 
-		List<Cep> entities = logradouro.getCeps();
+		List<Cep> ceps = logradouro.getCeps();
 
 		ResultList<Cep> result = new ResultList<>();
 
-		result.setResult(entities);
-		result.setLimit(entities.size());
+		result.setResult(ceps);
+		result.setLimit(ceps.size());
 
 		return result;
 	}

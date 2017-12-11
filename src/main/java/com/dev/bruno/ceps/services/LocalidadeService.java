@@ -21,81 +21,81 @@ import com.dev.bruno.ceps.utils.StringUtils;
 public class LocalidadeService extends AbstractService<Localidade> {
 
 	@Inject
-	private LocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO localidadeDAO;
 
 	@Inject
-	private UFDAO cepUFDAO;
+	private UFDAO ufDAO;
 	
 	public LocalidadeService(){}
 
-	public LocalidadeService(LocalidadeDAO cepLocalidadeDAO, UFDAO cepUFDAO, Validator validator) {
+	public LocalidadeService(LocalidadeDAO localidadeDAO, UFDAO ufDAO, Validator validator) {
 		super();
-		this.cepLocalidadeDAO = cepLocalidadeDAO;
-		this.cepUFDAO = cepUFDAO;
+		this.localidadeDAO = localidadeDAO;
+		this.ufDAO = ufDAO;
 		this.validator = validator;
 	}
 
 	@Override
 	protected AbstractDAO<Localidade> getDAO() {
-		return cepLocalidadeDAO;
+		return localidadeDAO;
 	}
 
 	@Override
-	protected void build(Localidade entity) {
-		Long ufId = entity.getCepUFId();
+	protected void build(Localidade localidade) {
+		Long ufId = localidade.getUfId();
 
-		UF uf = cepUFDAO.get(ufId);
+		UF uf = ufDAO.get(ufId);
 
-		entity.setCepUF(uf);
+		localidade.setUf(uf);
 
-		String distrito = entity.getDistrito();
+		String distrito = localidade.getDistrito();
 
-		String nome = entity.getNome();
+		String nome = localidade.getNome();
 
 		if (nome != null) {
 			if (distrito == null) {
-				entity.setNomeNormalizado(StringUtils.normalizarNome(nome));
+				localidade.setNomeNormalizado(StringUtils.normalizarNome(nome));
 			} else {
-				entity.setNomeNormalizado(StringUtils.normalizarNome(distrito + " (" + nome + ")"));
+				localidade.setNomeNormalizado(StringUtils.normalizarNome(distrito + " (" + nome + ")"));
 			}
 		}
 	}
 
-	public ResultList<Bairro> getBairros(Long cepLocalidadeId) {
-		Localidade localidade = getDAO().get(cepLocalidadeId);
+	public ResultList<Bairro> getBairros(Long localidadeId) {
+		Localidade localidade = getDAO().get(localidadeId);
 
-		List<Bairro> entities = localidade.getBairros();
+		List<Bairro> bairros = localidade.getBairros();
 
 		ResultList<Bairro> result = new ResultList<>();
 
-		result.setResult(entities);
-		result.setLimit(entities.size());
+		result.setResult(bairros);
+		result.setLimit(bairros.size());
 
 		return result;
 	}
 
-	public ResultList<Logradouro> getLogradouros(Long cepLocalidadeId) {
-		Localidade localidade = getDAO().get(cepLocalidadeId);
+	public ResultList<Logradouro> getLogradouros(Long localidadeId) {
+		Localidade localidade = getDAO().get(localidadeId);
 
-		List<Logradouro> entities = localidade.getLogradouros();
+		List<Logradouro> logradouros = localidade.getLogradouros();
 
 		ResultList<Logradouro> result = new ResultList<>();
 
-		result.setResult(entities);
-		result.setLimit(entities.size());
+		result.setResult(logradouros);
+		result.setLimit(logradouros.size());
 
 		return result;
 	}
 
-	public ResultList<Cep> getCeps(Long cepLocalidadeId) {
-		Localidade localidade = getDAO().get(cepLocalidadeId);
+	public ResultList<Cep> getCeps(Long localidadeId) {
+		Localidade localidade = getDAO().get(localidadeId);
 
-		List<Cep> entities = localidade.getCeps();
+		List<Cep> ceps = localidade.getCeps();
 
 		ResultList<Cep> result = new ResultList<>();
 
-		result.setResult(entities);
-		result.setLimit(entities.size());
+		result.setResult(ceps);
+		result.setLimit(ceps.size());
 
 		return result;
 	}

@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import com.dev.bruno.ceps.exceptions.EntityNotFoundException;
@@ -32,6 +33,8 @@ public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 
 	protected Set<String> queryOptions;
 
+	protected Set<String> dirOptions;
+
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	private void init() {
@@ -48,19 +51,23 @@ public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 
 		for (Field field : fields) {
 			orderOptions.add(field.getName());
-			
+
 			if (field.getType().equals(String.class)) {
 				queryOptions.add(field.getName());
 			}
 		}
+
+		dirOptions = new HashSet<>();
+		dirOptions.add("asc");
+		dirOptions.add("desc");
 	}
 
 	public MODEL1 get(Long id) {
-		if (!exists(id)) {
+		try {
+			return manager.find(type, id);
+		} catch (NoResultException e) {
 			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
-
-		return manager.find(type, id);
 	}
 
 	public void remove(Long id) {
@@ -90,12 +97,23 @@ public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 			throw new MandatoryFieldsException("start, limit, order e dir são obrigatórios");
 		}
 
-		if (!orderOptions.contains(order) || !dirOptions().contains(dir)) {
-			throw new InvalidValueException(String.format("Possíveis valores para order[%s] e dir[%s]",
-					String.join(", ", orderOptions), String.join(", ", dirOptions())));
+		if (!orderOptions.contains(order)) {
+			String msg = String.format("Possíveis valores para order[%s]", String.join(", ", orderOptions));
+
+			throw new InvalidValueException(msg);
 		}
 
-		StringBuilder hql = new StringBuilder("select e from " + type.getSimpleName() + " e where 1=1");
+		if (!dirOptions.contains(dir)) {
+			String msq = String.format("Possíveis valores para dir[%s]", String.join(", ", dirOptions));
+
+			throw new InvalidValueException(msq);
+		}
+
+		StringBuilder hql = new StringBuilder("select e from ");
+
+		hql.append(type.getSimpleName());
+
+		hql.append(" e where 1=1");
 
 		if (queryStr != null && !queryStr.isEmpty()) {
 			hql.append(" and (");
@@ -115,7 +133,7 @@ public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 			hql.append(")");
 		}
 
-		hql.append(" order by e." + order + " " + dir);
+		hql.append(" order by e.").append(order).append(" ").append(dir);
 
 		TypedQuery<MODEL1> query = manager.createQuery(hql.toString(), type);
 
@@ -128,29 +146,26 @@ public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 		return query.setFirstResult(start).setMaxResults(limit).getResultList();
 	}
 
-	public List<MODEL1> list() {
-		return manager.createQuery("select e from " + type.getSimpleName() + " e order by e.id", type).getResultList();
-	}
-
 	public Boolean exists(Long id) {
 		if (id == null) {
 			throw new MandatoryFieldsException("id é obrigatório");
 		}
 
-		Long result = manager
-				.createQuery("select count(e) from " + type.getSimpleName() + " e where e.id = :id", Long.class)
-				.setParameter("id", id).getSingleResult();
+		StringBuilder hql = new StringBuilder();
+
+		hql.append("select count(e) from ");
+
+		hql.append(type.getSimpleName());
+
+		hql.append(" e where e.id = :id");
+
+		TypedQuery<Long> query = manager.createQuery(hql.toString(), Long.class);
+
+		query.setParameter("id", id);
+
+		Long result = query.getSingleResult();
 
 		return result > 0;
-	}
-
-	public Set<String> dirOptions() {
-		Set<String> dirOptions = new HashSet<>();
-
-		dirOptions.add("asc");
-		dirOptions.add("desc");
-
-		return dirOptions;
 	}
 
 	public Class<MODEL1> getType() {

@@ -29,6 +29,7 @@ import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.LocalidadeDAO;
 import com.dev.bruno.ceps.model.Bairro;
 import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.UFEnum;
 import com.dev.bruno.ceps.timers.CaptacaoBairrosTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
@@ -54,8 +55,8 @@ public class CaptacaoBairrosService {
 	@Resource
 	private TimerService timerService;
 
-	public void agendarCaptacaoBairros(String uf) {
-		String info = CaptacaoBairrosTimer.INFO_PREFIX + uf + "_manualtimer";
+	public void agendarCaptacaoBairros(UFEnum uf) {
+		String info = CaptacaoBairrosTimer.INFO_PREFIX + uf.name() + "_manualtimer";
 
 		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
 
@@ -73,17 +74,17 @@ public class CaptacaoBairrosService {
 	}
 
 	@Timeout
-	public void captarBairros(Timer timer) {
+	public void executarCaptacaoBairros(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		String info = (String) timer.getInfo();
 
-		String uf = info.split("_")[1];
+		UFEnum uf = UFEnum.valueOf(info.split("_")[1]);
 
 		logger.info(String.format("CAPTACAO DE BAIRROS PARA %s --> BEGIN", uf));
 
 		try {
-			captarBairros(uf);
+			captarBairrosPorUF(uf);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
@@ -93,19 +94,15 @@ public class CaptacaoBairrosService {
 		logger.info(String.format("CAPTACAO DE BAIRROS PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	private void captarBairros(String uf) {
+	private void captarBairrosPorUF(UFEnum uf) {
 		for (Long localidadeId : localidadeDAO.listarLocalidadesIdsPorUF(uf)) {
 			context.createProducer().send(queue, localidadeId);
 		}
 	}
 
-	public void captarBairros(Long localidadeId) {
+	public void captarBairrosPorLocalidade(Long localidadeId) {
 		Localidade localidade = localidadeDAO.get(localidadeId);
-
-		buscarBairros(localidade);
-	}
-
-	private void buscarBairros(Localidade localidade) {
+		
 		LocalDate now = LocalDate.now();
 		LocalDate toCheck = now;
 
@@ -131,19 +128,20 @@ public class CaptacaoBairrosService {
 
 		Document localidadeDocument = null;
 		try {
-			Connection localidadeConnection = Jsoup
-					.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/consultaBairro.cfm?mostrar=1&UF="
-							+ uf + "&Localidade=" + URLEncoder.encode(localidadeQuery, CaptacaoCepsService.CORREIOS_CHARSET))
+			Connection localidadeConnection = Jsoup.connect(
+					"http://www.buscacep.correios.com.br/sistemas/buscacep/consultaBairro.cfm?mostrar=1&UF=" + uf
+							+ "&Localidade=" + URLEncoder.encode(localidadeQuery, CaptacaoCepsService.CORREIOS_CHARSET))
 					.timeout(360000);
 
 			Response localidadeResponse = localidadeConnection.method(Method.GET).execute();
 
 			localidadeCookies = localidadeResponse.cookies();
 
-			localidadeDocument = Jsoup.parse(new String(localidadeResponse.bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET));
+			localidadeDocument = Jsoup
+					.parse(new String(localidadeResponse.bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET));
 		} catch (Exception e) {
-			logger.info(String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(),
-					localidade.getUf().getNome()));
+			logger.info(
+					String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(), localidade.getUf().getNome()));
 
 			return;
 		}
@@ -186,8 +184,8 @@ public class CaptacaoBairrosService {
 			}
 
 			for (Element localidadeTr : localidadeLetterDocument.select("tr")) {
-				String nomeBairro = localidadeTr.select("td").get(1).html().replaceAll("&nbsp;", "").replaceAll("<.*?>", "")
-						.trim();
+				String nomeBairro = localidadeTr.select("td").get(1).html().replaceAll("&nbsp;", "")
+						.replaceAll("<.*?>", "").trim();
 
 				String nomeLocalidade = StringUtils.normalizarNome(localidadeTr.select("td").get(2).html()
 						.replaceAll("&nbsp;", "").replaceAll("<.*?>", "").trim());
@@ -200,7 +198,7 @@ public class CaptacaoBairrosService {
 					continue;
 				}
 
-				if (bairroDAO.existsByNomeLocalidade(localidade, nomeBairro)) {
+				if (bairroDAO.existeBairro(localidade, nomeBairro)) {
 					continue;
 				}
 

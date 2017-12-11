@@ -13,43 +13,38 @@ import com.dev.bruno.ceps.model.TipoCepEnum;
 @Stateless
 public class CepDAO extends AbstractDAO<Cep> {
 
-	@SuppressWarnings("unchecked")
-	public List<Cep> buscarCepsNaoValidados(Long codCepLocalidade) {
-		StringBuilder sql = new StringBuilder(
-				"select * from cep where dsc_cep in (select * from (select dsc_cep from cep where dsc_caixa_postal is null minus select case when LENGTH(TO_CHAR(nro_cep)) < 8 then '0' || TO_CHAR(nro_cep) else TO_CHAR(nro_cep) end NRO_CEPLOCALIDADE from (select nro_ceplogradouro as nro_cep from volta_tab.logradouro_cep union select nro_ceplocalidade as nro_cep from volta_tab.localidade_cep union select nro_cepespecial as nro_cep from volta_tab.especial_cep))) and tip_cep not in ('UNI', 'CPC', 'PRO')");
+	public Boolean existeCep(String numeroCep) {
+		String hql = "select count(c) from Cep c where c.numeroCep = :numeroCep";
 
-		if (codCepLocalidade != null) {
-			sql.append(" and cod_cep_localidade = ").append(codCepLocalidade);
-		}
+		TypedQuery<Long> query = manager.createQuery(hql, Long.class);
 
-		return manager.createNativeQuery(sql.toString(), Cep.class).setMaxResults(1000).getResultList();
-	}
+		query.setParameter("numeroCep", numeroCep);
 
-	public Boolean existsByCEP(String cep) {
-		Long result = manager.createQuery("select count(c) from Cep c where c.cep = :cep", Long.class)
-				.setParameter("cep", cep).getSingleResult();
+		Long result = query.getSingleResult();
 
 		return result > 0;
 	}
 
-	public Cep buscarByCEP(String cep) {
-		return manager.createQuery("select c from Cep c where c.cep = :cep", Cep.class).setParameter("cep", cep)
-				.getSingleResult();
-	}
-
-	public List<Cep> list(TipoCepEnum tipoCep, Integer start, Integer limit, String order, String dir) {
+	public List<Cep> listarPorTipo(TipoCepEnum tipoCep, Integer start, Integer limit, String order, String dir) {
 		if (tipoCep == null || start == null || limit == null || order == null || dir == null) {
 			throw new MandatoryFieldsException("tipo, start, limit, order e dir são obrigatórios");
 		}
 
-		if (!orderOptions.contains(order) || !dirOptions().contains(dir)) {
-			throw new InvalidValueException(String.format("Possíveis valores para order[%s] e dir[%s]",
-					String.join(", ", orderOptions), String.join(", ", dirOptions())));
+		if (!orderOptions.contains(order)) {
+			String msg = String.format("Possíveis valores para order[%s]", String.join(", ", orderOptions));
+
+			throw new InvalidValueException(msg);
 		}
 
-		StringBuilder hql = new StringBuilder("select c from Cep c where 1=1");
+		if (!dirOptions.contains(dir)) {
+			String msq = String.format("Possíveis valores para dir[%s]", String.join(", ", dirOptions));
 
-		hql.append(" and c.tipoCep = :tipoCep order by c." + order + " " + dir);
+			throw new InvalidValueException(msq);
+		}
+
+		StringBuilder hql = new StringBuilder("select c from Cep c where ");
+
+		hql.append("c.tipoCep = :tipoCep order by c.").append(order).append(" ").append(dir);
 
 		TypedQuery<Cep> query = manager.createQuery(hql.toString(), Cep.class);
 

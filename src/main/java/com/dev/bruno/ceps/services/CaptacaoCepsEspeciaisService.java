@@ -36,12 +36,13 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.Logradouro;
 import com.dev.bruno.ceps.model.TipoCepEnum;
+import com.dev.bruno.ceps.model.UFEnum;
 import com.dev.bruno.ceps.timers.CaptacaoCepsEspeciaisTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoCepsEspeciaisService {
-	
+
 	@Inject
 	private Logger logger;
 
@@ -73,7 +74,7 @@ public class CaptacaoCepsEspeciaisService {
 	@Resource
 	private TimerService timerService;
 
-	public void agendarCaptacaoCepsEspeciais(String uf) {
+	public void agendarCaptacaoCepsEspeciais(UFEnum uf) {
 		String info = CaptacaoCepsEspeciaisTimer.INFO_PREFIX + uf + "_manualtimer";
 
 		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
@@ -92,17 +93,17 @@ public class CaptacaoCepsEspeciaisService {
 	}
 
 	@Timeout
-	public void captarCepsEspeciais(Timer timer) {
+	public void executarCaptacaoCepsEspeciais(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		String info = (String) timer.getInfo();
 
-		String uf = info.split("_")[1];
+		UFEnum uf = UFEnum.valueOf(info.split("_")[1]);
 
 		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> BEGIN", uf));
 
 		try {
-			captarCepsEspeciaisByUF(uf);
+			captarCepsEspeciaisPorUF(uf);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
@@ -112,19 +113,15 @@ public class CaptacaoCepsEspeciaisService {
 		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	private void captarCepsEspeciaisByUF(String uf) {
+	private void captarCepsEspeciaisPorUF(UFEnum uf) {
 		for (Long localidadeId : localidadeDAO.listarLocalidadesIdsPorUF(uf)) {
 			context.createProducer().send(queue, localidadeId);
 		}
 	}
 
-	public void captarCepsEspeciaisByCepLocalidadeId(Long localidadeId) {
+	public void captarCepsEspeciaisPorLocalidade(Long localidadeId) {
 		Localidade localidade = localidadeDAO.get(localidadeId);
 
-		captarCepsEspeciaisPorLocalidade(localidade);
-	}
-
-	private void captarCepsEspeciaisPorLocalidade(Localidade localidade) {
 		if (localidade.getCaptacaoCepsEspeciais() != null
 				&& !LocalDate.now().isAfter(localidade.getCaptacaoCepsEspeciais())) {
 			return;
@@ -141,8 +138,8 @@ public class CaptacaoCepsEspeciaisService {
 		try {
 			ufResponse = beginConnection.method(Method.GET).execute();
 		} catch (Exception e) {
-			logger.info(String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(),
-					localidade.getUf().getNome()));
+			logger.info(
+					String.format("FALHA --> %s / %s", localidade.getNomeNormalizado(), localidade.getUf().getNome()));
 
 			return;
 		}
@@ -165,8 +162,8 @@ public class CaptacaoCepsEspeciaisService {
 
 	private boolean buscarCEPSEspeciais(Map<String, String> cookies, Localidade localidade, String tipoCep,
 			String qtdrow, String pagini, String pagfim) {
-		logger.info(String.format("CAPTACAO DE CEP ESPECIAL[%s] --> %s / %s", tipoCep,
-				localidade.getNomeNormalizado(), localidade.getUf().getNome()));
+		logger.info(String.format("CAPTACAO DE CEP ESPECIAL[%s] --> %s / %s", tipoCep, localidade.getNomeNormalizado(),
+				localidade.getUf().getNome()));
 
 		String nomeLocalidade = localidade.getNomeNormalizado() + "/" + localidade.getUf().getNome();
 
@@ -219,7 +216,8 @@ public class CaptacaoCepsEspeciaisService {
 			String validarCidade = tr.select("td").get(2).text();
 
 			if (!numeroCep.matches("^\\d{8}$") || ceps.contains(numeroCep)
-					|| !nomeLocalidade.equals(StringUtils.normalizarNome(validarCidade)) || cepDAO.existsByCEP(numeroCep)) {
+					|| !nomeLocalidade.equals(StringUtils.normalizarNome(validarCidade))
+					|| cepDAO.existeCep(numeroCep)) {
 				continue;
 			}
 
@@ -229,8 +227,8 @@ public class CaptacaoCepsEspeciaisService {
 			if (nomeBairro != null && !nomeBairro.isEmpty()) {
 				if (bairros.containsKey(nomeBairro)) {
 					bairro = bairros.get(nomeBairro);
-				} else if (bairroDAO.existsByNomeLocalidade(localidade, nomeBairro)) {
-					bairro = bairroDAO.buscarByNomeLocalidade(localidade, nomeBairro);
+				} else if (bairroDAO.existeBairro(localidade, nomeBairro)) {
+					bairro = bairroDAO.buscarBairro(localidade, nomeBairro);
 
 					bairros.put(nomeBairro, bairro);
 				} else {
@@ -278,10 +276,10 @@ public class CaptacaoCepsEspeciaisService {
 
 				if (logradouros.containsKey(chave)) {
 					logradouro = logradouros.get(chave);
-				} else if (logradouroDAO.existByLocalidadeBairroEnderecoComplemento(localidade, bairro,
-						nomeLogradouro, complemento)) {
-					logradouro = logradouroDAO.buscarByLocalidadeBairroEnderecoComplemento(localidade,
-							bairro, nomeLogradouro, complemento);
+				} else if (logradouroDAO.existeLogradouro(localidade, bairro, nomeLogradouro,
+						complemento)) {
+					logradouro = logradouroDAO.buscarLogradouro(localidade, bairro,
+							nomeLogradouro, complemento);
 
 					logradouros.put(chave, logradouro);
 				} else {

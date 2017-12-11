@@ -55,6 +55,6 @@ public class CaptacaoCepsTimer {
 
 	@Timeout
 	public void execute(Timer timer) {
-		service.captarCeps(timer);
+		service.executarCaptacaoCeps(timer);
 	}
 }

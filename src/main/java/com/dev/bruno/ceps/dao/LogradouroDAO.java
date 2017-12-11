@@ -1,7 +1,5 @@
 package com.dev.bruno.ceps.dao;
 
-import java.util.List;
-
 import javax.ejb.Stateless;
 import javax.persistence.TypedQuery;
 
@@ -12,71 +10,53 @@ import com.dev.bruno.ceps.model.Logradouro;
 @Stateless
 public class LogradouroDAO extends AbstractDAO<Logradouro> {
 
-	public Boolean existByLocalidadeBairroEnderecoComplemento(Localidade cepLocalidade, Bairro cepBairro,
-			String nome, String complemento) {
-		String hql = "select count(l) from CepLogradouro l where l.cepLocalidade.id = :cepLocalidade and l.nome = :nome";
-
-		if (cepBairro != null) {
-			hql += " and l.cepBairro.id = :cepBairro";
-		} else {
-			hql += " and l.cepBairro is null";
-		}
-
-		if (complemento != null) {
-			hql += " and l.complemento = :complemento";
-		} else {
-			hql += " and l.complemento is null";
-		}
-
-		TypedQuery<Long> query = manager.createQuery(hql, Long.class)
-				.setParameter("cepLocalidade", cepLocalidade.getId()).setParameter("nome", nome);
-
-		if (cepBairro != null) {
-			query.setParameter("cepBairro", cepBairro.getId());
-		}
-
-		if (complemento != null) {
-			query.setParameter("complemento", complemento);
-		}
+	public Boolean existeLogradouro(Localidade localidade, Bairro bairro, String nome, String complemento) {
+		TypedQuery<Long> query = buildQuery("select count(l) ", localidade, bairro, nome, complemento, Long.class);
 
 		Long result = query.getSingleResult();
 
 		return result > 0;
 	}
 
-	public Logradouro buscarByLocalidadeBairroEnderecoComplemento(Localidade cepLocalidade, Bairro cepBairro,
-			String nome, String complemento) {
-		String hql = "select l from CepLogradouro l where l.cepLocalidade.id = :cepLocalidade and l.nome = :nome";
+	public Logradouro buscarLogradouro(Localidade localidade, Bairro bairro, String nome, String complemento) {
+		TypedQuery<Logradouro> query = buildQuery("select l ", localidade, bairro, nome, complemento, Logradouro.class);
 
-		if (cepBairro != null) {
-			hql += " and l.cepBairro.id = :cepBairro";
+		return query.getSingleResult();
+	}
+
+	private <T> TypedQuery<T> buildQuery(String select, Localidade localidade, Bairro bairro, String nome,
+			String complemento, Class<T> clazz) {
+		StringBuilder hql = new StringBuilder();
+
+		hql.append(select);
+
+		hql.append("from Logradouro l where l.localidade = :localidade and l.nome = :nome");
+
+		if (bairro != null) {
+			hql.append(" and l.bairro = :bairro");
 		} else {
-			hql += " and l.cepBairro is null";
+			hql.append(" and l.bairro is null");
 		}
 
 		if (complemento != null) {
-			hql += " and l.complemento = :complemento";
+			hql.append(" and l.complemento = :complemento");
 		} else {
-			hql += " and l.complemento is null";
+			hql.append(" and l.complemento is null");
 		}
 
-		TypedQuery<Logradouro> query = manager.createQuery(hql, Logradouro.class)
-				.setParameter("cepLocalidade", cepLocalidade.getId()).setParameter("nome", nome);
+		TypedQuery<T> query = manager.createQuery(hql.toString(), clazz);
 
-		if (cepBairro != null) {
-			query.setParameter("cepBairro", cepBairro.getId());
+		query.setParameter("localidade", localidade);
+		query.setParameter("nome", nome);
+
+		if (bairro != null) {
+			query.setParameter("bairro", bairro);
 		}
 
 		if (complemento != null) {
 			query.setParameter("complemento", complemento);
 		}
 
-		return query.getSingleResult();
-	}
-
-	public List<Logradouro> listarLogradourosSemTipo() {
-		String hql = "select l from CepLogradouro l where l.cepTipoLogradouro is null";
-
-		return manager.createQuery(hql, Logradouro.class).setMaxResults(1000).getResultList();
+		return query;
 	}
 }

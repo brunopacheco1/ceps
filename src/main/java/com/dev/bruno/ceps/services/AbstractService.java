@@ -61,17 +61,6 @@ public abstract class AbstractService<MODEL1 extends AbstractModel> {
 		return result;
 	}
 
-	public ResultList<MODEL1> list() {
-		List<MODEL1> entities = getDAO().list();
-
-		ResultList<MODEL1> result = new ResultList<>();
-
-		result.setResult(entities);
-		result.setLimit(entities.size());
-
-		return result;
-	}
-
 	public MODEL1 get(Long id) {
 		return getDAO().get(id);
 	}

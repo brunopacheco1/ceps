@@ -8,6 +8,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.dev.bruno.ceps.model.UFEnum;
 import com.dev.bruno.ceps.responses.GenericResponse;
 import com.dev.bruno.ceps.services.CaptacaoBairrosService;
 import com.dev.bruno.ceps.services.CaptacaoCepsEspeciaisService;
@@ -45,29 +46,29 @@ public class CaptacaoResource {
 	private CaptacaoFaixasCepService captacaoFaixasCepsService;
 
 	@POST
-	@Path("/uf/{uf:[A-Z]{2}}/localidades")
+	@Path("/uf/{uf}/localidades")
 	@Operation(description = "Captacao de Localidade")
-	public GenericResponse captarLocalidades(@PathParam("uf") String uf) {
+	public GenericResponse captarLocalidades(@PathParam("uf") UFEnum uf) {
 		captacaoLocalidadesService.agendarCaptacaoLocalidades(uf);
 
 		return new GenericResponse(true);
 	}
 
 	@POST
-	@Path("/uf/{uf:[A-Z]{2}}/bairros")
+	@Path("/uf/{uf}/bairros")
 	@Operation(description = "Captacao de Bairros")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse captarBairros(@PathParam("uf") String uf) {
+	public GenericResponse captarBairros(@PathParam("uf") UFEnum uf) {
 		captacaoBairrosService.agendarCaptacaoBairros(uf);
 
 		return new GenericResponse(true);
 	}
 
 	@POST
-	@Path("/uf/{uf:[A-Z]{2}}/ceps-especiais")
+	@Path("/uf/{uf}/ceps-especiais")
 	@Operation(description = "Captacao de CEPs Especiais")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") String uf) {
+	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") UFEnum uf) {
 		captacaoCepsEspeciaisService.agendarCaptacaoCepsEspeciais(uf);
 
 		return new GenericResponse(true);

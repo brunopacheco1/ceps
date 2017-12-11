@@ -28,7 +28,7 @@ public class CaptacaoBairrosConsumer implements MessageListener {
 		try {
 			Long cepLocalidadeId = message.getBody(Long.class);
 
-			service.captarBairros(cepLocalidadeId);
+			service.captarBairrosPorLocalidade(cepLocalidadeId);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}

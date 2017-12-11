@@ -19,7 +19,7 @@ public class CaptacaoCepsEspeciaisConsumer implements MessageListener {
 
 	@Inject
 	private Logger logger;
-	
+
 	@Inject
 	private CaptacaoCepsEspeciaisService service;
 
@@ -28,7 +28,7 @@ public class CaptacaoCepsEspeciaisConsumer implements MessageListener {
 		try {
 			Long cepLocalidadeId = message.getBody(Long.class);
 
-			service.captarCepsEspeciaisByCepLocalidadeId(cepLocalidadeId);
+			service.captarCepsEspeciaisPorLocalidade(cepLocalidadeId);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}

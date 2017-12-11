@@ -59,7 +59,6 @@ public class CepServiceTest {
 		try {
 			service.add(cep);
 		} catch (Exception e) {
-			e.printStackTrace();
 			assertTrue(e instanceof ConstraintViolationException);
 		}
 
@@ -76,7 +75,7 @@ public class CepServiceTest {
 	public void testAdd() {
 		Cep cep = new Cep();
 		cep.setNumeroCep("20101111");
-
+		
 		Object result = service.add(cep);
 
 		assertNotNull(result);

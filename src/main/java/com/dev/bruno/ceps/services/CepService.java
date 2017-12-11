@@ -106,7 +106,7 @@ public class CepService extends AbstractService<Cep> {
 			dir = "asc";
 		}
 
-		List<Cep> ceps = cepDAO.list(tipo, start, limit, order, dir);
+		List<Cep> ceps = cepDAO.listarPorTipo(tipo, start, limit, order, dir);
 
 		ResultList<Cep> result = new ResultList<>();
 

@@ -83,7 +83,7 @@ public class CaptacaoCepsService {
 	}
 
 	@Timeout
-	public void captarCeps(Timer timer) {
+	public void executarCaptacaoCeps(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		logger.info(String.format("CAPTACAO DE CEPS DE LOGRADOUROS --> BEGIN"));
@@ -100,18 +100,14 @@ public class CaptacaoCepsService {
 	}
 
 	private void captarCeps() {
-		for (Bairro bairro : bairroDAO.listarBairrosNaoProcessados(limiteCaptacaoLogradouro)) {
-			captarCepsPorBairro(bairro);
+		for (Long bairroId : bairroDAO.listarBairrosNaoProcessados(limiteCaptacaoLogradouro)) {
+			captarCepsPorBairro(bairroId);
 		}
 	}
 
-	public void captarCeps(Long bairroId) {
+	public void captarCepsPorBairro(Long bairroId) {
 		Bairro bairro = bairroDAO.get(bairroId);
-
-		captarCepsPorBairro(bairro);
-	}
-
-	private void captarCepsPorBairro(Bairro bairro) {
+		
 		ceps = new HashSet<>();
 		logradouros = new HashMap<>();
 
@@ -201,7 +197,7 @@ public class CaptacaoCepsService {
 
 			if (!numeroCep.matches("^\\d{8}$") || ceps.contains(numeroCep)
 					|| !bairro.getNomeNormalizado().equals(StringUtils.normalizarNome(validarBairro))
-					|| cepDAO.existsByCEP(numeroCep)) {
+					|| cepDAO.existeCep(numeroCep)) {
 				continue;
 			}
 

@@ -27,6 +27,7 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.model.UF;
+import com.dev.bruno.ceps.model.UFEnum;
 import com.dev.bruno.ceps.timers.CaptacaoLocalidadesTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
@@ -48,7 +49,7 @@ public class CaptacaoLocalidadesService {
 	@Resource
 	private TimerService timerService;
 
-	public void agendarCaptacaoLocalidades(String uf) {
+	public void agendarCaptacaoLocalidades(UFEnum uf) {
 		String info = CaptacaoLocalidadesTimer.INFO_PREFIX + uf + "_manualtimer";
 
 		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
@@ -72,7 +73,7 @@ public class CaptacaoLocalidadesService {
 
 		String info = (String) timer.getInfo();
 
-		String uf = info.split("_")[1];
+		UFEnum uf = UFEnum.valueOf(info.split("_")[1]);
 
 		logger.info(String.format("CAPTACAO DE LOCALIDADES PARA %s --> BEGIN", uf));
 
@@ -87,11 +88,11 @@ public class CaptacaoLocalidadesService {
 		logger.info(String.format("CAPTACAO DE LOCALIDADES PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	public void captarLocalidadesPorUF(String nomeUf) {
-		UF uf = ufDAO.buscarPorUF(nomeUf);
+	public void captarLocalidadesPorUF(UFEnum ufEnum) {
+		UF uf = ufDAO.buscarPorUF(ufEnum);
 
 		Connection ufConnection = Jsoup.connect(
-				"http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=1&UF=" + nomeUf)
+				"http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=1&UF=" + uf.getNome())
 				.timeout(360000);
 
 		Response ufResponse = null;
@@ -114,7 +115,7 @@ public class CaptacaoLocalidadesService {
 					.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=2")
 					.timeout(360000);
 			letterConnection.cookies(cookies);
-			letterConnection.data("UF", nomeUf);
+			letterConnection.data("UF", uf.getNome());
 			letterConnection.data("Letra", ufLetra);
 
 			Document letterDocument = null;
@@ -140,7 +141,8 @@ public class CaptacaoLocalidadesService {
 
 				if (nomeLocalidade.matches("^.+\\s\\(.+\\)\\/\\D{2}$")) {
 					nomeDistrito = nomeLocalidade.substring(0, nomeLocalidade.indexOf("(")).trim();
-					nomeLocalidade = nomeLocalidade.substring(nomeLocalidade.indexOf("(") + 1, nomeLocalidade.indexOf(")")).trim();
+					nomeLocalidade = nomeLocalidade
+							.substring(nomeLocalidade.indexOf("(") + 1, nomeLocalidade.indexOf(")")).trim();
 				}
 
 				nomeLocalidade = nomeLocalidade.split("\\/")[0].trim();
@@ -149,7 +151,7 @@ public class CaptacaoLocalidadesService {
 					continue;
 				}
 
-				if (localidadeDAO.existePorNomeDistrito(nomeUf, nomeLocalidade, nomeDistrito)) {
+				if (localidadeDAO.existeLocalidade(ufEnum, nomeLocalidade, nomeDistrito)) {
 					continue;
 				}
 
@@ -160,7 +162,8 @@ public class CaptacaoLocalidadesService {
 				if (nomeDistrito == null) {
 					localidade.setNomeNormalizado(StringUtils.normalizarNome(nomeLocalidade));
 				} else {
-					localidade.setNomeNormalizado(StringUtils.normalizarNome(nomeDistrito + " (" + nomeLocalidade + ")"));
+					localidade
+							.setNomeNormalizado(StringUtils.normalizarNome(nomeDistrito + " (" + nomeLocalidade + ")"));
 				}
 				localidade.setDistrito(nomeDistrito);
 				localidade.setUf(uf);

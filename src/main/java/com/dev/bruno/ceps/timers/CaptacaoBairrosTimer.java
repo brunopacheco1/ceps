@@ -58,6 +58,6 @@ public class CaptacaoBairrosTimer {
 
 	@Timeout
 	public void execute(Timer timer) {
-		service.captarBairros(timer);
+		service.executarCaptacaoBairros(timer);
 	}
 }

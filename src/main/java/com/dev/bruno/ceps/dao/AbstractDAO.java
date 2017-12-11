@@ -63,10 +63,8 @@ public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 		return manager.find(type, id);
 	}
 
-	public void remove(MODEL1 entity) {
-		if (entity == null) {
-			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
-		}
+	public void remove(Long id) {
+		MODEL1 entity = get(id);
 
 		manager.remove(entity);
 	}

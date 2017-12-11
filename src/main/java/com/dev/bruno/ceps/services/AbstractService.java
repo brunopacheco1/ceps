@@ -95,16 +95,15 @@ public abstract class AbstractService<MODEL1 extends AbstractModel> {
 	}
 
 	public void remove(Long id) {
-		MODEL1 entity = getDAO().get(id);
-		getDAO().remove(entity);
+		getDAO().remove(id);
 	}
 
 	public void validateAndBuild(Long id, MODEL1 model) {
-		if (model == null || !(model instanceof AbstractModel)) {
+		if (model == null) {
 			throw new MandatoryFieldsException(getEntityType().getSimpleName() + " nao encontrada na requisicao.");
 		}
 
-		if (id != null && !getDAO().exists(id)) {
+		if (!getDAO().exists(id)) {
 			throw new EntityNotFoundException(getEntityType().getSimpleName() + "[" + id + "] não encontrado.");
 		}
 

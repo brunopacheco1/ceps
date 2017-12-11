@@ -17,7 +17,7 @@ import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.TipoLogradouro;
 import com.dev.bruno.ceps.services.TipoLogradouroService;
 
-public class CepTipoLogradouroTest {
+public class TipoLogradouroServiceTest {
 
 	private static TipoLogradouroService service;
 

@@ -17,7 +17,7 @@ import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.UF;
 import com.dev.bruno.ceps.services.UFService;
 
-public class CepUFTest {
+public class UFServiceTest {
 
 	private static UFService service;
 

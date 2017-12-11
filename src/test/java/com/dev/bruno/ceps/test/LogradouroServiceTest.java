@@ -22,7 +22,7 @@ import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.Logradouro;
 import com.dev.bruno.ceps.services.LogradouroService;
 
-public class CepLogradouroTest {
+public class LogradouroServiceTest {
 
 	private static LogradouroService service;
 

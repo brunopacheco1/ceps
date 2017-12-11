@@ -12,30 +12,30 @@ import javax.validation.ValidatorFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.LocalidadeDAO;
-import com.dev.bruno.ceps.dao.UFDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
+import com.dev.bruno.ceps.model.Bairro;
 import com.dev.bruno.ceps.model.Localidade;
-import com.dev.bruno.ceps.model.UF;
-import com.dev.bruno.ceps.services.LocalidadeService;
+import com.dev.bruno.ceps.services.BairroService;
 
-public class CepLocalidadeTest {
+public class BairroServiceTest {
 
-	private static UFDAO cepUFDAO;
+	private static BairroService service;
 
-	private static LocalidadeService service;
+	private static LocalidadeDAO cepLocalidadeDAO;
 
 	@BeforeClass
 	public static void setUp() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		cepUFDAO = mock(UFDAO.class);
+		cepLocalidadeDAO = mock(LocalidadeDAO.class);
 
-		service = new LocalidadeService(mock(LocalidadeDAO.class), cepUFDAO, validator);
+		service = new BairroService(cepLocalidadeDAO, mock(BairroDAO.class), validator);
 	}
-	
+
 	@Test
 	public void testAddNull() {
 		try {
@@ -44,52 +44,52 @@ public class CepLocalidadeTest {
 			assertTrue(e instanceof MandatoryFieldsException);
 		}
 	}
-	
+
 	@Test
 	public void testAddEmptyObject() {
-		when(cepUFDAO.get(null)).thenThrow(MandatoryFieldsException.class);
-		
+		when(cepLocalidadeDAO.get(null)).thenThrow(MandatoryFieldsException.class);
+
 		try {
-			service.add(new Localidade());
+			service.add(new Bairro());
 		} catch (Exception e) {
 			assertTrue(e instanceof MandatoryFieldsException);
 		}
 	}
 
 	@Test
-	public void testAddUf() {
-		UF cepUF = new UF();
-		cepUF.setUf("RJ");
-		cepUF.setId(1L);
-
+	public void testAddLocalidade() {
 		Localidade cepLocalidade = new Localidade();
-		cepLocalidade.setCepUF(cepUF);
+		cepLocalidade.setNome("Rio de Janeiro");
+		cepLocalidade.setId(1L);
 
-		when(cepUFDAO.get(1L)).thenReturn(cepUF);
+		Bairro cepBairro = new Bairro();
+		cepBairro.setCepLocalidade(cepLocalidade);
+
+		when(cepLocalidadeDAO.get(1L)).thenReturn(cepLocalidade);
 
 		try {
-			service.add(cepLocalidade);
+			service.add(cepBairro);
 		} catch (Exception e) {
 			assertTrue(e instanceof ConstraintViolationException);
 		}
 	}
-	
+
 	@Test
 	public void testAdd() {
-		UF cepUF = new UF();
-		cepUF.setUf("RJ");
-		cepUF.setId(1L);
-
 		Localidade cepLocalidade = new Localidade();
-		cepLocalidade.setCepUF(cepUF);
 		cepLocalidade.setNome("Rio de Janeiro");
-		
-		when(cepUFDAO.get(1L)).thenReturn(cepUF);
+		cepLocalidade.setId(1L);
 
-		Object result = service.add(cepLocalidade);
-		
+		Bairro cepBairro = new Bairro();
+		cepBairro.setCepLocalidade(cepLocalidade);
+		cepBairro.setNome("Santo Cristo");
+
+		when(cepLocalidadeDAO.get(1L)).thenReturn(cepLocalidade);
+
+		Object result = service.add(cepBairro);
+
 		assertNotNull(result);
-		
-		assertTrue(result instanceof Localidade);
+
+		assertTrue(result instanceof Bairro);
 	}
 }

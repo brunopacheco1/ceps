@@ -21,7 +21,7 @@ import com.dev.bruno.ceps.model.Cep;
 import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.services.CepService;
 
-public class CepTest {
+public class CepServiceTest {
 
 	private static CepService service;
 

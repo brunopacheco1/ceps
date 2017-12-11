@@ -5,7 +5,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,11 +47,9 @@ public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 		queryOptions = new HashSet<>();
 
 		for (Field field : fields) {
-			if (field.getType().equals(Long.class) || field.getType().equals(Long.class)
-					|| field.getType().equals(Date.class)) {
-				orderOptions.add(field.getName());
-			} else if (field.getType().equals(String.class)) {
-				orderOptions.add(field.getName());
+			orderOptions.add(field.getName());
+			
+			if (field.getType().equals(String.class)) {
 				queryOptions.add(field.getName());
 			}
 		}

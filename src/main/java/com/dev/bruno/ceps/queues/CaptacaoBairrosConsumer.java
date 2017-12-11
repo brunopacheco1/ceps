@@ -1,5 +1,8 @@
 package com.dev.bruno.ceps.queues;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.inject.Inject;
@@ -15,6 +18,9 @@ import com.dev.bruno.ceps.services.CaptacaoBairrosService;
 public class CaptacaoBairrosConsumer implements MessageListener {
 
 	@Inject
+	private Logger logger;
+
+	@Inject
 	private CaptacaoBairrosService service;
 
 	@Override
@@ -24,7 +30,7 @@ public class CaptacaoBairrosConsumer implements MessageListener {
 
 			service.captarBairros(cepLocalidadeId);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 }

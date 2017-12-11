@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.services;
+package com.dev.bruno.ceps.captacao.services;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -27,6 +27,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.dev.bruno.ceps.captacao.timers.CaptacaoCepsEspeciaisTimer;
 import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.CepDAO;
 import com.dev.bruno.ceps.dao.LocalidadeDAO;
@@ -37,11 +38,10 @@ import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.Logradouro;
 import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.model.UFEnum;
-import com.dev.bruno.ceps.timers.CaptacaoCepsEspeciaisTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
-public class CaptacaoCepsEspeciaisService {
+public class CaptacaoCepsEspeciaisService extends AbstractCaptacaoService {
 
 	@Inject
 	private Logger logger;
@@ -93,7 +93,7 @@ public class CaptacaoCepsEspeciaisService {
 	}
 
 	@Timeout
-	public void executarCaptacaoCepsEspeciais(Timer timer) {
+	public void executarTimer(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		String info = (String) timer.getInfo();
@@ -276,10 +276,8 @@ public class CaptacaoCepsEspeciaisService {
 
 				if (logradouros.containsKey(chave)) {
 					logradouro = logradouros.get(chave);
-				} else if (logradouroDAO.existeLogradouro(localidade, bairro, nomeLogradouro,
-						complemento)) {
-					logradouro = logradouroDAO.buscarLogradouro(localidade, bairro,
-							nomeLogradouro, complemento);
+				} else if (logradouroDAO.existeLogradouro(localidade, bairro, nomeLogradouro, complemento)) {
+					logradouro = logradouroDAO.buscarLogradouro(localidade, bairro, nomeLogradouro, complemento);
 
 					logradouros.put(chave, logradouro);
 				} else {

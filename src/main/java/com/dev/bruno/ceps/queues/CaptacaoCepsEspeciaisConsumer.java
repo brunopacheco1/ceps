@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import com.dev.bruno.ceps.services.CaptacaoCepsEspeciaisService;
+import com.dev.bruno.ceps.captacao.services.CaptacaoCepsEspeciaisService;
 
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),

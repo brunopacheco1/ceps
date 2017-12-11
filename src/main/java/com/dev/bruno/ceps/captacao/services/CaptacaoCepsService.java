@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.services;
+package com.dev.bruno.ceps.captacao.services;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -24,6 +24,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.dev.bruno.ceps.captacao.timers.CaptacaoCepsTimer;
 import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.CepDAO;
 import com.dev.bruno.ceps.dao.LogradouroDAO;
@@ -33,11 +34,10 @@ import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.Logradouro;
 import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.resources.Configurable;
-import com.dev.bruno.ceps.timers.CaptacaoCepsTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
-public class CaptacaoCepsService {
+public class CaptacaoCepsService extends AbstractCaptacaoService {
 
 	public static final String CORREIOS_CHARSET = "ISO-8859-1";
 
@@ -83,7 +83,7 @@ public class CaptacaoCepsService {
 	}
 
 	@Timeout
-	public void executarCaptacaoCeps(Timer timer) {
+	public void executarTimer(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		logger.info(String.format("CAPTACAO DE CEPS DE LOGRADOUROS --> BEGIN"));
@@ -107,7 +107,7 @@ public class CaptacaoCepsService {
 
 	public void captarCepsPorBairro(Long bairroId) {
 		Bairro bairro = bairroDAO.get(bairroId);
-		
+
 		ceps = new HashSet<>();
 		logradouros = new HashMap<>();
 
@@ -127,16 +127,15 @@ public class CaptacaoCepsService {
 
 		Map<String, String> cookies = ufResponse.cookies();
 
-		buscarCeps(cookies, bairro.getLocalidade(), bairro, bairro.getLocalidade().getUf().getNome(),
-				null, null, null);
+		buscarCeps(cookies, bairro.getLocalidade(), bairro, bairro.getLocalidade().getUf().getNome(), null, null, null);
 
 		bairro.setDataUltimoProcessamento(LocalDateTime.now());
 
 		bairroDAO.update(bairro);
 	}
 
-	private void buscarCeps(Map<String, String> cookies, Localidade localidade, Bairro bairro, String uf,
-			String qtdrow, String pagini, String pagfim) {
+	private void buscarCeps(Map<String, String> cookies, Localidade localidade, Bairro bairro, String uf, String qtdrow,
+			String pagini, String pagfim) {
 		logger.info(String.format("CAPTACAO DE CEPS DE LOGRADOUROS[%s,%s/%s] --> %s - %s / %s", qtdrow, pagini, pagfim,
 				bairro.getNomeNormalizado(), bairro.getLocalidade().getNomeNormalizado(),
 				bairro.getLocalidade().getUf().getNome()));
@@ -242,7 +241,6 @@ public class CaptacaoCepsService {
 			cep.setLocalidade(localidade);
 			cep.setNomeEspecial(nomeEspecial);
 			cep.setTipoCep(TipoCepEnum.getTipoPorCEP(numeroCep));
-			
 
 			cepDAO.add(cep);
 

@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.services;
+package com.dev.bruno.ceps.captacao.services;
 
 import java.util.Date;
 import java.util.Map;
@@ -20,6 +20,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.dev.bruno.ceps.captacao.timers.CaptacaoLocalidadesTimer;
 import com.dev.bruno.ceps.dao.CepDAO;
 import com.dev.bruno.ceps.dao.LocalidadeDAO;
 import com.dev.bruno.ceps.dao.UFDAO;
@@ -28,11 +29,10 @@ import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.model.UF;
 import com.dev.bruno.ceps.model.UFEnum;
-import com.dev.bruno.ceps.timers.CaptacaoLocalidadesTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
-public class CaptacaoLocalidadesService {
+public class CaptacaoLocalidadesService extends AbstractCaptacaoService {
 
 	@Inject
 	private UFDAO ufDAO;
@@ -68,7 +68,7 @@ public class CaptacaoLocalidadesService {
 	}
 
 	@Timeout
-	public void captarLocalidades(Timer timer) {
+	public void executarTimer(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		String info = (String) timer.getInfo();
@@ -91,8 +91,9 @@ public class CaptacaoLocalidadesService {
 	public void captarLocalidadesPorUF(UFEnum ufEnum) {
 		UF uf = ufDAO.buscarPorUF(ufEnum);
 
-		Connection ufConnection = Jsoup.connect(
-				"http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=1&UF=" + uf.getNome())
+		Connection ufConnection = Jsoup
+				.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=1&UF="
+						+ uf.getNome())
 				.timeout(360000);
 
 		Response ufResponse = null;

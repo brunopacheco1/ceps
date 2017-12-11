@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.services;
+package com.dev.bruno.ceps.captacao.services;
 
 import java.net.URLEncoder;
 import java.time.LocalDate;
@@ -25,16 +25,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.dev.bruno.ceps.captacao.timers.CaptacaoBairrosTimer;
 import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.LocalidadeDAO;
 import com.dev.bruno.ceps.model.Bairro;
 import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.UFEnum;
-import com.dev.bruno.ceps.timers.CaptacaoBairrosTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
-public class CaptacaoBairrosService {
+public class CaptacaoBairrosService extends AbstractCaptacaoService {
 
 	@Inject
 	private Logger logger;
@@ -74,7 +74,7 @@ public class CaptacaoBairrosService {
 	}
 
 	@Timeout
-	public void executarCaptacaoBairros(Timer timer) {
+	public void executarTimer(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		String info = (String) timer.getInfo();

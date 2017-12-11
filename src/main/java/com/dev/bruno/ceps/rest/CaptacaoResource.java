@@ -8,13 +8,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.dev.bruno.ceps.captacao.services.CaptacaoBairrosService;
+import com.dev.bruno.ceps.captacao.services.CaptacaoCepsEspeciaisService;
+import com.dev.bruno.ceps.captacao.services.CaptacaoCepsService;
+import com.dev.bruno.ceps.captacao.services.CaptacaoFaixasCepService;
+import com.dev.bruno.ceps.captacao.services.CaptacaoLocalidadesService;
 import com.dev.bruno.ceps.model.UFEnum;
 import com.dev.bruno.ceps.responses.GenericResponse;
-import com.dev.bruno.ceps.services.CaptacaoBairrosService;
-import com.dev.bruno.ceps.services.CaptacaoCepsEspeciaisService;
-import com.dev.bruno.ceps.services.CaptacaoCepsService;
-import com.dev.bruno.ceps.services.CaptacaoFaixasCepService;
-import com.dev.bruno.ceps.services.CaptacaoLocalidadesService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.services;
+package com.dev.bruno.ceps.captacao.services;
 
 import java.util.Date;
 import java.util.Map;
@@ -20,14 +20,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.dev.bruno.ceps.captacao.timers.CaptacaoFaixasCepTimer;
 import com.dev.bruno.ceps.dao.LocalidadeDAO;
 import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.model.UF;
 import com.dev.bruno.ceps.resources.Configurable;
-import com.dev.bruno.ceps.timers.CaptacaoFaixasCepTimer;
 
 @Stateless
-public class CaptacaoFaixasCepService {
+public class CaptacaoFaixasCepService extends AbstractCaptacaoService {
 
 	@Inject
 	private Logger logger;
@@ -60,7 +60,7 @@ public class CaptacaoFaixasCepService {
 	}
 
 	@Timeout
-	public void captarFaixasCep(Timer timer) {
+	public void executarTimer(Timer timer) {
 		Long time = System.currentTimeMillis();
 
 		logger.info(String.format("CAPTACAO DE FAIXAS DE CEP --> BEGIN"));

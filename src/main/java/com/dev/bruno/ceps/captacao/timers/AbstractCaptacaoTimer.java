@@ -1,64 +1,60 @@
-package com.dev.bruno.ceps.timers;
+package com.dev.bruno.ceps.captacao.timers;
 
+import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.ScheduleExpression;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
 import javax.inject.Inject;
 
-import com.dev.bruno.ceps.model.UFEnum;
+import com.dev.bruno.ceps.captacao.services.AbstractCaptacaoService;
 import com.dev.bruno.ceps.resources.Configurable;
-import com.dev.bruno.ceps.services.CaptacaoLocalidadesService;
 
-@Singleton
-@Startup
-public class CaptacaoLocalidadesTimer {
+public abstract class AbstractCaptacaoTimer {
 
-	public static final String INFO_PREFIX = "CaptacaoLocalidadesTimer_";
-
-	@Inject
-	private CaptacaoLocalidadesService service;
-
-	@Inject
-	private Properties properties;
-	
 	@Inject
 	@Configurable("captacao.ativa")
 	private Boolean captacaoAtiva;
 
 	@Resource
 	private TimerService timerService;
+	
+	@Inject
+	protected Properties properties;
 
 	@PostConstruct
 	private void init() {
 		if (!captacaoAtiva) {
 			return;
 		}
+		
+		Map<String, String> expressions = getExpressions();
 
-		for (UFEnum uf : UFEnum.values()) {
+		for (String info : expressions.keySet()) {
 			TimerConfig timerConfig = new TimerConfig();
-			timerConfig.setInfo(INFO_PREFIX + uf);
+			timerConfig.setInfo(info);
 			timerConfig.setPersistent(false);
 
-			String[] expressions = properties.getProperty("captacao.localidades." + uf).split("\\s");
+			String[] expression = expressions.get(info).split("\\s");
 
 			ScheduleExpression schedule = new ScheduleExpression();
-
-			schedule.second(expressions[0]).minute(expressions[1]).hour(expressions[2]).dayOfWeek(expressions[5]);
+			schedule.second(expression[0]).minute(expression[1]).hour(expression[2]).dayOfWeek(expression[5]);
 
 			timerService.createCalendarTimer(schedule, timerConfig);
 		}
 	}
 
+	protected abstract Map<String, String> getExpressions();
+
+	protected abstract AbstractCaptacaoService getTimerService();
+	
 	@Timeout
-	public void execute(Timer timer) {
-		service.captarLocalidades(timer);
+	private void execute(Timer timer) {
+		getTimerService().executarTimer(timer);
 	}
 }

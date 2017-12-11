@@ -1,4 +1,4 @@
-package com.dev.bruno.ceps.rest;
+package com.dev.bruno.ceps.captacao.rest;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

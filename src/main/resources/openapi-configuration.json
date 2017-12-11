@@ -1,6 +1,6 @@
 {
 	"resourcePackages": [
-		"com.dev.bruno.ceps.rest"
+		"com.dev.bruno.ceps.rest", "com.dev.bruno.ceps.captacao.rest"
 	],
 	"prettyPrint": true,
 	"openAPI": {

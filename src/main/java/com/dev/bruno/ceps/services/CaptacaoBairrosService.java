@@ -25,26 +25,24 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.dev.bruno.ceps.dao.CepBairroDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.model.CepBairro;
-import com.dev.bruno.ceps.model.CepLocalidade;
+import com.dev.bruno.ceps.dao.BairroDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.model.Bairro;
+import com.dev.bruno.ceps.model.Localidade;
 import com.dev.bruno.ceps.timers.CaptacaoBairrosTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoBairrosService {
 
-	private static final String CORREIOS_CHARSET = "ISO-8859-1";
-
 	@Inject
 	private Logger logger;
 
 	@Inject
-	private CepLocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
-	private CepBairroDAO cepBairroDAO;
+	private BairroDAO cepBairroDAO;
 
 	@Inject
 	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
@@ -95,19 +93,19 @@ public class CaptacaoBairrosService {
 		logger.info(String.format("CAPTACAO DE BAIRROS PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	private void captarBairros(String uf) throws Exception {
+	private void captarBairros(String uf) {
 		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
 			context.createProducer().send(queue, cepLocalidadeId);
 		}
 	}
 
-	public void captarBairros(Long cepLocalidadeId) throws Exception {
-		CepLocalidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
+	public void captarBairros(Long cepLocalidadeId) {
+		Localidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
 		buscarBairros(cepLocalidade);
 	}
 
-	private void buscarBairros(CepLocalidade cepLocalidade) throws Exception {
+	private void buscarBairros(Localidade cepLocalidade) {
 		LocalDate now = LocalDate.now();
 		LocalDate toCheck = now;
 
@@ -129,24 +127,26 @@ public class CaptacaoBairrosService {
 			localidadeQuery = cepLocalidade.getDistrito();
 		}
 
-		Connection localidadeConnection = Jsoup
-				.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/consultaBairro.cfm?mostrar=1&UF=" + uf
-						+ "&Localidade=" + URLEncoder.encode(localidadeQuery, CORREIOS_CHARSET))
-				.timeout(360000);
+		Map<String, String> localidadeCookies = null;
 
-		Response localidadeResponse = null;
+		Document localidadeDocument = null;
 		try {
-			localidadeResponse = localidadeConnection.method(Method.GET).execute();
+			Connection localidadeConnection = Jsoup
+					.connect("http://www.buscacep.correios.com.br/sistemas/buscacep/consultaBairro.cfm?mostrar=1&UF="
+							+ uf + "&Localidade=" + URLEncoder.encode(localidadeQuery, CaptacaoCepsService.CORREIOS_CHARSET))
+					.timeout(360000);
+
+			Response localidadeResponse = localidadeConnection.method(Method.GET).execute();
+
+			localidadeCookies = localidadeResponse.cookies();
+
+			localidadeDocument = Jsoup.parse(new String(localidadeResponse.bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET));
 		} catch (Exception e) {
 			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
 					cepLocalidade.getCepUF().getUf()));
 
 			return;
 		}
-
-		Map<String, String> localidadeCookies = localidadeResponse.cookies();
-
-		Document localidadeDocument = Jsoup.parse(new String(localidadeResponse.bodyAsBytes(), CORREIOS_CHARSET));
 
 		if (localidadeDocument.toString().contains("ACESSO NEGADO")) {
 			logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
@@ -169,7 +169,7 @@ public class CaptacaoBairrosService {
 			Document localidadeLetterDocument = null;
 			try {
 				Response response = localidadeLetterConnection.method(Method.POST).execute();
-				String stringBody = new String(response.bodyAsBytes(), CORREIOS_CHARSET);
+				String stringBody = new String(response.bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET);
 
 				if (stringBody.contains("ACESSO NEGADO")) {
 					logger.info(String.format("FALHA[ACESSO NEGADO] --> %s / %s", cepLocalidade.getNomeNormalizado(),
@@ -204,7 +204,7 @@ public class CaptacaoBairrosService {
 					continue;
 				}
 
-				CepBairro cepBairro = new CepBairro();
+				Bairro cepBairro = new Bairro();
 				cepBairro.setCepLocalidade(cepLocalidade);
 				cepBairro.setNome(bairro);
 				cepBairro.setNomeNormalizado(StringUtils.normalizarNome(bairro));

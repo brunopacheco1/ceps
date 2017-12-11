@@ -2,7 +2,6 @@ package com.dev.bruno.ceps.services;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,14 +16,13 @@ import javax.inject.Inject;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepUF;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.UF;
 import com.dev.bruno.ceps.resources.Configurable;
 import com.dev.bruno.ceps.timers.CaptacaoFaixasCepTimer;
 
@@ -38,7 +36,7 @@ public class CaptacaoFaixasCepService {
 	private Integer limiteCaptacaoFaixas;
 
 	@Inject
-	private CepLocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO cepLocalidadeDAO;
 
 	@Resource
 	private TimerService timerService;
@@ -79,24 +77,20 @@ public class CaptacaoFaixasCepService {
 	}
 
 	private void captarFaixasCep() throws Exception {
-		for (CepLocalidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesSemFaixaCep(limiteCaptacaoFaixas)) {
+		for (Localidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesSemFaixaCep(limiteCaptacaoFaixas)) {
 			buscarFaixaCep(cepLocalidade);
 
 			cepLocalidadeDAO.update(cepLocalidade);
 		}
 	}
 
-	private void buscarFaixaCep(CepLocalidade cepLocalidade) throws Exception {
-		Random random = new Random();
-		Integer secs = random.nextInt(9) + 1;
-		Thread.sleep(secs * 1000);
-
-		logger.info(String.format("CAPTACAO DE FAIXAS DE CEP (ESPERA %s sec) --> %s / %s", secs,
+	private void buscarFaixaCep(Localidade cepLocalidade) {
+		logger.info(String.format("CAPTACAO DE FAIXAS DE CEP --> %s / %s",
 				cepLocalidade.getNomeNormalizado(), cepLocalidade.getCepUF().getUf()));
 
 		String localidadeQuery = cepLocalidade.getDistrito() != null ? cepLocalidade.getDistrito()
 				: cepLocalidade.getNome();
-		CepUF cepUF = cepLocalidade.getCepUF();
+		UF cepUF = cepLocalidade.getCepUF();
 		String uf = cepUF.getUf();
 		if (cepLocalidade.getDistrito() != null) {
 			return;
@@ -108,15 +102,10 @@ public class CaptacaoFaixasCepService {
 		Response cookieResponse = null;
 		try {
 			cookieResponse = cookieConnection.method(Method.GET).execute();
-		} catch (HttpStatusException e) {
-			try {
-				Thread.sleep(5000l);
-				cookieResponse = cookieConnection.method(Method.GET).execute();
-			} catch (HttpStatusException e1) {
-				logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-						cepLocalidade.getCepUF().getUf()));
-				return;
-			}
+		} catch (Exception e) {
+			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
+					cepLocalidade.getCepUF().getUf()));
+			return;
 		}
 
 		Map<String, String> cookies = cookieResponse.cookies();
@@ -131,17 +120,11 @@ public class CaptacaoFaixasCepService {
 		Document faixaDocument = null;
 		try {
 			faixaDocument = Jsoup
-					.parse(new String(faixaConnection.method(Method.POST).execute().bodyAsBytes(), "ISO-8859-1"));
-		} catch (HttpStatusException e) {
-			try {
-				Thread.sleep(5000l);
-				faixaDocument = Jsoup
-						.parse(new String(faixaConnection.method(Method.POST).execute().bodyAsBytes(), "ISO-8859-1"));
-			} catch (HttpStatusException e1) {
-				logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-						cepLocalidade.getCepUF().getUf()));
-				return;
-			}
+					.parse(new String(faixaConnection.method(Method.POST).execute().bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET));
+		} catch (Exception e) {
+			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
+					cepLocalidade.getCepUF().getUf()));
+			return;
 		}
 
 		if (faixaDocument == null || faixaDocument.select("table.tmptabela").isEmpty()) {

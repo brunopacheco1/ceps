@@ -13,7 +13,7 @@ import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
 import javax.inject.Inject;
 
-import com.dev.bruno.ceps.model.CepUFEnum;
+import com.dev.bruno.ceps.model.UFEnum;
 import com.dev.bruno.ceps.resources.Configurable;
 import com.dev.bruno.ceps.services.CaptacaoLocalidadesService;
 
@@ -42,7 +42,7 @@ public class CaptacaoLocalidadesTimer {
 			return;
 		}
 
-		for (CepUFEnum uf : CepUFEnum.values()) {
+		for (UFEnum uf : UFEnum.values()) {
 			TimerConfig timerConfig = new TimerConfig();
 			timerConfig.setInfo(INFO_PREFIX + uf);
 			timerConfig.setPersistent(false);

@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "CEP_LOCALIDADE")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CepLocalidade extends AbstractModel {
+public class Localidade extends AbstractModel {
 
 	private static final long serialVersionUID = 6380647707611003240L;
 
@@ -35,7 +35,7 @@ public class CepLocalidade extends AbstractModel {
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_UF")
 	@NotNull
-	private CepUF cepUF;
+	private UF cepUF;
 
 	@Column(name = "DSC_NOME", nullable = false)
 	@NotNull
@@ -53,11 +53,11 @@ public class CepLocalidade extends AbstractModel {
 
 	@OneToMany(mappedBy = "cepLocalidade")
 	@XmlTransient
-	private List<CepBairro> bairros = new ArrayList<>();
+	private List<Bairro> bairros = new ArrayList<>();
 
 	@OneToMany(mappedBy = "cepLocalidade")
 	@XmlTransient
-	private List<CepLogradouro> logradouros = new ArrayList<>();
+	private List<Logradouro> logradouros = new ArrayList<>();
 
 	@OneToMany(mappedBy = "cepLocalidade")
 	@XmlTransient
@@ -79,11 +79,11 @@ public class CepLocalidade extends AbstractModel {
 		this.id = id;
 	}
 
-	public CepUF getCepUF() {
+	public UF getCepUF() {
 		return cepUF;
 	}
 
-	public void setCepUF(CepUF cepUF) {
+	public void setCepUF(UF cepUF) {
 		this.cepUF = cepUF;
 	}
 
@@ -123,19 +123,19 @@ public class CepLocalidade extends AbstractModel {
 		this.faixaCEP = faixaCEP;
 	}
 
-	public List<CepBairro> getBairros() {
+	public List<Bairro> getBairros() {
 		return bairros;
 	}
 
-	public void setBairros(List<CepBairro> bairros) {
+	public void setBairros(List<Bairro> bairros) {
 		this.bairros = bairros;
 	}
 
-	public List<CepLogradouro> getLogradouros() {
+	public List<Logradouro> getLogradouros() {
 		return logradouros;
 	}
 
-	public void setLogradouros(List<CepLogradouro> logradouros) {
+	public void setLogradouros(List<Logradouro> logradouros) {
 		this.logradouros = logradouros;
 	}
 

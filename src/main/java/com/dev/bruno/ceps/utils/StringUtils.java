@@ -2,6 +2,9 @@ package com.dev.bruno.ceps.utils;
 
 public class StringUtils {
 
+	private StringUtils() {
+	}
+
 	public static String normalizarNome(String text) {
 		if (text == null) {
 			return null;

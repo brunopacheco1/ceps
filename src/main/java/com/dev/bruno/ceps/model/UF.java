@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "CEP_UF")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CepUF extends AbstractModel {
+public class UF extends AbstractModel {
 
 	private static final long serialVersionUID = 6001113379795063656L;
 
@@ -38,7 +38,7 @@ public class CepUF extends AbstractModel {
 
 	@OneToMany(mappedBy = "cepUF")
 	@XmlTransient
-	private List<CepLocalidade> localidades = new ArrayList<>();
+	private List<Localidade> localidades = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -64,11 +64,11 @@ public class CepUF extends AbstractModel {
 		this.faixaCEP = faixaCEP;
 	}
 
-	public List<CepLocalidade> getLocalidades() {
+	public List<Localidade> getLocalidades() {
 		return localidades;
 	}
 
-	public void setLocalidades(List<CepLocalidade> localidades) {
+	public void setLocalidades(List<Localidade> localidades) {
 		this.localidades = localidades;
 	}
 }

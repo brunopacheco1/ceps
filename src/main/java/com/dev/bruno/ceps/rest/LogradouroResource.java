@@ -5,13 +5,12 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.TipoCepEnum;
+import com.dev.bruno.ceps.model.Logradouro;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.services.AbstractService;
-import com.dev.bruno.ceps.services.CepService;
+import com.dev.bruno.ceps.services.LogradouroService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
@@ -21,26 +20,24 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestScoped
-@Path("cep")
-@Tag(name = "cep", description = "Servicos consulta e persistencia relacionados a CEP")
+@Path("logradouro")
+@Tag(name = "logradouro", description = "Servicos consulta e persistencia relacionados a Logradouro")
 @SecurityScheme(name = "api_key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
-public class CepResource extends AbstractResource<Cep> {
+public class LogradouroResource extends AbstractResource<Logradouro> {
 
 	@Inject
-	private CepService service;
+	private LogradouroService service;
 
 	@Override
-	protected AbstractService<Cep> getService() {
+	protected AbstractService<Logradouro> getService() {
 		return service;
 	}
 
 	@GET
-	@Path("/{tipo:[A-Z]{3}}")
-	@Operation(description = "Busca de CEPs por Tipo de CEP")
+	@Path("/{id:\\d+}/ceps")
+	@Operation(description = "Busca de CEPs por Logradouro")
 	@SecurityRequirement(name = "api_key")
-	public ResultList<Cep> getCepsPorTipo(@PathParam("tipo") TipoCepEnum cepTipo, @QueryParam("start") Integer start,
-			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir)
-			throws Exception {
-		return service.getCeps(cepTipo, start, limit, order, dir);
+	public ResultList<Cep> getCepsDeLogradouro(@PathParam("id") Long id) throws Exception {
+		return service.getCeps(id);
 	}
 }

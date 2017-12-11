@@ -7,43 +7,43 @@ import javax.inject.Inject;
 import javax.validation.Validator;
 
 import com.dev.bruno.ceps.dao.AbstractDAO;
-import com.dev.bruno.ceps.dao.CepBairroDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
+import com.dev.bruno.ceps.dao.BairroDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.model.Bairro;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.CepBairro;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepLogradouro;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.Logradouro;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
-public class CepBairroService extends AbstractService<CepBairro> {
+public class BairroService extends AbstractService<Bairro> {
 
 	@Inject
-	private CepLocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
-	private CepBairroDAO cepBairroDAO;
+	private BairroDAO cepBairroDAO;
 
 	@Override
-	protected AbstractDAO<CepBairro> getDAO() {
+	protected AbstractDAO<Bairro> getDAO() {
 		return cepBairroDAO;
 	}
 
-	public CepBairroService() {
+	public BairroService() {
 	}
 
-	public CepBairroService(CepLocalidadeDAO cepLocalidadeDAO, CepBairroDAO cepBairroDAO, Validator validator) {
+	public BairroService(LocalidadeDAO cepLocalidadeDAO, BairroDAO cepBairroDAO, Validator validator) {
 		this.cepBairroDAO = cepBairroDAO;
 		this.cepLocalidadeDAO = cepLocalidadeDAO;
 		this.validator = validator;
 	}
 
 	@Override
-	protected void build(CepBairro entity) {
+	protected void build(Bairro entity) {
 		Long cepLocalidadeId = entity.getCepLocalidadeId();
 
-		CepLocalidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
+		Localidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
 		entity.setCepLocalidade(localidade);
 
@@ -54,12 +54,12 @@ public class CepBairroService extends AbstractService<CepBairro> {
 		}
 	}
 
-	public ResultList<CepLogradouro> getLogradouros(Long cepBairroId) throws Exception {
-		CepBairro bairro = getDAO().get(cepBairroId);
+	public ResultList<Logradouro> getLogradouros(Long cepBairroId) {
+		Bairro bairro = getDAO().get(cepBairroId);
 
-		List<CepLogradouro> entities = bairro.getLogradouros();
+		List<Logradouro> entities = bairro.getLogradouros();
 
-		ResultList<CepLogradouro> result = new ResultList<>();
+		ResultList<Logradouro> result = new ResultList<>();
 
 		result.setResult(entities);
 		result.setLimit(entities.size());
@@ -67,8 +67,8 @@ public class CepBairroService extends AbstractService<CepBairro> {
 		return result;
 	}
 
-	public ResultList<Cep> getCeps(Long cepBairroId) throws Exception {
-		CepBairro bairro = getDAO().get(cepBairroId);
+	public ResultList<Cep> getCeps(Long cepBairroId) {
+		Bairro bairro = getDAO().get(cepBairroId);
 
 		List<Cep> entities = bairro.getCeps();
 

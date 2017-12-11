@@ -11,22 +11,22 @@ import javax.validation.ValidatorFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.dev.bruno.ceps.dao.CepUFDAO;
+import com.dev.bruno.ceps.dao.UFDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
-import com.dev.bruno.ceps.model.CepUF;
-import com.dev.bruno.ceps.services.CepUFService;
+import com.dev.bruno.ceps.model.UF;
+import com.dev.bruno.ceps.services.UFService;
 
 public class CepUFTest {
 
-	private static CepUFService service;
+	private static UFService service;
 
 	@BeforeClass
 	public static void setUp() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		service = new CepUFService(mock(CepUFDAO.class), validator);
+		service = new UFService(mock(UFDAO.class), validator);
 	}
 
 	@Test
@@ -41,7 +41,7 @@ public class CepUFTest {
 	@Test
 	public void testAddEmptyObject() {
 		try {
-			service.add(new CepUF());
+			service.add(new UF());
 		} catch (Exception e) {
 			assertTrue(e instanceof ConstraintViolationException);
 		}
@@ -49,13 +49,13 @@ public class CepUFTest {
 
 	@Test
 	public void testAdd() {
-		CepUF cepUF = new CepUF();
+		UF cepUF = new UF();
 		cepUF.setUf("RJ");
 
 		Object result = service.add(cepUF);
 
 		assertNotNull(result);
 
-		assertTrue(result instanceof CepUF);
+		assertTrue(result instanceof UF);
 	}
 }

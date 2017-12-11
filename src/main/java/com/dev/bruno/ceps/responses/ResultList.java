@@ -8,15 +8,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.dev.bruno.ceps.model.AbstractModel;
-
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ResultList<ENTITY extends AbstractModel> implements Serializable {
+public class ResultList<MODEL> implements Serializable {
 
 	private static final long serialVersionUID = -4216175342452534456L;
 
-	private List<ENTITY> result = new ArrayList<>();
+	private List<MODEL> result = new ArrayList<>();
 
 	private Integer size = 0;
 
@@ -28,11 +26,11 @@ public class ResultList<ENTITY extends AbstractModel> implements Serializable {
 
 	private String dir = "asc";
 
-	public List<ENTITY> getResult() {
+	public List<MODEL> getResult() {
 		return result;
 	}
 
-	public void setResult(List<ENTITY> result) {
+	public void setResult(List<MODEL> result) {
 		this.result = result;
 		this.size = result.size();
 	}

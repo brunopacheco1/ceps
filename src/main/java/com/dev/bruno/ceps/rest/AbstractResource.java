@@ -11,7 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import com.dev.bruno.ceps.model.AbstractModel;
 import com.dev.bruno.ceps.responses.GenericResponse;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.services.AbstractService;
@@ -20,16 +19,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @Produces(MediaType.APPLICATION_JSON)
-public abstract class AbstractResource<ENTITY extends AbstractModel> {
+public abstract class AbstractResource<MODEL> {
 
-	protected abstract AbstractService<ENTITY> getService();
+	protected abstract AbstractService<MODEL> getService();
 
 	@GET
 	@Operation(description = "Listar Entidades")
 	@SecurityRequirement(name = "api_key")
-	public ResultList<ENTITY> list(@QueryParam("query") String queryStr, @QueryParam("start") Integer start,
-			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir)
-			throws Exception {
+	public ResultList<MODEL> list(@QueryParam("query") String queryStr, @QueryParam("start") Integer start,
+			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir) {
 		return getService().list(queryStr, start, limit, order, dir);
 	}
 
@@ -37,7 +35,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	@Path("/{id:\\d+}")
 	@Operation(description = "Buscar Entidade Por ID")
 	@SecurityRequirement(name = "api_key")
-	public ENTITY get(@PathParam("id") Long id) throws Exception {
+	public MODEL get(@PathParam("id") Long id) {
 		return getService().get(id);
 	}
 
@@ -45,7 +43,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(description = "Adicionar Entidade")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse add(ENTITY dto) throws Exception {
+	public GenericResponse add(MODEL dto) {
 		getService().add(dto);
 
 		return new GenericResponse(true);
@@ -56,7 +54,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(description = "Atualizar Entidade")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse update(@PathParam("id") Long id, ENTITY dto) throws Exception {
+	public GenericResponse update(@PathParam("id") Long id, MODEL dto) {
 		getService().update(id, dto);
 
 		return new GenericResponse(true);
@@ -66,7 +64,7 @@ public abstract class AbstractResource<ENTITY extends AbstractModel> {
 	@Path("/{id:\\d+}")
 	@Operation(description = "Remover Entidade")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse remove(@PathParam("id") Long id) throws Exception {
+	public GenericResponse remove(@PathParam("id") Long id) {
 		getService().remove(id);
 
 		return new GenericResponse(true);

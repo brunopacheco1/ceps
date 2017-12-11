@@ -47,7 +47,7 @@ public class CaptacaoResource {
 	@POST
 	@Path("/uf/{uf:[A-Z]{2}}/localidades")
 	@Operation(description = "Captacao de Localidade")
-	public GenericResponse captarLocalidades(@PathParam("uf") String uf) throws Exception {
+	public GenericResponse captarLocalidades(@PathParam("uf") String uf) {
 		captacaoLocalidadesService.agendarCaptacaoLocalidades(uf);
 
 		return new GenericResponse(true);
@@ -57,7 +57,7 @@ public class CaptacaoResource {
 	@Path("/uf/{uf:[A-Z]{2}}/bairros")
 	@Operation(description = "Captacao de Bairros")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse captarBairros(@PathParam("uf") String uf) throws Exception {
+	public GenericResponse captarBairros(@PathParam("uf") String uf) {
 		captacaoBairrosService.agendarCaptacaoBairros(uf);
 
 		return new GenericResponse(true);
@@ -67,7 +67,7 @@ public class CaptacaoResource {
 	@Path("/uf/{uf:[A-Z]{2}}/ceps-especiais")
 	@Operation(description = "Captacao de CEPs Especiais")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") String uf) throws Exception {
+	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") String uf) {
 		captacaoCepsEspeciaisService.agendarCaptacaoCepsEspeciais(uf);
 
 		return new GenericResponse(true);
@@ -77,7 +77,7 @@ public class CaptacaoResource {
 	@Path("/localidades/faixas-cep")
 	@Operation(description = "Captacao de Faixas de CEPs")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse captarCepsEspeciais() throws Exception {
+	public GenericResponse captarCepsEspeciais() {
 		captacaoFaixasCepsService.agendarCaptacaoFaixasCep();
 
 		return new GenericResponse(true);
@@ -87,7 +87,7 @@ public class CaptacaoResource {
 	@Path("/bairros/ceps")
 	@Operation(description = "Captacao de CEPs")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse captarCeps() throws Exception {
+	public GenericResponse captarCeps() {
 		captacaoCepsService.agendarCaptacaoCeps();
 
 		return new GenericResponse(true);

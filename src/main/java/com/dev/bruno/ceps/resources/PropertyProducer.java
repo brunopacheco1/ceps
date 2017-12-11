@@ -1,12 +1,13 @@
 package com.dev.bruno.ceps.resources;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
+
+import com.dev.bruno.ceps.exceptions.PropertiesFileException;
 
 public class PropertyProducer {
 
@@ -43,13 +44,11 @@ public class PropertyProducer {
 	public void init() {
 		this.properties = new Properties();
 		final InputStream stream = PropertyProducer.class.getResourceAsStream("/META-INF/application.properties");
-		if (stream == null) {
-			throw new RuntimeException("No properties!!!");
-		}
+
 		try {
 			this.properties.load(stream);
-		} catch (final IOException e) {
-			throw new RuntimeException("Configuration could not be loaded!");
+		} catch (Exception e) {
+			throw new PropertiesFileException("Configuration could not be loaded!");
 		}
 	}
 }

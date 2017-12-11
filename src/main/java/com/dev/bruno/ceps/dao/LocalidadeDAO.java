@@ -5,16 +5,16 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.TypedQuery;
 
-import com.dev.bruno.ceps.model.CepLocalidade;
+import com.dev.bruno.ceps.model.Localidade;
 
 @Stateless
-public class CepLocalidadeDAO extends AbstractDAO<CepLocalidade> {
+public class LocalidadeDAO extends AbstractDAO<Localidade> {
 
 	@SuppressWarnings("unchecked")
-	public List<CepLocalidade> buscarLocalidadesNaoValidadas() {
+	public List<Localidade> buscarLocalidadesNaoValidadas() {
 		return manager.createNativeQuery(
 				"select distinct l.* from cep_localidade l where l.cod_cep_localidade in (4306,10801,351,377,468,270,728,1012,4839,5346,5431,5503,5917,6006,9055,7040,8064,8780,6816,1450,1538,1555,1799,1916,1946,9450,10782,10581,2850,2912,3033,3385,3529,1387,1724,1736,3386,17,4367,5290,8375,2966) order by l.cod_cep_localidade asc",
-				CepLocalidade.class).getResultList();
+				Localidade.class).getResultList();
 	}
 
 	public List<Long> buscarLocalidadeSemCepUnico(String uf) {
@@ -23,10 +23,10 @@ public class CepLocalidadeDAO extends AbstractDAO<CepLocalidade> {
 				Long.class).setParameter("uf", uf).setMaxResults(1).getResultList();
 	}
 
-	public CepLocalidade buscarLocalidadePorNomeUF(String uf, String nomeNormalizado) {
+	public Localidade buscarLocalidadePorNomeUF(String uf, String nomeNormalizado) {
 		return manager.createQuery(
 				"select distinct l from CepLocalidade l where l.cepUF.uf = :uf and l.nomeNormalizado = :nomeNormalizado",
-				CepLocalidade.class).setParameter("uf", uf).setParameter("nomeNormalizado", nomeNormalizado)
+				Localidade.class).setParameter("uf", uf).setParameter("nomeNormalizado", nomeNormalizado)
 				.getSingleResult();
 	}
 
@@ -50,15 +50,15 @@ public class CepLocalidadeDAO extends AbstractDAO<CepLocalidade> {
 		return result > 0;
 	}
 
-	public List<CepLocalidade> listarLocalidadesSemFaixaCep(Integer limit) {
+	public List<Localidade> listarLocalidadesSemFaixaCep(Integer limit) {
 		return manager.createQuery(
 				"select l from CepLocalidade l where l.distrito is null and l.faixaCEP is null order by l.nomeNormalizado",
-				CepLocalidade.class).setMaxResults(limit).getResultList();
+				Localidade.class).setMaxResults(limit).getResultList();
 	}
 
-	public List<CepLocalidade> listarLocalidadesPorUF(String uf) {
+	public List<Localidade> listarLocalidadesPorUF(String uf) {
 		return manager.createQuery("select l from CepLocalidade l where l.cepUF.uf = :uf order by l.nomeNormalizado",
-				CepLocalidade.class).setParameter("uf", uf).getResultList();
+				Localidade.class).setParameter("uf", uf).getResultList();
 	}
 
 	public List<Long> listarLocalidadesIdsPorUF(String uf) {

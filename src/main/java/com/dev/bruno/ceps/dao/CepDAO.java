@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 import com.dev.bruno.ceps.exceptions.InvalidValueException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.model.TipoCepEnum;
 
 @Stateless
 public class CepDAO extends AbstractDAO<Cep> {
@@ -37,8 +37,7 @@ public class CepDAO extends AbstractDAO<Cep> {
 				.getSingleResult();
 	}
 
-	public List<Cep> list(CepTipo tipoCep, Integer start, Integer limit, String order, String dir)
-			throws MandatoryFieldsException, InvalidValueException {
+	public List<Cep> list(TipoCepEnum tipoCep, Integer start, Integer limit, String order, String dir) {
 		if (tipoCep == null || start == null || limit == null || order == null || dir == null) {
 			throw new MandatoryFieldsException("tipo, start, limit, order e dir são obrigatórios");
 		}
@@ -50,17 +49,11 @@ public class CepDAO extends AbstractDAO<Cep> {
 
 		StringBuilder hql = new StringBuilder("select c from Cep c where 1=1");
 
-		if (tipoCep != null) {
-			hql.append(" and c.tipoCep = :tipoCep");
-		}
-
-		hql.append(" order by c." + order + " " + dir);
+		hql.append(" and c.tipoCep = :tipoCep order by c." + order + " " + dir);
 
 		TypedQuery<Cep> query = manager.createQuery(hql.toString(), Cep.class);
 
-		if (tipoCep != null) {
-			query.setParameter("tipoCep", tipoCep);
-		}
+		query.setParameter("tipoCep", tipoCep);
 
 		return query.setFirstResult(start).setMaxResults(limit).getResultList();
 	}

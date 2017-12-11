@@ -12,28 +12,28 @@ import javax.validation.ValidatorFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.dao.CepUFDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.dao.UFDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepUF;
-import com.dev.bruno.ceps.services.CepLocalidadeService;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.UF;
+import com.dev.bruno.ceps.services.LocalidadeService;
 
 public class CepLocalidadeTest {
 
-	private static CepUFDAO cepUFDAO;
+	private static UFDAO cepUFDAO;
 
-	private static CepLocalidadeService service;
+	private static LocalidadeService service;
 
 	@BeforeClass
 	public static void setUp() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		cepUFDAO = mock(CepUFDAO.class);
+		cepUFDAO = mock(UFDAO.class);
 
-		service = new CepLocalidadeService(mock(CepLocalidadeDAO.class), cepUFDAO, validator);
+		service = new LocalidadeService(mock(LocalidadeDAO.class), cepUFDAO, validator);
 	}
 	
 	@Test
@@ -50,7 +50,7 @@ public class CepLocalidadeTest {
 		when(cepUFDAO.get(null)).thenThrow(MandatoryFieldsException.class);
 		
 		try {
-			service.add(new CepLocalidade());
+			service.add(new Localidade());
 		} catch (Exception e) {
 			assertTrue(e instanceof MandatoryFieldsException);
 		}
@@ -58,11 +58,11 @@ public class CepLocalidadeTest {
 
 	@Test
 	public void testAddUf() {
-		CepUF cepUF = new CepUF();
+		UF cepUF = new UF();
 		cepUF.setUf("RJ");
 		cepUF.setId(1L);
 
-		CepLocalidade cepLocalidade = new CepLocalidade();
+		Localidade cepLocalidade = new Localidade();
 		cepLocalidade.setCepUF(cepUF);
 
 		when(cepUFDAO.get(1L)).thenReturn(cepUF);
@@ -76,11 +76,11 @@ public class CepLocalidadeTest {
 	
 	@Test
 	public void testAdd() {
-		CepUF cepUF = new CepUF();
+		UF cepUF = new UF();
 		cepUF.setUf("RJ");
 		cepUF.setId(1L);
 
-		CepLocalidade cepLocalidade = new CepLocalidade();
+		Localidade cepLocalidade = new Localidade();
 		cepLocalidade.setCepUF(cepUF);
 		cepLocalidade.setNome("Rio de Janeiro");
 		
@@ -90,6 +90,6 @@ public class CepLocalidadeTest {
 		
 		assertNotNull(result);
 		
-		assertTrue(result instanceof CepLocalidade);
+		assertTrue(result instanceof Localidade);
 	}
 }

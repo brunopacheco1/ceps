@@ -4,9 +4,9 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 
-import com.dev.bruno.ceps.model.CepTipoLogradouro;
+import com.dev.bruno.ceps.model.TipoLogradouro;
 import com.dev.bruno.ceps.services.AbstractService;
-import com.dev.bruno.ceps.services.CepTipoLogradouroService;
+import com.dev.bruno.ceps.services.TipoLogradouroService;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -17,13 +17,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path("tipo-logradouro")
 @Tag(name = "tipo-logradouro", description = "Servicos consulta e persistencia relacionados a Tipo de Logradouro")
 @SecurityScheme(name = "api_key", type = SecuritySchemeType.APIKEY, in = SecuritySchemeIn.HEADER)
-public class CepTipoLogradouroResource extends AbstractResource<CepTipoLogradouro> {
+public class TipoLogradouroResource extends AbstractResource<TipoLogradouro> {
 
 	@Inject
-	private CepTipoLogradouroService service;
+	private TipoLogradouroService service;
 
 	@Override
-	protected AbstractService<CepTipoLogradouro> getService() {
+	protected AbstractService<TipoLogradouro> getService() {
 		return service;
 	}
 }

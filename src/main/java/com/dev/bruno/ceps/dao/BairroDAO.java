@@ -6,13 +6,13 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.TypedQuery;
 
-import com.dev.bruno.ceps.model.CepBairro;
-import com.dev.bruno.ceps.model.CepLocalidade;
+import com.dev.bruno.ceps.model.Bairro;
+import com.dev.bruno.ceps.model.Localidade;
 
 @Stateless
-public class CepBairroDAO extends AbstractDAO<CepBairro> {
+public class BairroDAO extends AbstractDAO<Bairro> {
 
-	public Boolean existsByNomeLocalidade(CepLocalidade cepLocalidade, String nome) {
+	public Boolean existsByNomeLocalidade(Localidade cepLocalidade, String nome) {
 		Long result = manager
 				.createQuery(
 						"select count(b) from CepBairro b where b.cepLocalidade = :cepLocalidade and b.nome = :nome",
@@ -22,19 +22,19 @@ public class CepBairroDAO extends AbstractDAO<CepBairro> {
 		return result > 0;
 	}
 
-	public CepBairro buscarByNomeLocalidade(CepLocalidade localidade, String bairro) {
+	public Bairro buscarByNomeLocalidade(Localidade localidade, String bairro) {
 		return manager
 				.createQuery("select b from CepBairro b where b.cepLocalidade = :cepLocalidade and b.nome = :nome",
-						CepBairro.class)
+						Bairro.class)
 				.setParameter("cepLocalidade", localidade).setParameter("nome", bairro).getSingleResult();
 	}
 
-	public List<CepBairro> listarBairrosNaoProcessados(Integer limit) {
+	public List<Bairro> listarBairrosNaoProcessados(Integer limit) {
 		LocalDateTime date = LocalDateTime.now().minusDays(7L);
 
-		TypedQuery<CepBairro> query = manager.createQuery(
+		TypedQuery<Bairro> query = manager.createQuery(
 				"select b from CepBairro b where b.ultimoProcessamento is null or b.ultimoProcessamento < :date order by b.ultimoProcessamento",
-				CepBairro.class);
+				Bairro.class);
 
 		query.setParameter("date", date);
 

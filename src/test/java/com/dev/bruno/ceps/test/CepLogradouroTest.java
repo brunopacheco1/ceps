@@ -12,31 +12,31 @@ import javax.validation.ValidatorFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.dev.bruno.ceps.dao.CepBairroDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.dao.CepLogradouroDAO;
-import com.dev.bruno.ceps.dao.CepTipoLogradouroDAO;
+import com.dev.bruno.ceps.dao.BairroDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.dao.LogradouroDAO;
+import com.dev.bruno.ceps.dao.TipoLogradouroDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepLogradouro;
-import com.dev.bruno.ceps.services.CepLogradouroService;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.Logradouro;
+import com.dev.bruno.ceps.services.LogradouroService;
 
 public class CepLogradouroTest {
 
-	private static CepLogradouroService service;
+	private static LogradouroService service;
 
-	private static CepLocalidadeDAO cepLocalidadeDAO;
+	private static LocalidadeDAO cepLocalidadeDAO;
 
 	@BeforeClass
 	public static void SetUpTest() throws Exception {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		cepLocalidadeDAO = mock(CepLocalidadeDAO.class);
+		cepLocalidadeDAO = mock(LocalidadeDAO.class);
 
-		service = new CepLogradouroService(cepLocalidadeDAO, mock(CepBairroDAO.class), mock(CepTipoLogradouroDAO.class),
-				mock(CepLogradouroDAO.class), validator);
+		service = new LogradouroService(cepLocalidadeDAO, mock(BairroDAO.class), mock(TipoLogradouroDAO.class),
+				mock(LogradouroDAO.class), validator);
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class CepLogradouroTest {
 		when(cepLocalidadeDAO.get(null)).thenThrow(MandatoryFieldsException.class);
 
 		try {
-			service.add(new CepLogradouro());
+			service.add(new Logradouro());
 		} catch (Exception e) {
 			assertTrue(e instanceof MandatoryFieldsException);
 		}
@@ -61,11 +61,11 @@ public class CepLogradouroTest {
 
 	@Test
 	public void testAddLocalidade() {
-		CepLocalidade cepLocalidade = new CepLocalidade();
+		Localidade cepLocalidade = new Localidade();
 		cepLocalidade.setNome("Rio de Janeiro");
 		cepLocalidade.setId(1L);
 
-		CepLogradouro cepLogradouro = new CepLogradouro();
+		Logradouro cepLogradouro = new Logradouro();
 		cepLogradouro.setCepLocalidade(cepLocalidade);
 
 		when(cepLocalidadeDAO.get(1L)).thenReturn(cepLocalidade);
@@ -79,11 +79,11 @@ public class CepLogradouroTest {
 
 	@Test
 	public void testAdd() {
-		CepLocalidade cepLocalidade = new CepLocalidade();
+		Localidade cepLocalidade = new Localidade();
 		cepLocalidade.setNome("Rio de Janeiro");
 		cepLocalidade.setId(1L);
 
-		CepLogradouro cepLogradouro = new CepLogradouro();
+		Logradouro cepLogradouro = new Logradouro();
 		cepLogradouro.setCepLocalidade(cepLocalidade);
 		cepLogradouro.setNome("Rua Cidade de Lima");
 
@@ -93,6 +93,6 @@ public class CepLogradouroTest {
 
 		assertNotNull(result);
 
-		assertTrue(result instanceof CepLogradouro);
+		assertTrue(result instanceof Logradouro);
 	}
 }

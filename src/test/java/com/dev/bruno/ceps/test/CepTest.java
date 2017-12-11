@@ -11,14 +11,14 @@ import javax.validation.ValidatorFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.dev.bruno.ceps.dao.CepBairroDAO;
+import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.CepDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.dao.CepLogradouroDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.dao.LogradouroDAO;
 import com.dev.bruno.ceps.exceptions.ConstraintViolationException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.services.CepService;
 
 public class CepTest {
@@ -30,8 +30,8 @@ public class CepTest {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		service = new CepService(mock(CepDAO.class), mock(CepLocalidadeDAO.class), mock(CepBairroDAO.class),
-				mock(CepLogradouroDAO.class), validator);
+		service = new CepService(mock(CepDAO.class), mock(LocalidadeDAO.class), mock(BairroDAO.class),
+				mock(LogradouroDAO.class), validator);
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class CepTest {
 	@Test
 	public void testAddPadraoCEP() {
 		Cep cep = new Cep();
-		cep.setCep("20");
+		cep.setNumeroCep("20");
 
 		try {
 			service.add(cep);
@@ -63,7 +63,7 @@ public class CepTest {
 			assertTrue(e instanceof ConstraintViolationException);
 		}
 
-		cep.setCep("20101111");
+		cep.setNumeroCep("20101111");
 
 		try {
 			service.add(cep);
@@ -71,7 +71,7 @@ public class CepTest {
 			assertTrue(e instanceof ConstraintViolationException);
 		}
 
-		cep.setCep("20101-111");
+		cep.setNumeroCep("20101-111");
 
 		try {
 			service.add(cep);
@@ -83,8 +83,8 @@ public class CepTest {
 	@Test
 	public void testAdd() {
 		Cep cep = new Cep();
-		cep.setCep("20101-111");
-		cep.setTipoCep(CepTipo.UOP);
+		cep.setNumeroCep("20101-111");
+		cep.setTipoCep(TipoCepEnum.UOP);
 
 		Object result = service.add(cep);
 

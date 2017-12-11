@@ -5,14 +5,14 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.TypedQuery;
 
-import com.dev.bruno.ceps.model.CepBairro;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepLogradouro;
+import com.dev.bruno.ceps.model.Bairro;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.Logradouro;
 
 @Stateless
-public class CepLogradouroDAO extends AbstractDAO<CepLogradouro> {
+public class LogradouroDAO extends AbstractDAO<Logradouro> {
 
-	public Boolean existByLocalidadeBairroEnderecoComplemento(CepLocalidade cepLocalidade, CepBairro cepBairro,
+	public Boolean existByLocalidadeBairroEnderecoComplemento(Localidade cepLocalidade, Bairro cepBairro,
 			String nome, String complemento) {
 		String hql = "select count(l) from CepLogradouro l where l.cepLocalidade.id = :cepLocalidade and l.nome = :nome";
 
@@ -44,7 +44,7 @@ public class CepLogradouroDAO extends AbstractDAO<CepLogradouro> {
 		return result > 0;
 	}
 
-	public CepLogradouro buscarByLocalidadeBairroEnderecoComplemento(CepLocalidade cepLocalidade, CepBairro cepBairro,
+	public Logradouro buscarByLocalidadeBairroEnderecoComplemento(Localidade cepLocalidade, Bairro cepBairro,
 			String nome, String complemento) {
 		String hql = "select l from CepLogradouro l where l.cepLocalidade.id = :cepLocalidade and l.nome = :nome";
 
@@ -60,7 +60,7 @@ public class CepLogradouroDAO extends AbstractDAO<CepLogradouro> {
 			hql += " and l.complemento is null";
 		}
 
-		TypedQuery<CepLogradouro> query = manager.createQuery(hql, CepLogradouro.class)
+		TypedQuery<Logradouro> query = manager.createQuery(hql, Logradouro.class)
 				.setParameter("cepLocalidade", cepLocalidade.getId()).setParameter("nome", nome);
 
 		if (cepBairro != null) {
@@ -74,9 +74,9 @@ public class CepLogradouroDAO extends AbstractDAO<CepLogradouro> {
 		return query.getSingleResult();
 	}
 
-	public List<CepLogradouro> listarLogradourosSemTipo() {
+	public List<Logradouro> listarLogradourosSemTipo() {
 		String hql = "select l from CepLogradouro l where l.cepTipoLogradouro is null";
 
-		return manager.createQuery(hql, CepLogradouro.class).setMaxResults(1000).getResultList();
+		return manager.createQuery(hql, Logradouro.class).setMaxResults(1000).getResultList();
 	}
 }

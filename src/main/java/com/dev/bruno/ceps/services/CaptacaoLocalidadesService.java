@@ -16,18 +16,17 @@ import javax.inject.Inject;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import com.dev.bruno.ceps.dao.CepDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.dao.CepUFDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.dao.UFDAO;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepTipo;
-import com.dev.bruno.ceps.model.CepUF;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.TipoCepEnum;
+import com.dev.bruno.ceps.model.UF;
 import com.dev.bruno.ceps.timers.CaptacaoLocalidadesTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
@@ -35,10 +34,10 @@ import com.dev.bruno.ceps.utils.StringUtils;
 public class CaptacaoLocalidadesService {
 
 	@Inject
-	private CepUFDAO cepUFDAO;
+	private UFDAO cepUFDAO;
 
 	@Inject
-	private CepLocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
 	private CepDAO cepDAO;
@@ -49,7 +48,7 @@ public class CaptacaoLocalidadesService {
 	@Resource
 	private TimerService timerService;
 
-	public void agendarCaptacaoLocalidades(String uf) throws Exception {
+	public void agendarCaptacaoLocalidades(String uf) {
 		String info = CaptacaoLocalidadesTimer.INFO_PREFIX + uf + "_manualtimer";
 
 		long count = timerService.getTimers().stream().filter(timer -> timer.getInfo().toString().equals(info)).count();
@@ -88,8 +87,8 @@ public class CaptacaoLocalidadesService {
 		logger.info(String.format("CAPTACAO DE LOCALIDADES PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	public void captarLocalidades(String uf) throws Exception {
-		CepUF cepUF = cepUFDAO.buscarPorUF(uf);
+	public void captarLocalidades(String uf) {
+		UF cepUF = cepUFDAO.buscarPorUF(uf);
 
 		Connection ufConnection = Jsoup.connect(
 				"http://www.buscacep.correios.com.br/sistemas/buscacep/consultaLocalidade.cfm?mostrar=1&UF=" + uf)
@@ -99,9 +98,9 @@ public class CaptacaoLocalidadesService {
 
 		try {
 			ufResponse = ufConnection.method(Method.GET).execute();
-		} catch (HttpStatusException e) {
-			Thread.sleep(5000l);
-			ufResponse = ufConnection.method(Method.GET).execute();
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			return;
 		}
 
 		Map<String, String> cookies = ufResponse.cookies();
@@ -120,12 +119,11 @@ public class CaptacaoLocalidadesService {
 
 			Document letterDocument = null;
 			try {
-				letterDocument = Jsoup
-						.parse(new String(letterConnection.method(Method.POST).execute().bodyAsBytes(), "ISO-8859-1"));
-			} catch (HttpStatusException e) {
-				Thread.sleep(5000l);
-				letterDocument = Jsoup
-						.parse(new String(letterConnection.method(Method.POST).execute().bodyAsBytes(), "ISO-8859-1"));
+				letterDocument = Jsoup.parse(new String(letterConnection.method(Method.POST).execute().bodyAsBytes(),
+						CaptacaoCepsService.CORREIOS_CHARSET));
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, e.getMessage(), e);
+				continue;
 			}
 
 			for (Element ufTr : letterDocument.select("tr")) {
@@ -155,7 +153,7 @@ public class CaptacaoLocalidadesService {
 					continue;
 				}
 
-				CepLocalidade cepLocalidade = new CepLocalidade();
+				Localidade cepLocalidade = new Localidade();
 
 				cepLocalidade.setNome(localidade);
 
@@ -172,8 +170,8 @@ public class CaptacaoLocalidadesService {
 				Cep cepObj = null;
 				if (cep.matches("^\\d{8}$")) {
 					cepObj = new Cep();
-					cepObj.setTipoCep(CepTipo.UNI);
-					cepObj.setCep(cep);
+					cepObj.setTipoCep(TipoCepEnum.UNI);
+					cepObj.setNumeroCep(cep);
 					cepObj.setCepLocalidade(cepLocalidade);
 				}
 

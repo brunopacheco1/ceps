@@ -17,22 +17,21 @@ import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.AbstractModel;
 import com.dev.bruno.ceps.responses.ResultList;
 
-public abstract class AbstractService<ENTITY extends AbstractModel> {
+public abstract class AbstractService<MODEL> {
 
 	@Inject
 	protected Validator validator;
 
 	@SuppressWarnings("unchecked")
-	protected Class<ENTITY> getEntityType() {
+	protected Class<MODEL> getEntityType() {
 		Type t = getClass().getGenericSuperclass();
 		ParameterizedType pt = (ParameterizedType) t;
-		return (Class<ENTITY>) pt.getActualTypeArguments()[0];
+		return (Class<MODEL>) pt.getActualTypeArguments()[0];
 	}
 
-	protected abstract AbstractDAO<ENTITY> getDAO();
+	protected abstract AbstractDAO<MODEL> getDAO();
 
-	public ResultList<ENTITY> list(String queryStr, Integer start, Integer limit, String order, String dir)
-			throws Exception {
+	public ResultList<MODEL> list(String queryStr, Integer start, Integer limit, String order, String dir) {
 		if (start == null) {
 			start = 0;
 		}
@@ -49,9 +48,9 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 			dir = "asc";
 		}
 
-		List<ENTITY> entities = getDAO().list(queryStr, start, limit, order, dir);
+		List<MODEL> entities = getDAO().list(queryStr, start, limit, order, dir);
 
-		ResultList<ENTITY> result = new ResultList<>();
+		ResultList<MODEL> result = new ResultList<>();
 
 		result.setResult(entities);
 		result.setDir(dir);
@@ -62,10 +61,10 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 		return result;
 	}
 
-	public ResultList<ENTITY> list() throws Exception {
-		List<ENTITY> entities = getDAO().list();
+	public ResultList<MODEL> list() {
+		List<MODEL> entities = getDAO().list();
 
-		ResultList<ENTITY> result = new ResultList<>();
+		ResultList<MODEL> result = new ResultList<>();
 
 		result.setResult(entities);
 		result.setLimit(entities.size());
@@ -73,22 +72,22 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 		return result;
 	}
 
-	public ENTITY get(Long id) throws Exception {
+	public MODEL get(Long id) {
 		return getDAO().get(id);
 	}
 
-	public ENTITY add(ENTITY entity) {
-		validate(null, entity);
+	public MODEL add(MODEL entity) {
+		validateAndBuild(null, entity);
 
 		getDAO().add(entity);
 
 		return entity;
 	}
 
-	protected abstract void build(ENTITY entity);
+	protected abstract void build(MODEL entity);
 
-	public ENTITY update(Long id, ENTITY entity) {
-		validate(id, entity);
+	public MODEL update(Long id, MODEL entity) {
+		validateAndBuild(id, entity);
 
 		getDAO().update(entity);
 
@@ -96,12 +95,12 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 	}
 
 	public void remove(Long id) {
-		ENTITY entity = getDAO().get(id);
+		MODEL entity = getDAO().get(id);
 		getDAO().remove(entity);
 	}
 
-	public void validate(Long id, ENTITY entity) {
-		if (entity == null) {
+	public void validateAndBuild(Long id, MODEL model) {
+		if (model == null || !(model instanceof AbstractModel)) {
 			throw new MandatoryFieldsException(getEntityType().getSimpleName() + " nao encontrada na requisicao.");
 		}
 
@@ -109,14 +108,14 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 			throw new EntityNotFoundException(getEntityType().getSimpleName() + "[" + id + "] não encontrado.");
 		}
 
-		build(entity);
+		build(model);
 
-		Set<ConstraintViolation<ENTITY>> violations = validator.validate(entity);
+		Set<ConstraintViolation<MODEL>> violations = validator.validate(model);
 
 		if (!violations.isEmpty()) {
 			List<String> msgs = new ArrayList<>();
 
-			for (ConstraintViolation<ENTITY> violation : violations) {
+			for (ConstraintViolation<MODEL> violation : violations) {
 				msgs.add(String.format("%s field %s", violation.getPropertyPath(), violation.getMessage()));
 			}
 
@@ -125,6 +124,8 @@ public abstract class AbstractService<ENTITY extends AbstractModel> {
 			throw exception;
 		}
 
-		entity.setId(id);
+		AbstractModel abstractModel = (AbstractModel) model;
+
+		abstractModel.setId(id);
 	}
 }

@@ -7,15 +7,15 @@ import javax.inject.Inject;
 import javax.validation.Validator;
 
 import com.dev.bruno.ceps.dao.AbstractDAO;
-import com.dev.bruno.ceps.dao.CepBairroDAO;
+import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.CepDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.dao.CepLogradouroDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.dao.LogradouroDAO;
+import com.dev.bruno.ceps.model.Bairro;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.CepBairro;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepLogradouro;
-import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.Logradouro;
+import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.responses.ResultList;
 
 @Stateless
@@ -25,19 +25,19 @@ public class CepService extends AbstractService<Cep> {
 	private CepDAO cepDAO;
 
 	@Inject
-	private CepLocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
-	private CepBairroDAO cepBairroDAO;
+	private BairroDAO cepBairroDAO;
 
 	@Inject
-	private CepLogradouroDAO cepLogradouroDAO;
+	private LogradouroDAO cepLogradouroDAO;
 
 	public CepService() {
 	}
 
-	public CepService(CepDAO cepDAO, CepLocalidadeDAO cepLocalidadeDAO, CepBairroDAO cepBairroDAO,
-			CepLogradouroDAO cepLogradouroDAO, Validator validator) {
+	public CepService(CepDAO cepDAO, LocalidadeDAO cepLocalidadeDAO, BairroDAO cepBairroDAO,
+			LogradouroDAO cepLogradouroDAO, Validator validator) {
 		super();
 		this.cepDAO = cepDAO;
 		this.cepLocalidadeDAO = cepLocalidadeDAO;
@@ -53,11 +53,11 @@ public class CepService extends AbstractService<Cep> {
 
 	@Override
 	protected void build(Cep entity) {
-		CepLocalidade localidade = null;
+		Localidade localidade = null;
 
-		CepBairro bairro = null;
+		Bairro bairro = null;
 
-		CepLogradouro logradouro = null;
+		Logradouro logradouro = null;
 
 		Long cepLocalidadeId = entity.getCepLocalidadeId();
 
@@ -84,8 +84,7 @@ public class CepService extends AbstractService<Cep> {
 		entity.setCepLogradouro(logradouro);
 	}
 
-	public ResultList<Cep> getCeps(CepTipo cepTipo, Integer start, Integer limit, String order, String dir)
-			throws Exception {
+	public ResultList<Cep> getCeps(TipoCepEnum cepTipo, Integer start, Integer limit, String order, String dir) {
 
 		if (start == null) {
 			start = 0;

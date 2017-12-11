@@ -23,46 +23,45 @@ import javax.jms.JMSContext;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.dev.bruno.ceps.dao.CepBairroDAO;
+import com.dev.bruno.ceps.dao.BairroDAO;
 import com.dev.bruno.ceps.dao.CepDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.dao.CepLogradouroDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.dao.LogradouroDAO;
+import com.dev.bruno.ceps.model.Bairro;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.CepBairro;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepLogradouro;
-import com.dev.bruno.ceps.model.CepTipo;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.Logradouro;
+import com.dev.bruno.ceps.model.TipoCepEnum;
 import com.dev.bruno.ceps.timers.CaptacaoCepsEspeciaisTimer;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
 public class CaptacaoCepsEspeciaisService {
-
+	
 	@Inject
 	private Logger logger;
 
 	@Inject
-	private CepLocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
-	private CepBairroDAO cepBairroDAO;
+	private BairroDAO cepBairroDAO;
 
 	@Inject
-	private CepLogradouroDAO cepLogradouroDAO;
+	private LogradouroDAO cepLogradouroDAO;
 
 	@Inject
 	private CepDAO cepDAO;
 
 	private Set<String> ceps = new HashSet<>();
 
-	private Map<String, CepLogradouro> logradouros = new HashMap<>();
+	private Map<String, Logradouro> logradouros = new HashMap<>();
 
-	private Map<String, CepBairro> bairros = new HashMap<>();
+	private Map<String, Bairro> bairros = new HashMap<>();
 
 	@Inject
 	@JMSConnectionFactory("java:jboss/DefaultJMSConnectionFactory")
@@ -113,19 +112,19 @@ public class CaptacaoCepsEspeciaisService {
 		logger.info(String.format("CAPTACAO DE CEPS ESPECIAIS PARA %s --> END - Tempo total: %sms", uf, time));
 	}
 
-	private void captarCepsEspeciaisByUF(String uf) throws Exception {
+	private void captarCepsEspeciaisByUF(String uf) {
 		for (Long cepLocalidadeId : cepLocalidadeDAO.listarLocalidadesIdsPorUF(uf)) {
 			context.createProducer().send(queue, cepLocalidadeId);
 		}
 	}
 
-	public void captarCepsEspeciaisByCepLocalidadeId(Long cepLocalidadeId) throws Exception {
-		CepLocalidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
+	public void captarCepsEspeciaisByCepLocalidadeId(Long cepLocalidadeId) {
+		Localidade cepLocalidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
 		captarCepsEspeciaisByCepLocalidade(cepLocalidade);
 	}
 
-	private void captarCepsEspeciaisByCepLocalidade(CepLocalidade cepLocalidade) throws Exception {
+	private void captarCepsEspeciaisByCepLocalidade(Localidade cepLocalidade) {
 		if (cepLocalidade.getCaptacaoCepsEspeciais() != null
 				&& !LocalDate.now().isAfter(cepLocalidade.getCaptacaoCepsEspeciais())) {
 			return;
@@ -141,16 +140,11 @@ public class CaptacaoCepsEspeciaisService {
 		Response ufResponse = null;
 		try {
 			ufResponse = beginConnection.method(Method.GET).execute();
-		} catch (HttpStatusException e) {
-			Thread.sleep(5000l);
-			try {
-				ufResponse = beginConnection.method(Method.GET).execute();
-			} catch (HttpStatusException e1) {
-				logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
-						cepLocalidade.getCepUF().getUf()));
+		} catch (Exception e) {
+			logger.info(String.format("FALHA --> %s / %s", cepLocalidade.getNomeNormalizado(),
+					cepLocalidade.getCepUF().getUf()));
 
-				return;
-			}
+			return;
 		}
 
 		Map<String, String> cookies = ufResponse.cookies();
@@ -169,8 +163,8 @@ public class CaptacaoCepsEspeciaisService {
 		}
 	}
 
-	private boolean buscarCEPSEspeciais(Map<String, String> cookies, CepLocalidade cepLocalidade, String tipoCep,
-			String qtdrow, String pagini, String pagfim) throws Exception {
+	private boolean buscarCEPSEspeciais(Map<String, String> cookies, Localidade cepLocalidade, String tipoCep,
+			String qtdrow, String pagini, String pagfim) {
 		logger.info(String.format("CAPTACAO DE CEP ESPECIAL[%s] --> %s / %s", tipoCep,
 				cepLocalidade.getNomeNormalizado(), cepLocalidade.getCepUF().getUf()));
 
@@ -197,24 +191,16 @@ public class CaptacaoCepsEspeciaisService {
 			logradourosConnection.data("pagfim", pagfim);
 		}
 
-		Response response = null;
-
+		Document logradourosDocument = null;
 		try {
-			response = logradourosConnection.method(Method.POST).execute();
-		} catch (HttpStatusException e) {
-			Thread.sleep(5000l);
-			try {
-				response = logradourosConnection.method(Method.POST).execute();
-			} catch (HttpStatusException e1) {
-				logger.info(String.format("FALHA NA CAPTACAO DE CEP ESPECIAL[%s] --> %s / %s", tipoCep,
-						cepLocalidade.getNomeNormalizado(), cepLocalidade.getCepUF().getUf()));
-				return false;
-			}
+			Response response = logradourosConnection.method(Method.POST).execute();
+			cookies = response.cookies();
+			logradourosDocument = Jsoup.parse(new String(response.bodyAsBytes(), CaptacaoCepsService.CORREIOS_CHARSET));
+		} catch (Exception e) {
+			logger.info(String.format("FALHA NA CAPTACAO DE CEP ESPECIAL[%s] --> %s / %s", tipoCep,
+					cepLocalidade.getNomeNormalizado(), cepLocalidade.getCepUF().getUf()));
+			return false;
 		}
-
-		cookies = response.cookies();
-
-		Document logradourosDocument = Jsoup.parse(new String(response.bodyAsBytes(), "ISO-8859-1"));
 
 		if (logradourosDocument.select("table.tmptabela").isEmpty()) {
 			return true;
@@ -238,7 +224,7 @@ public class CaptacaoCepsEspeciaisService {
 			}
 
 			String bairro = tr.select("td").get(1).html().replaceAll("&nbsp;", "").trim();
-			CepBairro cepBairro = null;
+			Bairro cepBairro = null;
 
 			if (bairro != null && !bairro.isEmpty()) {
 				if (bairros.containsKey(bairro)) {
@@ -248,7 +234,7 @@ public class CaptacaoCepsEspeciaisService {
 
 					bairros.put(bairro, cepBairro);
 				} else {
-					cepBairro = new CepBairro();
+					cepBairro = new Bairro();
 					cepBairro.setCepLocalidade(cepLocalidade);
 					cepBairro.setNome(bairro);
 					cepBairro.setNomeNormalizado(StringUtils.normalizarNome(bairro));
@@ -279,7 +265,7 @@ public class CaptacaoCepsEspeciaisService {
 				logradouro = logradouro.substring(0, logradouro.indexOf(" - ")).trim();
 			}
 
-			CepLogradouro cepLogradouro = null;
+			Logradouro cepLogradouro = null;
 
 			if (logradouro != null && !logradouro.isEmpty()) {
 				String chave = null;
@@ -299,7 +285,7 @@ public class CaptacaoCepsEspeciaisService {
 
 					logradouros.put(chave, cepLogradouro);
 				} else {
-					cepLogradouro = new CepLogradouro();
+					cepLogradouro = new Logradouro();
 					cepLogradouro.setCepLocalidade(cepLocalidade);
 					cepLogradouro.setCepBairro(cepBairro);
 					cepLogradouro.setNome(logradouro);
@@ -313,12 +299,12 @@ public class CaptacaoCepsEspeciaisService {
 			}
 
 			Cep cepObj = new Cep();
-			cepObj.setCep(cep);
+			cepObj.setNumeroCep(cep);
 			cepObj.setCepLogradouro(cepLogradouro);
 			cepObj.setCepBairro(cepBairro);
 			cepObj.setCepLocalidade(cepLocalidade);
 			cepObj.setNomeEspecial(nomeEspecial);
-			cepObj.setTipoCep(CepTipo.valueOf(tipoCep));
+			cepObj.setTipoCep(TipoCepEnum.valueOf(tipoCep));
 
 			cepDAO.add(cepObj);
 

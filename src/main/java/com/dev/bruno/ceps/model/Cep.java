@@ -31,25 +31,25 @@ public class Cep extends AbstractModel {
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_LOCALIDADE")
-	private CepLocalidade cepLocalidade;
+	private Localidade cepLocalidade;
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_BAIRRO")
-	private CepBairro cepBairro;
+	private Bairro cepBairro;
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_LOGRADOURO")
-	private CepLogradouro cepLogradouro;
+	private Logradouro cepLogradouro;
 
 	@Column(name = "DSC_CEP", nullable = false)
 	@NotNull
 	@Pattern(regexp = "\\d{5}-\\d{3}")
-	private String cep;
+	private String numeroCep;
 
 	@Column(name = "TIP_CEP", nullable = false)
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private CepTipo tipoCep;
+	private TipoCepEnum tipoCep;
 
 	@Column(name = "DSC_CAIXA_POSTAL")
 	private String caixaPostal;
@@ -57,7 +57,7 @@ public class Cep extends AbstractModel {
 	@Column(name = "DSC_NOME_ESPECIAL")
 	private String nomeEspecial;
 
-	public CepLocalidade getCepLocalidade() {
+	public Localidade getCepLocalidade() {
 		return cepLocalidade;
 	}
 
@@ -65,11 +65,11 @@ public class Cep extends AbstractModel {
 		return cepLocalidade != null ? cepLocalidade.getId() : null;
 	}
 
-	public void setCepLocalidade(CepLocalidade cepLocalidade) {
+	public void setCepLocalidade(Localidade cepLocalidade) {
 		this.cepLocalidade = cepLocalidade;
 	}
 
-	public CepBairro getCepBairro() {
+	public Bairro getCepBairro() {
 		return cepBairro;
 	}
 
@@ -77,11 +77,11 @@ public class Cep extends AbstractModel {
 		return cepBairro != null ? cepBairro.getId() : null;
 	}
 
-	public void setCepBairro(CepBairro cepBairro) {
+	public void setCepBairro(Bairro cepBairro) {
 		this.cepBairro = cepBairro;
 	}
 
-	public CepLogradouro getCepLogradouro() {
+	public Logradouro getCepLogradouro() {
 		return cepLogradouro;
 	}
 
@@ -89,23 +89,23 @@ public class Cep extends AbstractModel {
 		return cepLogradouro != null ? cepLogradouro.getId() : null;
 	}
 
-	public void setCepLogradouro(CepLogradouro cepLogradouro) {
+	public void setCepLogradouro(Logradouro cepLogradouro) {
 		this.cepLogradouro = cepLogradouro;
 	}
 
-	public String getCep() {
-		return cep;
+	public String getNumeroCodigo() {
+		return numeroCep;
 	}
 
-	public void setCep(String cep) {
-		this.cep = cep;
+	public void setNumeroCep(String numeroCep) {
+		this.numeroCep = numeroCep;
 	}
 
-	public CepTipo getTipoCep() {
+	public TipoCepEnum getTipoCep() {
 		return tipoCep;
 	}
 
-	public void setTipoCep(CepTipo tipoCep) {
+	public void setTipoCep(TipoCepEnum tipoCep) {
 		this.tipoCep = tipoCep;
 	}
 

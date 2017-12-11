@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "CEP_TIPO_LOGRADOURO")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CepTipoLogradouro extends AbstractModel {
+public class TipoLogradouro extends AbstractModel {
 
 	private static final long serialVersionUID = 4542587527145303945L;
 

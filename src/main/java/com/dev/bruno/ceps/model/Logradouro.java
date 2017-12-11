@@ -1,6 +1,5 @@
 package com.dev.bruno.ceps.model;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,22 +19,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
-@Table(name = "CEP_BAIRRO")
+@Table(name = "CEP_LOGRADOURO")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CepBairro extends AbstractModel {
+public class Logradouro extends AbstractModel {
 
-	private static final long serialVersionUID = 6821851936948464935L;
+	private static final long serialVersionUID = 4542587527145303945L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "COD_CEP_BAIRRO")
+	@Column(name = "COD_CEP_LOGRADOURO")
 	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "COD_CEP_LOCALIDADE", nullable = false)
 	@NotNull
-	private CepLocalidade cepLocalidade;
+	private Localidade cepLocalidade;
+
+	@ManyToOne
+	@JoinColumn(name = "COD_CEP_BAIRRO")
+	private Bairro cepBairro;
+
+	@ManyToOne
+	@JoinColumn(name = "COD_CEP_TIPO_LOGRADOURO")
+	private TipoLogradouro cepTipoLogradouro;
 
 	@Column(name = "DSC_NOME", nullable = false)
 	@NotNull
@@ -45,17 +52,12 @@ public class CepBairro extends AbstractModel {
 	@NotNull
 	private String nomeNormalizado;
 
-	@OneToMany(mappedBy = "cepBairro")
-	@XmlTransient
-	private List<CepLogradouro> logradouros = new ArrayList<>();
+	@Column(name = "DSC_COMPLEMENTO")
+	private String complemento;
 
-	@OneToMany(mappedBy = "cepBairro")
+	@OneToMany(mappedBy = "cepLogradouro")
 	@XmlTransient
 	private List<Cep> ceps = new ArrayList<>();
-
-	@Column(name = "DAT_ULTIMO_PROCESSAMENTO")
-	@XmlTransient
-	private LocalDateTime ultimoProcessamento;
 
 	public Long getId() {
 		return id;
@@ -65,7 +67,7 @@ public class CepBairro extends AbstractModel {
 		this.id = id;
 	}
 
-	public CepLocalidade getCepLocalidade() {
+	public Localidade getCepLocalidade() {
 		return cepLocalidade;
 	}
 
@@ -73,8 +75,32 @@ public class CepBairro extends AbstractModel {
 		return cepLocalidade != null ? cepLocalidade.getId() : null;
 	}
 
-	public void setCepLocalidade(CepLocalidade cepLocalidade) {
+	public void setCepLocalidade(Localidade cepLocalidade) {
 		this.cepLocalidade = cepLocalidade;
+	}
+
+	public Bairro getCepBairro() {
+		return cepBairro;
+	}
+
+	public Long getCepBairroId() {
+		return cepBairro != null ? cepBairro.getId() : null;
+	}
+
+	public void setCepBairro(Bairro cepBairro) {
+		this.cepBairro = cepBairro;
+	}
+
+	public TipoLogradouro getCepTipoLogradouro() {
+		return cepTipoLogradouro;
+	}
+
+	public Long getCepTipoLogradouroId() {
+		return cepTipoLogradouro != null ? cepTipoLogradouro.getId() : null;
+	}
+
+	public void setCepTipoLogradouro(TipoLogradouro cepTipoLogradouro) {
+		this.cepTipoLogradouro = cepTipoLogradouro;
 	}
 
 	public String getNome() {
@@ -93,12 +119,12 @@ public class CepBairro extends AbstractModel {
 		this.nomeNormalizado = nomeNormalizado;
 	}
 
-	public List<CepLogradouro> getLogradouros() {
-		return logradouros;
+	public String getComplemento() {
+		return complemento;
 	}
 
-	public void setLogradouros(List<CepLogradouro> logradouros) {
-		this.logradouros = logradouros;
+	public void setComplemento(String complemento) {
+		this.complemento = complemento;
 	}
 
 	public List<Cep> getCeps() {
@@ -107,13 +133,5 @@ public class CepBairro extends AbstractModel {
 
 	public void setCeps(List<Cep> ceps) {
 		this.ceps = ceps;
-	}
-
-	public LocalDateTime getUltimoProcessamento() {
-		return ultimoProcessamento;
-	}
-
-	public void setUltimoProcessamento(LocalDateTime ultimoProcessamento) {
-		this.ultimoProcessamento = ultimoProcessamento;
 	}
 }

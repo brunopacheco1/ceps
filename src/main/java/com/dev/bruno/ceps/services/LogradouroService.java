@@ -7,43 +7,43 @@ import javax.inject.Inject;
 import javax.validation.Validator;
 
 import com.dev.bruno.ceps.dao.AbstractDAO;
-import com.dev.bruno.ceps.dao.CepBairroDAO;
-import com.dev.bruno.ceps.dao.CepLocalidadeDAO;
-import com.dev.bruno.ceps.dao.CepLogradouroDAO;
-import com.dev.bruno.ceps.dao.CepTipoLogradouroDAO;
+import com.dev.bruno.ceps.dao.BairroDAO;
+import com.dev.bruno.ceps.dao.LocalidadeDAO;
+import com.dev.bruno.ceps.dao.LogradouroDAO;
+import com.dev.bruno.ceps.dao.TipoLogradouroDAO;
 import com.dev.bruno.ceps.model.Cep;
-import com.dev.bruno.ceps.model.CepBairro;
-import com.dev.bruno.ceps.model.CepLocalidade;
-import com.dev.bruno.ceps.model.CepLogradouro;
-import com.dev.bruno.ceps.model.CepTipoLogradouro;
+import com.dev.bruno.ceps.model.Bairro;
+import com.dev.bruno.ceps.model.Localidade;
+import com.dev.bruno.ceps.model.Logradouro;
+import com.dev.bruno.ceps.model.TipoLogradouro;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.utils.StringUtils;
 
 @Stateless
-public class CepLogradouroService extends AbstractService<CepLogradouro> {
+public class LogradouroService extends AbstractService<Logradouro> {
 
 	@Inject
-	private CepLocalidadeDAO cepLocalidadeDAO;
+	private LocalidadeDAO cepLocalidadeDAO;
 
 	@Inject
-	private CepBairroDAO cepBairroDAO;
+	private BairroDAO cepBairroDAO;
 
 	@Inject
-	private CepTipoLogradouroDAO cepTipoLogradouroDAO;
+	private TipoLogradouroDAO cepTipoLogradouroDAO;
 
 	@Inject
-	private CepLogradouroDAO cepLogradouroDAO;
+	private LogradouroDAO cepLogradouroDAO;
 
 	@Override
-	protected AbstractDAO<CepLogradouro> getDAO() {
+	protected AbstractDAO<Logradouro> getDAO() {
 		return cepLogradouroDAO;
 	}
 
-	public CepLogradouroService() {
+	public LogradouroService() {
 	}
 
-	public CepLogradouroService(CepLocalidadeDAO cepLocalidadeDAO, CepBairroDAO cepBairroDAO,
-			CepTipoLogradouroDAO cepTipoLogradouroDAO, CepLogradouroDAO cepLogradouroDAO, Validator validator) {
+	public LogradouroService(LocalidadeDAO cepLocalidadeDAO, BairroDAO cepBairroDAO,
+			TipoLogradouroDAO cepTipoLogradouroDAO, LogradouroDAO cepLogradouroDAO, Validator validator) {
 		this.cepLocalidadeDAO = cepLocalidadeDAO;
 		this.cepBairroDAO = cepBairroDAO;
 		this.cepTipoLogradouroDAO = cepTipoLogradouroDAO;
@@ -52,10 +52,10 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 	}
 
 	@Override
-	protected void build(CepLogradouro entity) {
-		CepBairro bairro = null;
+	protected void build(Logradouro entity) {
+		Bairro bairro = null;
 
-		CepTipoLogradouro tipoLogradouro = null;
+		TipoLogradouro tipoLogradouro = null;
 
 		Long cepLocalidadeId = entity.getCepLocalidadeId();
 
@@ -63,7 +63,7 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 
 		Long cepTipoLogradouroId = entity.getCepTipoLogradouroId();
 
-		CepLocalidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
+		Localidade localidade = cepLocalidadeDAO.get(cepLocalidadeId);
 
 		if (cepBairroId != null) {
 			bairro = cepBairroDAO.get(cepBairroId);
@@ -86,8 +86,8 @@ public class CepLogradouroService extends AbstractService<CepLogradouro> {
 		}
 	}
 
-	public ResultList<Cep> getCeps(Long cepLogradouroId) throws Exception {
-		CepLogradouro logradouro = getDAO().get(cepLogradouroId);
+	public ResultList<Cep> getCeps(Long cepLogradouroId) {
+		Logradouro logradouro = getDAO().get(cepLogradouroId);
 
 		List<Cep> entities = logradouro.getCeps();
 

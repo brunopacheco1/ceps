@@ -37,7 +37,7 @@ public class UFResource extends AbstractResource<UF> {
 	@Path("/{id:\\d+}/localidades")
 	@Operation(description = "Busca de Localidades por UF")
 	@SecurityRequirement(name = "api_key")
-	public ResultList<Localidade> getLocalidadesDeUF(@PathParam("id") Long id) throws Exception {
+	public ResultList<Localidade> getLocalidadesDeUF(@PathParam("id") Long id) {
 		return service.getLocalidades(id);
 	}
 }

@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.dev.bruno.ceps.model.AbstractModel;
 import com.dev.bruno.ceps.responses.GenericResponse;
 import com.dev.bruno.ceps.responses.ResultList;
 import com.dev.bruno.ceps.services.AbstractService;
@@ -19,14 +20,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @Produces(MediaType.APPLICATION_JSON)
-public abstract class AbstractResource<MODEL> {
+public abstract class AbstractResource<MODEL1 extends AbstractModel> {
 
-	protected abstract AbstractService<MODEL> getService();
+	protected abstract AbstractService<MODEL1> getService();
 
 	@GET
 	@Operation(description = "Listar Entidades")
 	@SecurityRequirement(name = "api_key")
-	public ResultList<MODEL> list(@QueryParam("query") String queryStr, @QueryParam("start") Integer start,
+	public ResultList<MODEL1> list(@QueryParam("query") String queryStr, @QueryParam("start") Integer start,
 			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir) {
 		return getService().list(queryStr, start, limit, order, dir);
 	}
@@ -35,7 +36,7 @@ public abstract class AbstractResource<MODEL> {
 	@Path("/{id:\\d+}")
 	@Operation(description = "Buscar Entidade Por ID")
 	@SecurityRequirement(name = "api_key")
-	public MODEL get(@PathParam("id") Long id) {
+	public MODEL1 get(@PathParam("id") Long id) {
 		return getService().get(id);
 	}
 
@@ -43,7 +44,7 @@ public abstract class AbstractResource<MODEL> {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(description = "Adicionar Entidade")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse add(MODEL dto) {
+	public GenericResponse add(MODEL1 dto) {
 		getService().add(dto);
 
 		return new GenericResponse(true);
@@ -54,7 +55,7 @@ public abstract class AbstractResource<MODEL> {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(description = "Atualizar Entidade")
 	@SecurityRequirement(name = "api_key")
-	public GenericResponse update(@PathParam("id") Long id, MODEL dto) {
+	public GenericResponse update(@PathParam("id") Long id, MODEL1 dto) {
 		getService().update(id, dto);
 
 		return new GenericResponse(true);

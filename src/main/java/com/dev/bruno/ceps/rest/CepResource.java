@@ -39,8 +39,7 @@ public class CepResource extends AbstractResource<Cep> {
 	@Operation(description = "Busca de CEPs por Tipo de CEP")
 	@SecurityRequirement(name = "api_key")
 	public ResultList<Cep> getCepsPorTipo(@PathParam("tipo") TipoCepEnum cepTipo, @QueryParam("start") Integer start,
-			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir)
-			throws Exception {
+			@QueryParam("limit") Integer limit, @QueryParam("order") String order, @QueryParam("dir") String dir) {
 		return service.getCeps(cepTipo, start, limit, order, dir);
 	}
 }

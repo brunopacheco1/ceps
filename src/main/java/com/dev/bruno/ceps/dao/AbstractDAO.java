@@ -18,15 +18,16 @@ import javax.persistence.TypedQuery;
 import com.dev.bruno.ceps.exceptions.EntityNotFoundException;
 import com.dev.bruno.ceps.exceptions.InvalidValueException;
 import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
+import com.dev.bruno.ceps.model.AbstractModel;
 
-public abstract class AbstractDAO<MODEL> {
+public abstract class AbstractDAO<MODEL1 extends AbstractModel> {
 
 	private static final String ENTIDADE_NAO_ENCONTRADA = "Entidade não encontrada";
 
 	@Inject
 	protected EntityManager manager;
 
-	protected Class<MODEL> type;
+	protected Class<MODEL1> type;
 
 	protected Set<String> orderOptions;
 
@@ -37,7 +38,7 @@ public abstract class AbstractDAO<MODEL> {
 	private void init() {
 		Type t = getClass().getGenericSuperclass();
 		ParameterizedType pt = (ParameterizedType) t;
-		type = (Class<MODEL>) pt.getActualTypeArguments()[0];
+		type = (Class<MODEL1>) pt.getActualTypeArguments()[0];
 
 		List<Field> fields = new ArrayList<>();
 
@@ -57,7 +58,7 @@ public abstract class AbstractDAO<MODEL> {
 		}
 	}
 
-	public MODEL get(Long id) {
+	public MODEL1 get(Long id) {
 		if (!exists(id)) {
 			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
@@ -65,7 +66,7 @@ public abstract class AbstractDAO<MODEL> {
 		return manager.find(type, id);
 	}
 
-	public void remove(MODEL entity) {
+	public void remove(MODEL1 entity) {
 		if (entity == null) {
 			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
@@ -73,7 +74,7 @@ public abstract class AbstractDAO<MODEL> {
 		manager.remove(entity);
 	}
 
-	public void add(MODEL entity) {
+	public void add(MODEL1 entity) {
 		if (entity == null) {
 			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
@@ -81,7 +82,7 @@ public abstract class AbstractDAO<MODEL> {
 		manager.persist(entity);
 	}
 
-	public void update(MODEL entity) {
+	public void update(MODEL1 entity) {
 		if (entity == null) {
 			throw new EntityNotFoundException(ENTIDADE_NAO_ENCONTRADA);
 		}
@@ -89,7 +90,7 @@ public abstract class AbstractDAO<MODEL> {
 		manager.merge(entity);
 	}
 
-	public List<MODEL> list(String queryStr, Integer start, Integer limit, String order, String dir) {
+	public List<MODEL1> list(String queryStr, Integer start, Integer limit, String order, String dir) {
 		if (start == null || limit == null || order == null || dir == null) {
 			throw new MandatoryFieldsException("start, limit, order e dir são obrigatórios");
 		}
@@ -121,7 +122,7 @@ public abstract class AbstractDAO<MODEL> {
 
 		hql.append(" order by e." + order + " " + dir);
 
-		TypedQuery<MODEL> query = manager.createQuery(hql.toString(), type);
+		TypedQuery<MODEL1> query = manager.createQuery(hql.toString(), type);
 
 		if (queryStr != null && !queryStr.isEmpty()) {
 			for (String queryOption : queryOptions) {
@@ -132,7 +133,7 @@ public abstract class AbstractDAO<MODEL> {
 		return query.setFirstResult(start).setMaxResults(limit).getResultList();
 	}
 
-	public List<MODEL> list() {
+	public List<MODEL1> list() {
 		return manager.createQuery("select e from " + type.getSimpleName() + " e order by e.id", type).getResultList();
 	}
 
@@ -157,7 +158,7 @@ public abstract class AbstractDAO<MODEL> {
 		return dirOptions;
 	}
 
-	public Class<MODEL> getType() {
+	public Class<MODEL1> getType() {
 		return type;
 	}
 }

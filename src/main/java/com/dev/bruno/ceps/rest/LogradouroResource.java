@@ -37,7 +37,7 @@ public class LogradouroResource extends AbstractResource<Logradouro> {
 	@Path("/{id:\\d+}/ceps")
 	@Operation(description = "Busca de CEPs por Logradouro")
 	@SecurityRequirement(name = "api_key")
-	public ResultList<Cep> getCepsDeLogradouro(@PathParam("id") Long id) throws Exception {
+	public ResultList<Cep> getCepsDeLogradouro(@PathParam("id") Long id) {
 		return service.getCeps(id);
 	}
 }

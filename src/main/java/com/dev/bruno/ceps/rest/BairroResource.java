@@ -38,7 +38,7 @@ public class BairroResource extends AbstractResource<Bairro> {
 	@Path("/{id:\\d+}/logradouros")
 	@Operation(description = "Busca de Logradouros por Bairro")
 	@SecurityRequirement(name = "api_key")
-	public ResultList<Logradouro> getLogradourosDeBairro(@PathParam("id") Long id) throws Exception {
+	public ResultList<Logradouro> getLogradourosDeBairro(@PathParam("id") Long id) {
 		return service.getLogradouros(id);
 	}
 
@@ -46,7 +46,7 @@ public class BairroResource extends AbstractResource<Bairro> {
 	@Path("/{id:\\d+}/ceps")
 	@Operation(description = "Busca de CEPs por Bairro")
 	@SecurityRequirement(name = "api_key")
-	public ResultList<Cep> getCepsDeBairro(@PathParam("id") Long id) throws Exception {
+	public ResultList<Cep> getCepsDeBairro(@PathParam("id") Long id) {
 		return service.getCeps(id);
 	}
 }

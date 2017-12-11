@@ -17,21 +17,21 @@ import com.dev.bruno.ceps.exceptions.MandatoryFieldsException;
 import com.dev.bruno.ceps.model.AbstractModel;
 import com.dev.bruno.ceps.responses.ResultList;
 
-public abstract class AbstractService<MODEL> {
+public abstract class AbstractService<MODEL1 extends AbstractModel> {
 
 	@Inject
 	protected Validator validator;
 
 	@SuppressWarnings("unchecked")
-	protected Class<MODEL> getEntityType() {
+	protected Class<MODEL1> getEntityType() {
 		Type t = getClass().getGenericSuperclass();
 		ParameterizedType pt = (ParameterizedType) t;
-		return (Class<MODEL>) pt.getActualTypeArguments()[0];
+		return (Class<MODEL1>) pt.getActualTypeArguments()[0];
 	}
 
-	protected abstract AbstractDAO<MODEL> getDAO();
+	protected abstract AbstractDAO<MODEL1> getDAO();
 
-	public ResultList<MODEL> list(String queryStr, Integer start, Integer limit, String order, String dir) {
+	public ResultList<MODEL1> list(String queryStr, Integer start, Integer limit, String order, String dir) {
 		if (start == null) {
 			start = 0;
 		}
@@ -48,9 +48,9 @@ public abstract class AbstractService<MODEL> {
 			dir = "asc";
 		}
 
-		List<MODEL> entities = getDAO().list(queryStr, start, limit, order, dir);
+		List<MODEL1> entities = getDAO().list(queryStr, start, limit, order, dir);
 
-		ResultList<MODEL> result = new ResultList<>();
+		ResultList<MODEL1> result = new ResultList<>();
 
 		result.setResult(entities);
 		result.setDir(dir);
@@ -61,10 +61,10 @@ public abstract class AbstractService<MODEL> {
 		return result;
 	}
 
-	public ResultList<MODEL> list() {
-		List<MODEL> entities = getDAO().list();
+	public ResultList<MODEL1> list() {
+		List<MODEL1> entities = getDAO().list();
 
-		ResultList<MODEL> result = new ResultList<>();
+		ResultList<MODEL1> result = new ResultList<>();
 
 		result.setResult(entities);
 		result.setLimit(entities.size());
@@ -72,11 +72,11 @@ public abstract class AbstractService<MODEL> {
 		return result;
 	}
 
-	public MODEL get(Long id) {
+	public MODEL1 get(Long id) {
 		return getDAO().get(id);
 	}
 
-	public MODEL add(MODEL entity) {
+	public MODEL1 add(MODEL1 entity) {
 		validateAndBuild(null, entity);
 
 		getDAO().add(entity);
@@ -84,9 +84,9 @@ public abstract class AbstractService<MODEL> {
 		return entity;
 	}
 
-	protected abstract void build(MODEL entity);
+	protected abstract void build(MODEL1 entity);
 
-	public MODEL update(Long id, MODEL entity) {
+	public MODEL1 update(Long id, MODEL1 entity) {
 		validateAndBuild(id, entity);
 
 		getDAO().update(entity);
@@ -95,11 +95,11 @@ public abstract class AbstractService<MODEL> {
 	}
 
 	public void remove(Long id) {
-		MODEL entity = getDAO().get(id);
+		MODEL1 entity = getDAO().get(id);
 		getDAO().remove(entity);
 	}
 
-	public void validateAndBuild(Long id, MODEL model) {
+	public void validateAndBuild(Long id, MODEL1 model) {
 		if (model == null || !(model instanceof AbstractModel)) {
 			throw new MandatoryFieldsException(getEntityType().getSimpleName() + " nao encontrada na requisicao.");
 		}
@@ -110,22 +110,18 @@ public abstract class AbstractService<MODEL> {
 
 		build(model);
 
-		Set<ConstraintViolation<MODEL>> violations = validator.validate(model);
+		Set<ConstraintViolation<MODEL1>> violations = validator.validate(model);
 
 		if (!violations.isEmpty()) {
 			List<String> msgs = new ArrayList<>();
 
-			for (ConstraintViolation<MODEL> violation : violations) {
+			for (ConstraintViolation<MODEL1> violation : violations) {
 				msgs.add(String.format("%s field %s", violation.getPropertyPath(), violation.getMessage()));
 			}
 
-			ConstraintViolationException exception = new ConstraintViolationException(String.join(", ", msgs));
-
-			throw exception;
+			throw new ConstraintViolationException(String.join(", ", msgs));
 		}
 
-		AbstractModel abstractModel = (AbstractModel) model;
-
-		abstractModel.setId(id);
+		model.setId(id);
 	}
 }

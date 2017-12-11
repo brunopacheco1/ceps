@@ -76,7 +76,7 @@ public class CaptacaoFaixasCepService {
 		logger.info(String.format("CAPTACAO DE FAIXAS DE CEP --> END - Tempo total: %sms", time));
 	}
 
-	private void captarFaixasCep() throws Exception {
+	private void captarFaixasCep() {
 		for (Localidade cepLocalidade : cepLocalidadeDAO.listarLocalidadesSemFaixaCep(limiteCaptacaoFaixas)) {
 			buscarFaixaCep(cepLocalidade);
 

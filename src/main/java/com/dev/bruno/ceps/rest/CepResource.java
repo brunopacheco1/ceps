@@ -35,7 +35,7 @@ public class CepResource extends AbstractResource<Cep> {
 	}
 
 	@GET
-	@Path("/{tipo:[A-Z]{3}}")
+	@Path("/{tipo:[A-Z]}")
 	@Operation(description = "Busca de CEPs por Tipo de CEP")
 	@SecurityRequirement(name = "api_key")
 	public ResultList<Cep> getCepsPorTipo(@PathParam("tipo") TipoCepEnum cepTipo, @QueryParam("start") Integer start,

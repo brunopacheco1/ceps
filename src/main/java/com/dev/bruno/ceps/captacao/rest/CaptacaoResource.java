@@ -46,7 +46,7 @@ public class CaptacaoResource {
 	private CaptacaoFaixasCepService captacaoFaixasCepsService;
 
 	@POST
-	@Path("/uf/{uf:[A-Z]{2}}/localidades")
+	@Path("/uf/{uf:[A-Z]}/localidades")
 	@Operation(description = "Captacao de Localidade")
 	public GenericResponse captarLocalidades(@PathParam("uf") UFEnum uf) {
 		captacaoLocalidadesService.agendarCaptacaoLocalidades(uf);
@@ -55,7 +55,7 @@ public class CaptacaoResource {
 	}
 
 	@POST
-	@Path("/uf/{uf:[A-Z]{2}}/bairros")
+	@Path("/uf/{uf:[A-Z]}/bairros")
 	@Operation(description = "Captacao de Bairros")
 	@SecurityRequirement(name = "api_key")
 	public GenericResponse captarBairros(@PathParam("uf") UFEnum uf) {
@@ -65,7 +65,7 @@ public class CaptacaoResource {
 	}
 
 	@POST
-	@Path("/uf/{uf:[A-Z]{2}}/ceps-especiais")
+	@Path("/uf/{uf:[A-Z]}/ceps-especiais")
 	@Operation(description = "Captacao de CEPs Especiais")
 	@SecurityRequirement(name = "api_key")
 	public GenericResponse captarCepsEspeciaisByUF(@PathParam("uf") UFEnum uf) {
